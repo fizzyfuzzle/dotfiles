@@ -3,3 +3,9 @@ DEBIAN
 {{ else if eq .chezmoi.osRelease.id "ubuntu" }}
 UBUNTU
 {{ end }}
+
+{{ if eq .chezmoi.hostname .chezmoi.home }}
+HOME
+{{ else if eq .chezmoi.hostname .chezmoi.work }}
+WORK
+{{ end }}
