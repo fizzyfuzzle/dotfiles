@@ -1,5 +1,0 @@
-{{ if eq .chezmoi.osRelease.id "ubuntu" }}
-UBUNTU
-{{ else if eq .chezmoi.osRelease.id "debian" }}
-DEBIAN
-{{ end }}
