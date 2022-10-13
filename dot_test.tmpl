@@ -1,1 +1,5 @@
+{{ if eq .chezmoi.osRelease.id "debian" }}
 DEBIAN
+{{ else if eq .chezmoi.osRelease.id "ubuntu" }}
+UBUNTU
+{{ end }}
