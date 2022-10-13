@@ -4,8 +4,8 @@ DEBIAN
 UBUNTU
 {{ end }}
 
-{{ if eq .chezmoi.hostname hostname-home }}
+{{ if eq .chezmoi.hostname hostname.home }}
 HOME
-{{ else if eq .chezmoi.hostname hostname-work }}
+{{ else if eq .chezmoi.hostname hostname.work }}
 WORK
 {{ end }}
