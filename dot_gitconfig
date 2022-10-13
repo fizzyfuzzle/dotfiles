@@ -1,0 +1,66 @@
+[core]
+    editor = vim
+    whitespace = fix,-indent-with-non-tab,trailing-space,cr-at-eol
+    excludesfile = ~/.gitignore
+    autocrlf = input
+[fetch]
+    prune = true
+[pull]
+    ff = only
+[push]
+    default = simple
+    followTags = true
+[color]
+    ui = auto
+[color "branch"]
+    current = yellow bold
+    local = green bold
+    remote = cyan bold
+[color "diff"]
+    meta = yellow bold
+    frag = magenta bold
+    old = red bold
+    new = green bold
+    whitespace = red reverse
+[color "status"]
+    added = green bold
+    changed = yellow bold
+    untracked = red bold
+[diff]
+    tool = meld
+[difftool]
+    prompt = false
+[merge]
+    tool = meld
+    conflictstyle = diff3
+[mergetool]
+    prompt = false
+    keepBackup = false
+    cmd = meld "$LOCAL" "$MERGED" "$REMOTE" --output "$MERGED"
+[alias]
+    a = add
+    aa = add --all
+    c = checkout
+    b = branch
+    cam = commit --amend
+    d = diff
+    l = log -10
+    lines = "!git ls-files | xargs wc -l"
+    p = push
+    pf = push --force
+    sc = clone --depth 1
+    st = status
+    sa = config --get-regexp alias
+    ib = --bare init
+    r = reflog
+    rc = reset --soft HEAD~1
+    rp = remote prune origin
+    rmr = "!git checkout main && git branch --merged | egrep -v '(master|main)' | xargs git branch -d"
+    up = "!git add -A && git commit -m \"Commit from $(uname -n) on $(date '+%d-%m-%Y @ %H:%M:%S')\" && git push"
+[user]
+    name = Marco
+    email = marco@localhost
+[format]
+    pretty = %h - %cd: %s
+[log]
+    date = format:"%Y-%m-%d @ %H:%M"
