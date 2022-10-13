@@ -1,8 +1,8 @@
-{{ if eq .chezmoi.hostname "surface-pro" }}
-
 #!/bin/bash
 #
+{{ if eq .chezmoi.hostname "surface-pro" }}
 # Installation script for Surface PRO
+exit
 
 #  Set APT defaults
 APT="apt --quiet --assume-yes --no-install-recommends"
