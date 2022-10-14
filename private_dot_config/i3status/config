@@ -1,0 +1,97 @@
+general {
+    output_format = "i3bar"
+    colors = true
+    color_good = "#008800"
+    color_degraded = "#888800"
+    color_bad = "#880000"
+    interval = 5
+}
+
+order += "read_file status"
+order += "load"
+order += "memory"
+order += "cpu_temperature 8"
+order += "disk /"
+order += "ethernet _first_"
+order += "wireless _first_"
+order += "path_exists WG"
+order += "path_exists OVPN"
+order += "volume master"
+order += "battery 1"
+order += "time"
+
+read_file status {
+    format = "%content"
+    format_bad = ""
+    path = "/tmp/i3status"
+    color_good = "#008888"
+}
+
+load {
+    format = "L: %1min"
+    max_threshold = 2
+}
+
+memory {
+    format = "M: %percentage_used"
+    memory_used_method = "memavailable"
+    threshold_degraded = "50%"
+    threshold_critical = "10%"
+}
+
+cpu_temperature 8 {
+    format = "T: %degrees°C"
+    max_threshold = 60
+}
+
+disk "/" {
+    format = "D: %avail"
+    threshold_type = "percentage_free"
+    low_threshold = 10
+}
+
+ethernet _first_ {
+    format_up = "E: %ip"
+    format_down = ""
+}
+
+wireless _first_ {
+    format_up = "W: %quality %ip"
+    format_down = ""
+    format_quality = "%d%s"
+}
+
+path_exists WG {
+    format = "[%title]"
+    format_down = ""
+    path = "/proc/sys/net/ipv4/conf/wg0"
+}
+
+path_exists OVPN {
+    format = "[%title]"
+    format_down = ""
+    path = "/proc/sys/net/ipv4/conf/tun0"
+}
+
+volume master {
+    format = "V: %volume"
+    format_muted = "V: M"
+    device = "default"
+}
+
+battery 1 {
+    format = "P: %percentage [%status]"
+    last_full_capacity = true
+    integer_battery_capacity = true
+    low_threshold = 25
+    threshold_type = "percentage"
+    status_chr = "C"
+    status_bat = "B"
+    status_unk = "?"
+    status_full = "F"
+    format_down = ""
+}
+
+time {
+    format = "%d-%m %H:%M"
+}
