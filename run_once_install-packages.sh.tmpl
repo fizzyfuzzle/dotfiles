@@ -1,6 +1,9 @@
 #!/bin/bash
 #
-{{ if eq .chezmoi.hostname "surface-pro" }}
+{{- if not .home }}
+exit
+{{- end }}
+
 # Installation script for Surface PRO
 exit
 
@@ -159,5 +162,3 @@ KERNEL=="hidraw*", SUBSYSTEM=="hidraw", MODE="0660", GROUP="plugdev", ATTRS{idVe
 EOF
 udevadm trigger
 udevadm control --reload-rules
-
-{{ end }}
