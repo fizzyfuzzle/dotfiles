@@ -3,6 +3,7 @@ README.md
 .profile
 {{- end }}
 {{- if .mobile }}
+.config
 .zshenv
 {{- end }}
 {{- if not .mobile }}
