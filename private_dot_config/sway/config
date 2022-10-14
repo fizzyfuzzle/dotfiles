@@ -1,0 +1,272 @@
+###############
+# Sway config #
+###############
+
+# Disable Xwayland
+#xwayland disable
+
+## Variables
+#
+# Modifier key 1 (WIN)
+set $mod Mod4
+#
+# Device lock
+set $lock swaylock -c 000000 -f -F && mpc --quiet stop
+#
+# Terminal
+set $term kitty
+#
+# Browser
+set $browser GDK_BACKEND=x11 firefox
+#
+# Visual Studio Code
+#set $code code --enable-features=UseOzonePlatform --ozone-platform=wayland
+set $code code
+#
+# Moving around
+set $up Up
+set $left Left
+set $right Right
+set $down Down
+
+## General
+#
+# Wallpaper
+output * bg ~/dotfiles/background.png center #000000
+#
+# Font
+font pango:DejaVu Sans Mono bold 7
+#
+# Colors
+#
+# class                 border  backgr. text    indicator child_border
+client.focused          #4c7899 #285577 #ffffff #2e9ef4   #285577
+client.focused_inactive #333333 #5f676a #ffffff #484e50   #5f676a
+client.unfocused        #333333 #222222 #888888 #292d2e   #222222
+client.urgent           #2f343a #900000 #ffffff #900000   #900000
+client.placeholder      #000000 #0c0c0c #ffffff #000000   #0c0c0c
+client.background       #ffffff
+#
+# Border
+default_border pixel 1
+#
+# Use Mouse+$mod to drag floating windows
+floating_modifier $mod
+#
+# No mouse focus
+focus_follows_mouse no
+#
+# Hide mouse pointer after timeout
+seat * hide_cursor 5000
+
+## Inputs
+#
+# [swaymsg -t get_inputs]
+#
+# Keyboard
+#input type:keyboard {
+#    xkb_layout us_custom
+#}
+#
+# Touchpad
+input type:touchpad {
+    tap enabled
+    natural_scroll disabled
+}
+#
+# Surface GO mouse
+input "1118:2415:Microsoft_Surface_Type_Cover_Mouse" {
+    # Disable (conflicting with Touchpad)
+    events disabled
+}
+
+## Outputs
+#
+# [swaymsg -t get_outputs]
+#
+# Primary screen
+set $primary "eDP-1"
+output $primary {
+    scale 1.25
+    position 0,0
+}
+# Clamshell mode
+bindswitch --reload --locked lid:on output $primary disable
+bindswitch --reload --locked lid:off output $primary enable
+
+#
+# External monitor
+output "DP-1" {
+    scale 1.25
+}
+
+#
+# Docking station
+output "HDMI1" {
+    scale 1.0
+}
+
+## Key bindings
+#
+# Application launcher
+bindsym $mod+d exec $term --class kitty-menu --override background_opacity=0.8 bash -c "compgen -c | sort -u | fzf | xargs -r swaymsg -t command exec"
+for_window [app_id="kitty-menu"] floating enable, resize set height 250 px, resize set width 800 px, move position center
+#
+# Start a terminal
+bindsym $mod+Return exec $term --single-instance
+#
+# Start internet browser
+bindsym $mod+i exec $browser
+#
+# Start Visual Studio Code
+bindsym $mod+c exec $code
+#
+# Kill focused window
+bindsym $mod+Shift+q kill
+#
+# Toggle status bar
+bindsym $mod+b bar mode toggle
+#
+# Move focus
+bindsym $mod+$left focus left
+bindsym $mod+$down focus down
+bindsym $mod+$up focus up
+bindsym $mod+$right focus right
+#
+# Move window
+bindsym $mod+Shift+$left move left
+bindsym $mod+Shift+$down move down
+bindsym $mod+Shift+$up move up
+bindsym $mod+Shift+$right move right
+#
+# Split horizontal
+bindsym $mod+backslash split h
+#
+# Split vertical
+bindsym $mod+minus split v
+#
+# Fullscreen mode
+bindsym $mod+f fullscreen toggle
+#
+# Change container layout
+bindsym $mod+s layout stacking
+bindsym $mod+w layout tabbed
+bindsym $mod+e layout toggle split
+#
+# Toggle tiling / floating
+bindsym $mod+Shift+space floating toggle
+#
+# Change focus between tiling / floating
+bindsym $mod+space focus mode_toggle
+#
+# Focus parent container
+bindsym $mod+a focus parent
+#
+# Switch to workspace
+bindsym $mod+1 workspace 1
+bindsym $mod+2 workspace 2
+bindsym $mod+3 workspace 3
+bindsym $mod+4 workspace 4
+bindsym $mod+5 workspace 5
+bindsym $mod+6 workspace 6
+bindsym $mod+7 workspace 7
+bindsym $mod+8 workspace 8
+bindsym $mod+9 workspace 9
+bindsym $mod+0 workspace 10
+#
+# Move focused container to workspace
+bindsym $mod+Shift+1 move container to workspace 1
+bindsym $mod+Shift+2 move container to workspace 2
+bindsym $mod+Shift+3 move container to workspace 3
+bindsym $mod+Shift+4 move container to workspace 4
+bindsym $mod+Shift+5 move container to workspace 5
+bindsym $mod+Shift+6 move container to workspace 6
+bindsym $mod+Shift+7 move container to workspace 7
+bindsym $mod+Shift+8 move container to workspace 8
+bindsym $mod+Shift+9 move container to workspace 9
+bindsym $mod+Shift+0 move container to workspace 10
+#
+# Move workspace between outputs
+bindsym $mod+x move workspace to output right
+#
+# Resize window mode
+set $mode_resize "RESIZE"
+mode $mode_resize {
+    bindsym $left resize shrink width 10 px or 10 ppt
+    bindsym $up resize grow height 10 px or 10 ppt
+    bindsym $down resize shrink height 10 px or 10 ppt
+    bindsym $right resize grow width 10 px or 10 ppt
+    bindsym Return mode "default"
+    bindsym Escape mode "default"
+    bindsym $mod+r mode "default"
+}
+bindsym $mod+r mode $mode_resize
+#
+# System mode
+set $mode_system "SYSTEM: [l]ock | [e]xit | [s]uspend | [h]ibernate | [r]eboot | [p]oweroff"
+mode $mode_system {
+    bindsym l exec $lock, mode "default"
+    bindsym e exec swaymsg exit, mode "default"
+    bindsym s exec $lock && systemctl suspend, mode "default"
+    bindsym h exec $lock && systemctl hibernate, mode "default"
+    bindsym r exec systemctl reboot, mode "default"
+    bindsym p exec systemctl poweroff -i, mode "default"
+    bindsym Return mode "default"
+    bindsym Escape mode "default"
+    bindsym $mod+p mode "default"
+}
+bindsym $mod+p mode $mode_system
+#
+# Audio
+bindsym XF86AudioRaiseVolume exec "pactl -- set-sink-volume 0 +5%"
+bindsym XF86AudioLowerVolume exec "pactl -- set-sink-volume 0 -5%"
+bindsym XF86AudioMute exec "pactl set-sink-mute 0 toggle"
+bindsym XF86AudioPlay exec "mpc --quiet toggle"
+#
+# Brightness
+bindsym XF86MonBrightnessUp exec "brightnessctl s +10%"
+bindsym XF86MonBrightnessDown exec "brightnessctl s 10%-"
+
+## Statusbar
+#
+bar {
+    position top
+    tray_output none
+    status_command i3status
+    colors {
+        # Text
+        statusline #888888
+        # Background
+        background #000000
+        # Separator
+        separator #888888
+    }
+    separator_symbol " "
+    font pango:DejaVu Sans Mono bold 10
+}
+
+## Scratchpad terminal
+#
+bindsym $mod+Shift+t exec $term --class kitty-scratch --override background_opacity=0.8
+for_window [app_id="kitty-scratch"] floating enable, resize set height 500 px, resize set width 800 px, move position center, move scratchpad
+bindsym $mod+t [app_id="kitty-scratch"] scratchpad show
+
+## Application manipulations
+#
+# [swaymsg -t get_tree]
+#
+# Inhibit Idle if a window is fullscreen
+for_window [app_id="^.*"] inhibit_idle fullscreen
+for_window [class="^.*"] inhibit_idle fullscreen
+
+## Idle configuration
+#
+exec swayidle -w \
+    timeout 600 '$lock' \
+    timeout 1800 'swaymsg "output * dpms off"' \
+    resume 'swaymsg "output * dpms on"' \
+    before-sleep '$lock'
+
+## X11 systemd environment
+#
+exec systemctl --user import-environment DBUS_SESSION_BUS_ADDRESS DISPLAY XAUTHORITY XDG_CURRENT_DESKTOP WAYLAND_DISPLAY
