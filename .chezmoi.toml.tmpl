@@ -1,16 +1,45 @@
-# Get email address for specific machine on first init
-{{- $email := promptStringOnce . "email" "Email address" -}}
+{{- $name := promptStringOnce . "name" "Full name: " -}}
+{{- $email := promptStringOnce . "email" "Email address: " -}}
+{{- $recipient := "" -}}
 
-# Are we running on a HOME machine
 {{- $home := false -}}
-{{- if eq .chezmoi.hostname "surface-pro" -}}
+{{- if (and (eq .chezmoi.os "linux") (eq .chezmoi.osRelease.id "ubuntu") (eq .chezmoi.hostname "surface-pro")) -}}
 {{-   $home = true -}}
+{{-   $recipient = "CCCC4D7FB5DFBD72FE0748DC0F3CF7A7A3EB049F" -}}
+{{- end -}}
+
+{{- $work := false -}}
+{{- if (and (eq .chezmoi.os "linux") (eq .chezmoi.osRelease.id "debian") (eq .chezmoi.hostname "nl1-lin-002")) -}}
+{{-   $work = true -}}
+{{-   $recipient = "A97E0F13BED9240E490951985E30437FC6E3CD7F" -}}
+{{- end -}}
+
+{{- $server := false -}}
+{{- if (and (eq .chezmoi.os "linux") (eq .chezmoi.osRelease.id "ubuntu") (ne .chezmoi.hostname "surface-pro")) -}}
+{{-   $server = true -}}
+{{- end -}}
+
+{{- $mobile := false -}}
+{{- if (eq .chezmoi.os "android") -}}
+{{-   $mobile = true -}}
 {{- end -}}
 
 [data]
+    name = {{ $name | quote }}
     email = {{ $email | quote }}
-    home = {{ $home | quote }}
+    home = {{ $home }}
+    work = {{ $work }}
+    server = {{ $server }}
+    mobile = {{ $mobile }}
+
+{{if (or $home $work) -}}
+encryption = "gpg"
+[gpg]
+    recipient = {{ $recipient | quote }}
+    args = ["--quiet"]
+{{- end}}
 
 [git]
     autoCommit = true
     autoPush = false
+
