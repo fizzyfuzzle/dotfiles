@@ -8,3 +8,6 @@ README.md
 {{- if not .mobile }}
 .termux
 {{- end }}
+{{- if not .home }}
+.config/mpd
+{{- end }}
