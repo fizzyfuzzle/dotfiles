@@ -85,8 +85,8 @@ function sshz() {
 compdef sshz='ssh'
 
 # ZSH-syntax-highlighting
-if [[ -a ~/dotfiles/submodules/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh ]]; then
-    source ~/dotfiles/submodules/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
+if [[ -a ~/.submodules/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh ]]; then
+    source ~/.submodules/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
     ZSH_HIGHLIGHT_HIGHLIGHTERS=(main brackets cursor)
     ZSH_HIGHLIGHT_MAXLENGTH=250
     typeset -A ZSH_HIGHLIGHT_STYLES
@@ -96,21 +96,21 @@ if [[ -a ~/dotfiles/submodules/zsh-syntax-highlighting/zsh-syntax-highlighting.z
 fi
 
 # ZSH-autosuggestions
-if [[ -a ~/dotfiles/submodules/zsh-autosuggestions/zsh-autosuggestions.zsh ]]; then
-    source ~/dotfiles/submodules/zsh-autosuggestions/zsh-autosuggestions.zsh
+if [[ -a ~/.submodules/zsh-autosuggestions/zsh-autosuggestions.zsh ]]; then
+    source ~/.submodules/zsh-autosuggestions/zsh-autosuggestions.zsh
     ZSH_AUTOSUGGEST_BUFFER_MAX_SIZE=20
 fi
 
 # ZSH-history-substring-search
-if [[ -a ~/dotfiles/submodules/zsh-history-substring-search/zsh-history-substring-search.zsh ]]; then
-    source ~/dotfiles/submodules/zsh-history-substring-search/zsh-history-substring-search.zsh
+if [[ -a ~/.submodules/zsh-history-substring-search/zsh-history-substring-search.zsh ]]; then
+    source ~/.submodules/zsh-history-substring-search/zsh-history-substring-search.zsh
     bindkey '^[[1;5A' history-substring-search-up
     bindkey '^[[1;5B' history-substring-search-down
 fi
 
 # Powerlevel10k prompt
-if [[ -a ~/dotfiles/submodules/zsh-powerlevel10k/powerlevel10k.zsh-theme ]]; then
-    source ~/dotfiles/submodules/zsh-powerlevel10k/powerlevel10k.zsh-theme
+if [[ -a ~/.submodules/zsh-powerlevel10k/powerlevel10k.zsh-theme ]]; then
+    source ~/.submodules/zsh-powerlevel10k/powerlevel10k.zsh-theme
 
     # To customize prompt, run `p10k configure` or edit ~/.p10k.zsh.
     [[ ! -f ~/.p10k.zsh ]] || source ~/.p10k.zsh
