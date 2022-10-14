@@ -32,7 +32,7 @@ set $down Down
 ## General
 #
 # Wallpaper
-output * bg ~/dotfiles/background.png center #000000
+output * bg ~/background.png center #000000
 #
 # Font
 font pango:DejaVu Sans Mono bold 7
