@@ -24,15 +24,7 @@
 {{-   $mobile = true -}}
 {{- end -}}
 
-[data]
-    name = {{ $name | quote }}
-    email = {{ $email | quote }}
-    home = {{ $home }}
-    work = {{ $work }}
-    server = {{ $server }}
-    mobile = {{ $mobile }}
-
-{{if (or $home $work) -}}
+{{- if (or $home $work) -}}
 encryption = "gpg"
 [gpg]
     recipient = {{ $recipient | quote }}
@@ -43,3 +35,10 @@ encryption = "gpg"
     autoCommit = true
     autoPush = false
 
+[data]
+    name = {{ $name | quote }}
+    email = {{ $email | quote }}
+    home = {{ $home }}
+    work = {{ $work }}
+    server = {{ $server }}
+    mobile = {{ $mobile }}
