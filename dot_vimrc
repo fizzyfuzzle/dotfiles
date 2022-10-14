@@ -47,24 +47,24 @@ syntax on
 filetype plugin indent on
 
 " Jellybeans (Theme)
-set runtimepath^=~/dotfiles/submodules/vim-jellybeans
+set runtimepath^=~/.submodules/vim-jellybeans
 " Airline (Status bar)
-set runtimepath^=~/dotfiles/submodules/vim-airline
-set runtimepath^=~/dotfiles/submodules/vim-airline-themes
+set runtimepath^=~/.submodules/vim-airline
+set runtimepath^=~/.submodules/vim-airline-themes
 " Tagbar (Tags browser)
-set runtimepath^=~/dotfiles/submodules/vim-tagbar
+set runtimepath^=~/.submodules/vim-tagbar
 " CtrlP (File browser)
-set runtimepath^=~/dotfiles/submodules/vim-ctrlp
+set runtimepath^=~/.submodules/vim-ctrlp
 " Fugitive (Git)
-set runtimepath^=~/dotfiles/submodules/vim-fugitive
+set runtimepath^=~/.submodules/vim-fugitive
 " GitGutter (Git diff)
-set runtimepath^=~/dotfiles/submodules/vim-gitgutter
+set runtimepath^=~/.submodules/vim-gitgutter
 " Syntastic (Syntax checking)
-set runtimepath^=~/dotfiles/submodules/vim-syntastic
+set runtimepath^=~/.submodules/vim-syntastic
 " Puppet (Puppet)
-set runtimepath^=~/dotfiles/submodules/vim-puppet
+set runtimepath^=~/.submodules/vim-puppet
 " GPG (GPG encrypt/decrypt)
-set runtimepath^=~/dotfiles/submodules/vim-gnupg
+set runtimepath^=~/.submodules/vim-gnupg
 
 " todo command
 command! Todo noautocmd vimgrep /TODO\|FIXME/j ** | cw
