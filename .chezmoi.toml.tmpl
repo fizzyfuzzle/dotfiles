@@ -1,9 +1,15 @@
+# Get email address for specific machine on first init
 {{- $email := promptStringOnce . "email" "Email address" -}}
+
+# Are we running on a HOME machine
+{{- $home := false -}}
+{{- if eq .chezmoi.hostname "surface-pro" -}}
+{{-   $home = true -}}
+{{- end -}}
 
 [data]
     email = {{ $email | quote }}
-    hostname.home = "surface-pro"
-    hostname.work = "nl-lin-002"
+    home = {{ $home | quote }}
 
 [git]
     autoCommit = true
