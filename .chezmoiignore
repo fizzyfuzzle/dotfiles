@@ -5,3 +5,6 @@ README.md
 {{- if .mobile }}
 .zshenv
 {{- end }}
+{{- if not .mobile }}
+.termux
+{{- end }}
