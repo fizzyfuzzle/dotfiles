@@ -58,12 +58,6 @@ export LC_ALL=$LOCALE &>/dev/null
 sed --in-place 's/^#\?NTP=.*/NTP=0.nl.pool.ntp.org 1.nl.pool.ntp.org 2.nl.pool.ntp.org 3.nl.pool.ntp.org/g' /etc/systemd/timesyncd.conf
 sed --in-place 's/^#\?FallbackNTP=.*/FallbackNTP=0.europe.pool.ntp.org 1.europe.pool.ntp.org 2.europe.pool.ntp.org 3.europe.pool.ntp.org/g' /etc/systemd/timesyncd.conf
 
-# MesloLGS NF fonts (Powerlevel10k)
-curl -o "/usr/local/share/fonts/MesloLGS NF Regular.ttf" "https://github.com/romkatv/powerlevel10k-media/raw/master/MesloLGS%20NF%20Regular.ttf"
-curl -o "/usr/local/share/fonts/MesloLGS NF Bold.ttf" "https://github.com/romkatv/powerlevel10k-media/raw/master/MesloLGS%20NF%20Bold.ttf"
-curl -o "/usr/local/share/fonts/MesloLGS NF Italic.ttf" "https://github.com/romkatv/powerlevel10k-media/raw/master/MesloLGS%20NF%20Italic.ttf"
-curl -o "/usr/local/share/fonts/MesloLGS NF Bold Italic.ttf" "https://github.com/romkatv/powerlevel10k-media/raw/master/MesloLGS%20NF%20Bold%20Italic.ttf"
-
 # Change shell
 chsh --shell /usr/bin/zsh
 

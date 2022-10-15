@@ -96,6 +96,22 @@
     exact = false
     stripComponents = 1
     refreshPeriod = "168h"
+[".fonts/MesloLGS NF Regular.ttf"]
+    type = "file"
+    url = "https://raw.githubusercontent.com/romkatv/powerlevel10k-media/master/MesloLGS NF Regular.ttf"
+    refreshPeriod = "4380h"
+[".fonts/MesloLGS NF Bold.ttf"]
+    type = "file"
+    url = "https://raw.githubusercontent.com/romkatv/powerlevel10k-media/master/MesloLGS NF Bold.ttf"
+    refreshPeriod = "4380h"
+[".fonts/MesloLGS NF Italic.ttf"]
+    type = "file"
+    url = "https://raw.githubusercontent.com/romkatv/powerlevel10k-media/master/MesloLGS NF Italic.ttf"
+    refreshPeriod = "4380h"
+[".fonts/MesloLGS NF Bold Italic.ttf"]
+    type = "file"
+    url = "https://raw.githubusercontent.com/romkatv/powerlevel10k-media/master/MesloLGS NF Bold Italic.ttf"
+    refreshPeriod = "4380h"
 [".submodules/zsh-syntax-highlighting"]
     type = "archive"
     url = "https://github.com/zsh-users/zsh-syntax-highlighting/archive/master.tar.gz"
