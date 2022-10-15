@@ -1,0 +1,156 @@
+#!{{ lookPath "bash" }}
+#
+exit
+
+# Installation script for Surface PRO
+exit
+
+#  Set APT defaults
+APT="apt --quiet --assume-yes --no-install-recommends"
+#
+LOCALE="en_US.UTF-8"
+
+# Elevate permissions
+[ "$UID" -eq 0 ] || exec sudo "$0" "$@"
+
+# Create wpc-supplicant config
+wpa_passphrase YOUR_SSID YOUR_PASSWORD > /etc/wpa_supplicant.conf
+
+# Auto start network interface
+cat >>"/etc/network/interfaces.d/wifi" <<EOL
+# Wifi
+auto wlp0s20f3
+iface wlp0s20f3 inet dhcp
+  pre-up wpa_supplicant -c /etc/wpa_supplicant.conf -i wlp0s20f3 &
+  pre-up sleep 4
+  post-down pkill wpa_supplicant
+EOL
+
+# Fix DHCP client DNS override
+echo 'make_resolv_conf() { :; }' > /etc/dhcp/dhclient-enter-hooks.d/leave_my_resolv_conf_alone
+chmod 755 /etc/dhcp/dhclient-enter-hooks.d/leave_my_resolv_conf_alone
+sed -i '/#DNS=/c\DNS=1.1.1.1#cloudflare-dns.com 9.9.9.9#dns.quad9.net' /etc/systemd/resolved.conf
+sed -i '/#FallbackDNS=/c\FallbackDNS=1.1.1.1' /etc/systemd/resolved.conf
+
+# Update repositories
+$APT update
+$APT upgrade
+
+# Install packages
+$APT install brightnessctl curl fzf git gpg grim i3status ifupdown intel-media-va-driver kitty libgfshare-bin mutt pass pass-extension-otp pinentry-gtk2 qrencode ripgrep scdaemon steghide sway swayidle swaylock syncthing tomb ufw vim wireguard wl-clipboard wpasupplicant xdg-desktop-portal-wlr xwayland zbar-tools zsh
+
+# Remove installed packages
+$APT remove --purge --auto-remove gdm3 snapd bluez ubuntu-session gvfs-daemons gnome* cups* netplan.io network-manager plymouth* sssd sssd-common ubuntu-wallpapers* unattended-upgrades xserver-xorg-video-intel
+$APT autoremove
+$APT autoclean
+
+# Set locale
+printf "${LOCALE} UTF-8\n" > /etc/locale.gen
+locale-gen
+printf "LANG=${LOCALE}\nLANGUAGE=${LOCALE}\nLC_ALL=${LOCALE}\n" > /etc/default/locale
+export LANG=$LOCALE
+export LANGUAGE=$LOCALE
+export LC_ALL=$LOCALE &>/dev/null
+
+# Set NTP servers
+sed --in-place 's/^#\?NTP=.*/NTP=0.nl.pool.ntp.org 1.nl.pool.ntp.org 2.nl.pool.ntp.org 3.nl.pool.ntp.org/g' /etc/systemd/timesyncd.conf
+sed --in-place 's/^#\?FallbackNTP=.*/FallbackNTP=0.europe.pool.ntp.org 1.europe.pool.ntp.org 2.europe.pool.ntp.org 3.europe.pool.ntp.org/g' /etc/systemd/timesyncd.conf
+
+# Change shell
+chsh --shell /usr/bin/zsh
+
+# Configure Thermald
+cat >"/etc/thermald/thermal-conf.xml" <<EOL
+<?xml version="1.0"?>
+<ThermalConfiguration>
+  <Platform>
+    <Name>Surface Pro 7</Name>
+    <ProductName>*</ProductName>
+    <Preference>QUIET</Preference>
+    <ThermalSensors>
+      <ThermalSensor>
+        <Type>coretemp</Type>
+        <Path>/sys/class/thermal/thermal_zone8/temp</Path>
+        <AsyncCapable>0</AsyncCapable>
+      </ThermalSensor>
+    </ThermalSensors>
+    <ThermalZones>
+      <ThermalZone>
+        <Type>cpu</Type>
+        <TripPoints>
+          <TripPoint>
+            <SensorType>x86_pkg_temp</SensorType>
+            <Temperature>60000</Temperature>
+            <type>passive</type>
+            <ControlType>PARALLEL</ControlType>
+            <CoolingDevice>
+              <index>1</index>
+              <type>rapl_controller</type>
+              <influence>50</influence>
+              <SamplingPeriod>10</SamplingPeriod>
+            </CoolingDevice>
+            <CoolingDevice>
+              <index>2</index>
+              <type>intel_pstate</type>
+              <influence>40</influence>
+              <SamplingPeriod>10</SamplingPeriod>
+            </CoolingDevice>
+            <CoolingDevice>
+              <index>3</index>
+              <type>intel_powerclamp</type>
+              <influence>30</influence>
+              <SamplingPeriod>10</SamplingPeriod>
+            </CoolingDevice>
+            <CoolingDevice>
+              <index>4</index>
+              <type>cpufreq</type>
+              <influence>20</influence>
+              <SamplingPeriod>8</SamplingPeriod>
+            </CoolingDevice>
+            <CoolingDevice>
+              <index>5</index>
+              <type>Processor</type>
+              <influence>10</influence>
+              <SamplingPeriod>5</SamplingPeriod>
+            </CoolingDevice>
+          </TripPoint>
+        </TripPoints>
+      </ThermalZone>
+    </ThermalZones>
+  </Platform>
+</ThermalConfiguration>
+EOL
+
+# Make Intel Backlight VIDEO group writable
+cat <<EOF > /etc/udev/rules.d/20-backlight.rules
+RUN+="/bin/chgrp video /sys/class/backlight/intel_backlight/brightness"
+RUN+="/bin/chmod g+w /sys/class/backlight/intel_backlight/brightness"
+EOF
+
+# Add user to VIDEO group to allow brightness control
+usermod -aG video $USER
+
+# Set powerbutton to suspend
+cat >"/etc/systemd/logind.conf" <<EOL
+[Login]
+HandlePowerKey=suspend
+EOL
+
+# Fix mouse pointer in Firefox
+gsettings set org.gnome.desktop.interface cursor-theme 'DMZ-White'
+
+# USB device udev permissions
+cat <<EOF > /etc/udev/rules.d/20-hw1.rules
+# YubiKey
+SUBSYSTEMS=="usb", ATTRS{idVendor}=="1050", ATTRS{idProduct}=="0113|0114|0115|0116|0120|0121|0200|0402|0403|0406|0407|0410", TAG+="uaccess", TAG+="udev-acl"
+# HI-power
+KERNEL=="hidraw*", SUBSYSTEM=="hidraw", MODE="0660", GROUP="plugdev", ATTRS{idVendor}=="1050"
+# Nano S
+SUBSYSTEMS=="usb", ATTRS{idVendor}=="2c97", ATTRS{idProduct}=="0001|1000|1001|1002|1003|1004|1005|1006|1007|1008|1009|100a|100b|100c|100d|100e|100f|1010|1011|1012|1013|1014|1015|1016|1017|1018|1019|101a|101b|101c|101d|101e|101f", TAG+="uaccess", TAG+="udev-acl"
+# Nano X
+SUBSYSTEMS=="usb", ATTRS{idVendor}=="2c97", ATTRS{idProduct}=="0004|4000|4001|4002|4003|4004|4005|4006|4007|4008|4009|400a|400b|400c|400d|400e|400f|4010|4011|4012|4013|4014|4015|4016|4017|4018|4019|401a|401b|401c|401d|401e|401f", TAG+="uaccess", TAG+="udev-acl"
+# HI-power
+KERNEL=="hidraw*", SUBSYSTEM=="hidraw", MODE="0660", GROUP="plugdev", ATTRS{idVendor}=="2c97"
+EOF
+udevadm trigger
+udevadm control --reload-rules

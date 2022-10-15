@@ -1,0 +1,16 @@
+#!{{ lookPath "bash" }}
+#
+{{ if .home -}}
+LOCALE="en_US.UTF-8"
+
+# Elevate permissions
+[ "$UID" -eq 0 ] || exec sudo "$0" "$@"
+
+# Set locale
+printf "${LOCALE} UTF-8\n" > /etc/locale.gen
+locale-gen
+printf "LANG=${LOCALE}\nLANGUAGE=${LOCALE}\nLC_ALL=${LOCALE}\n" > /etc/default/locale
+export LANG=$LOCALE
+export LANGUAGE=$LOCALE
+export LC_ALL=$LOCALE &>/dev/null
+{{- end -}}
