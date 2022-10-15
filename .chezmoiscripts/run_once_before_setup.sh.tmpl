@@ -1,23 +1,24 @@
 #!{{ lookPath "bash" }}
+# vim: filetype=bash
 #
-exit
+# Initial system installation script
 
-# Installation script for Surface PRO
-exit
-
-#  Set APT defaults
-APT="apt --quiet --assume-yes --no-install-recommends"
-#
-LOCALE="en_US.UTF-8"
-
+{{ if not .mobile -}}
 # Elevate permissions
 [ "$UID" -eq 0 ] || exec sudo "$0" "$@"
+{{- end }}
 
+{{ if .home -}}
 # Create wpc-supplicant config
-wpa_passphrase YOUR_SSID YOUR_PASSWORD > /etc/wpa_supplicant.conf
+FILE=/etc/wpa_supplicant.conf
+if [ ! -f "$FILE" ]; then
+    wpa_passphrase YOUR_SSID YOUR_PASSWORD > $FILE
+fi
 
 # Auto start network interface
-cat >>"/etc/network/interfaces.d/wifi" <<EOL
+FILE=/etc/network/interfaces.d/wifi
+if [ ! -f "$FILE" ]; then
+    cat >>"$FILE" <<EOL
 # Wifi
 auto wlp0s20f3
 iface wlp0s20f3 inet dhcp
@@ -25,14 +26,21 @@ iface wlp0s20f3 inet dhcp
   pre-up sleep 4
   post-down pkill wpa_supplicant
 EOL
+fi
 
 # Fix DHCP client DNS override
-echo 'make_resolv_conf() { :; }' > /etc/dhcp/dhclient-enter-hooks.d/leave_my_resolv_conf_alone
-chmod 755 /etc/dhcp/dhclient-enter-hooks.d/leave_my_resolv_conf_alone
+FILE=/etc/dhcp/dhclient-enter-hooks.d/leave_my_resolv_conf_alone
+if [ ! -f "$FILE" ]; then
+    echo 'make_resolv_conf() { :; }' > $FILE
+    chmod 755 $FILE
+fi
 sed -i '/#DNS=/c\DNS=1.1.1.1#cloudflare-dns.com 9.9.9.9#dns.quad9.net' /etc/systemd/resolved.conf
 sed -i '/#FallbackDNS=/c\FallbackDNS=1.1.1.1' /etc/systemd/resolved.conf
+{{- end }}
 
+{{ if .home -}}
 # Update repositories
+APT="apt --quiet --assume-yes --no-install-recommends"
 $APT update
 $APT upgrade
 
@@ -43,8 +51,10 @@ $APT install brightnessctl curl fzf git gpg grim i3status ifupdown intel-media-v
 $APT remove --purge --auto-remove gdm3 snapd bluez ubuntu-session gvfs-daemons gnome* cups* netplan.io network-manager plymouth* sssd sssd-common ubuntu-wallpapers* unattended-upgrades xserver-xorg-video-intel
 $APT autoremove
 $APT autoclean
+{{- end }}
 
 # Set locale
+LOCALE="en_US.UTF-8"
 printf "${LOCALE} UTF-8\n" > /etc/locale.gen
 locale-gen
 printf "LANG=${LOCALE}\nLANGUAGE=${LOCALE}\nLC_ALL=${LOCALE}\n" > /etc/default/locale
@@ -52,6 +62,7 @@ export LANG=$LOCALE
 export LANGUAGE=$LOCALE
 export LC_ALL=$LOCALE &>/dev/null
 
+{{ if .home -}}
 # Set NTP servers
 sed --in-place 's/^#\?NTP=.*/NTP=0.nl.pool.ntp.org 1.nl.pool.ntp.org 2.nl.pool.ntp.org 3.nl.pool.ntp.org/g' /etc/systemd/timesyncd.conf
 sed --in-place 's/^#\?FallbackNTP=.*/FallbackNTP=0.europe.pool.ntp.org 1.europe.pool.ntp.org 2.europe.pool.ntp.org 3.europe.pool.ntp.org/g' /etc/systemd/timesyncd.conf
@@ -122,10 +133,13 @@ cat >"/etc/thermald/thermal-conf.xml" <<EOL
 EOL
 
 # Make Intel Backlight VIDEO group writable
-cat <<EOF > /etc/udev/rules.d/20-backlight.rules
+FILE=/etc/udev/rules.d/20-backlight.rules
+if [ ! -f "$FILE" ]; then
+    cat >"$FILE" <<EOF
 RUN+="/bin/chgrp video /sys/class/backlight/intel_backlight/brightness"
 RUN+="/bin/chmod g+w /sys/class/backlight/intel_backlight/brightness"
 EOF
+fi
 
 # Add user to VIDEO group to allow brightness control
 usermod -aG video $USER
@@ -140,7 +154,9 @@ EOL
 gsettings set org.gnome.desktop.interface cursor-theme 'DMZ-White'
 
 # USB device udev permissions
-cat <<EOF > /etc/udev/rules.d/20-hw1.rules
+FILE=/etc/udev/rules.d/20-hw1.rules
+if [ ! -f "$FILE" ]; then
+    cat >"$FILE" <<EOF
 # YubiKey
 SUBSYSTEMS=="usb", ATTRS{idVendor}=="1050", ATTRS{idProduct}=="0113|0114|0115|0116|0120|0121|0200|0402|0403|0406|0407|0410", TAG+="uaccess", TAG+="udev-acl"
 # HI-power
@@ -152,5 +168,7 @@ SUBSYSTEMS=="usb", ATTRS{idVendor}=="2c97", ATTRS{idProduct}=="0004|4000|4001|40
 # HI-power
 KERNEL=="hidraw*", SUBSYSTEM=="hidraw", MODE="0660", GROUP="plugdev", ATTRS{idVendor}=="2c97"
 EOF
+fi
 udevadm trigger
 udevadm control --reload-rules
+{{- end }}
