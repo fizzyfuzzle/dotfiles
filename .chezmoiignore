@@ -11,6 +11,7 @@ background.png
 {{- end }}
 {{- if not .mobile }}
 .termux
+.hushlogin
 {{- end }}
 {{- if not .home }}
 .config/mpd
