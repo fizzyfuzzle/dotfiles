@@ -1,4 +1,7 @@
 README.md
+{{- if (and (not .home) (not .work)) }}
+background.png
+{{- end }}
 {{- if not .server }}
 .profile
 {{- end }}
