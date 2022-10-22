@@ -13,16 +13,6 @@ set $mod Mod4
 # Device lock
 set $lock swaylock -c 000000 -f -F && mpc --quiet stop
 #
-# Terminal
-set $term kitty
-#
-# Browser
-set $browser GDK_BACKEND=x11 firefox
-#
-# Visual Studio Code
-#set $code code --enable-features=UseOzonePlatform --ozone-platform=wayland
-set $code code
-#
 # Moving around
 set $up Up
 set $left Left
@@ -109,17 +99,17 @@ output "HDMI1" {
 ## Key bindings
 #
 # Application launcher
-bindsym $mod+d exec $term --class kitty-menu --override background_opacity=0.8 bash -c "compgen -c | sort -u | fzf | xargs -r swaymsg -t command exec"
+bindsym $mod+d exec kitty --class kitty-menu --override background_opacity=0.8 bash -c "compgen -c | sort -u | fzf | xargs -r swaymsg -t command exec"
 for_window [app_id="kitty-menu"] floating enable, resize set height 250 px, resize set width 800 px, move position center
 #
 # Start a terminal
-bindsym $mod+Return exec $term --single-instance
+bindsym $mod+Return exec kitty --single-instance
 #
 # Start internet browser
-bindsym $mod+i exec $browser
+bindsym $mod+i exec GDK_BACKEND=x11 firefox
 #
 # Start Visual Studio Code
-bindsym $mod+c exec $code
+bindsym $mod+c exec code --enable-features=UseOzonePlatform --ozone-platform=wayland
 #
 # Kill focused window
 bindsym $mod+Shift+q kill
@@ -247,7 +237,7 @@ bar {
 
 ## Scratchpad terminal
 #
-bindsym $mod+Shift+t exec $term --class kitty-scratch --override background_opacity=0.8
+bindsym $mod+Shift+t exec kitty --class kitty-scratch --override background_opacity=0.8
 for_window [app_id="kitty-scratch"] floating enable, resize set height 500 px, resize set width 800 px, move position center, move scratchpad
 bindsym $mod+t [app_id="kitty-scratch"] scratchpad show
 
