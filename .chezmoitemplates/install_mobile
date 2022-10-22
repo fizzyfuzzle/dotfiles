@@ -1,0 +1,13 @@
+# Update system
+pkg update
+pkg upgrade
+
+# Install packages
+pkg install chezmoi curl dnsutils git gnupg gzip inetutils mosh net-tools \
+    openssh pinentry tmux vim zsh
+
+# Cleanup
+pkg autoclean
+
+# Enable storage
+termux-setup-storage
