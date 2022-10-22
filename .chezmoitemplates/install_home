@@ -1,3 +1,4 @@
+# Set APT defaults
 APT="apt --quiet --assume-yes --no-install-recommends"
 
 # Update repositories
@@ -13,12 +14,19 @@ sudo $APT install brightnessctl curl fzf git gpg grim i3status ifupdown \
 
 # Remove installed packages
 sudo $APT remove --purge --auto-remove gdm3 snapd bluez ubuntu-session \
-    gvfs-daemons gnome* cups* netplan.io network-manager plymouth* sssd sssd-common \
-    ubuntu-wallpapers* unattended-upgrades xserver-xorg-video-intel
+    gvfs-daemons gnome* cups* language-pack-en language-pack-en-base \
+    language-pack-gnome-en language-pack-gnome-en-base netplan.io \
+    network-manager plymouth* sssd sssd-common ubuntu-wallpapers* \
+    unattended-upgrades xserver-xorg-video-intel
 
 # Cleanup
 sudo $APT autoremove
 sudo $APT autoclean
+
+# Set locale
+printf "en_US.UTF-8 UTF-8\n" | sudo tee /etc/locale.gen > /dev/null \
+    && sudo locale-gen \
+    && printf "LANG=en_US.UTF-8\nLANGUAGE=en_US.UTF-8\nLC_ALL=en_US.UTF-8\n" | sudo tee /etc/default/locale > /dev/null
 
 # Change shell to ZSH
 chsh --shell /usr/bin/zsh
