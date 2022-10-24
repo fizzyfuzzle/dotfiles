@@ -3,7 +3,7 @@ apt update
 apt upgrade
 
 # Install packages
-apt install chezmoi curl dnsutils git gnupg gzip inetutils mosh net-tools \
+apt install curl dnsutils git gnupg gzip inetutils mosh net-tools \
     openssh pinentry tmux vim zsh
 
 # Cleanup
@@ -11,4 +11,4 @@ apt autoremove
 apt autoclean
 
 # Enable storage
-termux-setup-storage
+[ ! -d "$HOME/storage" ] && termux-setup-storage
