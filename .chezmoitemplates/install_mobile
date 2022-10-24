@@ -1,14 +1,19 @@
+# Set APT defaults
+APT="apt --quiet --assume-yes --no-install-recommends"
+
 # Update system
-apt update
-apt upgrade
+$APT update
+$APT upgrade
 
 # Install packages
-apt install curl dnsutils git gnupg gzip inetutils mosh net-tools \
+$APT install curl dnsutils git gnupg gzip inetutils mosh net-tools \
     openssh pinentry tmux vim zsh
 
 # Cleanup
-apt autoremove
-apt autoclean
+$APT autoremove
+$APT autoclean
 
 # Enable storage
 [ ! -d "$HOME/storage" ] && termux-setup-storage
+
+exit 0
