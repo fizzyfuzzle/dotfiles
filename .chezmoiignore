@@ -14,5 +14,6 @@ background.png
 .hushlogin
 {{- end }}
 {{- if not .home }}
+vnc_server.sh
 .config/mpd
 {{- end }}
