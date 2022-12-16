@@ -1,0 +1,20 @@
+#!{{ lookPath "bash" }}
+# vim: filetype=bash
+#
+# Periodic system update
+#
+{{- if .home }}
+{{ template "update_home" . }}
+{{ end -}}
+
+{{- if .work }}
+{{ template "update_work" . }}
+{{ end -}}
+
+{{- if .server }}
+{{ template "update_server" . }}
+{{ end -}}
+
+{{- if .mobile }}
+{{ template "update_mobile" . }}
+{{ end -}}
