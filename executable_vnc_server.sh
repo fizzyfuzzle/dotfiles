@@ -11,7 +11,7 @@ export WAYLAND_DISPLAY=wayland-1
 #swaymsg unplug $SCREEN_FAKE
 
 #echo "Disabling SLEEP"
-#sudo systemctl mask sleep.target hibernate.target
+#sudo systemctl mask sleep.target suspend.target hibernate.target
 
 echo "[SWITCHING OUTPUTS] ${SCREEN_REAL} -> ${SCREEN_FAKE}"
 swaymsg output $SCREEN_FAKE enable
@@ -26,4 +26,4 @@ swaymsg output $SCREEN_REAL enable
 swaymsg output $SCREEN_FAKE disable
 
 #echo "Enabling SLEEP"
-#sudo systemctl unmask sleep.target hibernate.target
+#sudo systemctl unmask sleep.target suspend.target hibernate.target
