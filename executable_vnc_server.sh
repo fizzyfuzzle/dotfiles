@@ -11,18 +11,19 @@ export WAYLAND_DISPLAY=wayland-1
 #swaymsg unplug $SCREEN_FAKE
 
 #echo "Disabling SLEEP"
-#sudo systemctl mask sleep.target
+#sudo systemctl mask sleep.target hibernate.target
 
 echo "[SWITCHING OUTPUTS] ${SCREEN_REAL} -> ${SCREEN_FAKE}"
 swaymsg output $SCREEN_FAKE enable
 swaymsg output $SCREEN_REAL disable
 
 echo "STARTING VNC ..."
-wayvnc --output=HEADLESS-1 --max-fps=15 127.0.0.1 5900
+#systemd-inhibit --who="wayvnc" --mode=block --what=idle --why="Remote working"
+wayvnc --output=$SCREEN_FAKE --max-fps=15 127.0.0.1 5900
 
 echo "[SWITCHING OUTPUTS] ${SCREEN_FAKE} -> ${SCREEN_REAL}"
 swaymsg output $SCREEN_REAL enable
 swaymsg output $SCREEN_FAKE disable
 
 #echo "Enabling SLEEP"
-#sudo systemctl unmask sleep.target
+#sudo systemctl unmask sleep.target hibernate.target
