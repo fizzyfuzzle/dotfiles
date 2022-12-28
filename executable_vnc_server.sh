@@ -4,11 +4,8 @@ SCREEN_REAL="DP-1"
 SCREEN_FAKE="HEADLESS-1"
 
 # SWAY ENVIRONMENT
-export SWAYSOCK=$(awk 'BEGIN {RS="\0"; FS="="} $1 == "SWAYSOCK" { print $2 }' /proc/$(pgrep -o swaybg)/environ)
+export SWAYSOCK=/run/user/$(id -u)/sway-ipc.$(id -u).$(pgrep -x sway).sock
 export WAYLAND_DISPLAY=wayland-1
-
-#swaymsg create_output $SCREEN_FAKE
-#swaymsg unplug $SCREEN_FAKE
 
 #echo "Disabling SLEEP"
 #sudo systemctl mask sleep.target suspend.target hibernate.target
