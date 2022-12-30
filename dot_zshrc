@@ -124,12 +124,12 @@ else
     PROMPT='%(?..%F{red}[%?] )%f%2~ ${vcs_info_msg_0_}%(!.%F{red}#%f.%f») '
 fi
 
-# Include local zshrc file if exists
-[[ ! -f ~/.zshrc.local ]] || source ~/.zshrc.local
-
 # Update GPG variables
 if command -v gpgconf >/dev/null; then
     export GPG_TTY=$TTY
     export SSH_AUTH_SOCK="$(gpgconf --list-dirs agent-ssh-socket)"
     gpg-connect-agent updatestartuptty /bye >/dev/null 2>&1
 fi
+
+# Include local zshrc file if exists
+[[ ! -f ~/.zshrc.local ]] || source ~/.zshrc.local
