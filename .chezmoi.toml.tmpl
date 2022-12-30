@@ -36,6 +36,9 @@ encryption = "gpg"
     autoCommit = true
     autoPush = false
 
+[diff]
+    exclude = ["scripts"]
+
 [data]
     name = {{ $name | quote }}
     email = {{ $email | quote }}
