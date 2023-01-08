@@ -129,7 +129,11 @@ if command -v gpgconf >/dev/null; then
     export GPG_TTY=$TTY
     export GPG_EXTRA_SOCK="$(gpgconf --list-dirs agent-extra-socket)"
     export SSH_AUTH_SOCK="$(gpgconf --list-dirs agent-ssh-socket)"
-    gpg-connect-agent updatestartuptty /bye >/dev/null 2>&1
+
+    # Do not start local gpg-agent on remote sessions
+    if [ -z "$SSH_CLIENT" ] && [ -z "$SSH_TTY" ]; then
+        gpg-connect-agent updatestartuptty /bye >/dev/null 2>&1
+    fi
 fi
 
 # Include local zshrc file if exists
