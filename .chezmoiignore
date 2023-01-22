@@ -1,4 +1,7 @@
 README.md
+{{- if .server }}
+.ssh/config
+{{- end }}
 {{- if (and (not .home) (not .work)) }}
 background.png
 {{- end }}
