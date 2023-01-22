@@ -5,13 +5,11 @@
 {{- $home := false -}}
 {{- if (and (eq .chezmoi.os "linux") (eq .chezmoi.osRelease.id "ubuntu") (eq .chezmoi.hostname "surface-pro")) -}}
 {{-   $home = true -}}
-{{-   $recipient = "CCCC4D7FB5DFBD72FE0748DC0F3CF7A7A3EB049F" -}}
 {{- end -}}
 
 {{- $work := false -}}
 {{- if (and (eq .chezmoi.os "linux") (eq .chezmoi.osRelease.id "debian") (eq .chezmoi.hostname "NL1-LIN-002")) -}}
 {{-   $work = true -}}
-{{-   $recipient = "A97E0F13BED9240E490951985E30437FC6E3CD7F" -}}
 {{- end -}}
 
 {{- $server := false -}}
@@ -24,12 +22,10 @@
 {{-   $mobile = true -}}
 {{- end -}}
 
-{{- if (or $home $work) -}}
 encryption = "gpg"
 [gpg]
-    recipient = {{ $recipient | quote }}
+    symmetric = true
     args = ["--quiet"]
-{{- end}}
 
 [git]
     autoAdd = true
