@@ -15,12 +15,15 @@ zstyle ':completion:*' menu select
 zstyle ':completion:*' special-dirs true
 zstyle ':completion:*' matcher-list 'm:{a-zA-Z-_}={A-Za-z_-}' 'r:|[._-]=* r:|=*' 'l:|=* r:|=*'
 zstyle ':completion:*' list-colors "${(s.:.)LS_COLORS}"
+if [[ -r ~/.ssh/known_hosts ]]; then
+    hosts=(${${${${(f)"$(<~/.ssh/known_hosts)"}:#([0-9]|\[)*}%%\ *}%%,*})
+fi
 if [[ -r ~/.ssh/known_hosts_managed ]]; then
-    hosts=(${${${${(f)"$(<~/.ssh/known_hosts <~/.ssh/known_hosts_managed)"}:#([0-9]|\[)*}%%\ *}%%,*})
+    hosts=($hosts ${${${${(f)"$(<~/.ssh/known_hosts_managed)"}:#([0-9]|\[)*}%%\ *}%%,*})
 fi
-if [[ -r ~/.ssh/config ]]; then
-    hosts=($hosts ${${${(@M)${(f)"$(<~/.ssh/config)"}:#Host *}#Host }:#*[*?]*})
-fi
+#if [[ -r ~/.ssh/config ]]; then
+#    hosts=($hosts ${${${(@M)${(f)"$(<~/.ssh/config)"}:#Host *}#Host }:#*[*?]*})
+#fi
 zstyle ':completion:*:hosts' hosts $hosts
 zstyle ':completion:*:(rsync|scp|ssh|sshz):argument-1:*' tag-order hosts
 bindkey '^[[Z' reverse-menu-complete
