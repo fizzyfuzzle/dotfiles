@@ -21,9 +21,9 @@ fi
 if [[ -r ~/.ssh/known_hosts_managed ]]; then
     hosts=($hosts ${${${${(f)"$(<~/.ssh/known_hosts_managed)"}:#([0-9]|\[)*}%%\ *}%%,*})
 fi
-#if [[ -r ~/.ssh/config ]]; then
-#    hosts=($hosts ${${${(@M)${(f)"$(<~/.ssh/config)"}:#Host *}#Host }:#*[*?]*})
-#fi
+if [[ -r ~/.ssh/config ]]; then
+    hosts=($hosts ${${${(@M)${(f)"$(<~/.ssh/config)"}:#Host *}#Host }:#*[*?]*})
+fi
 zstyle ':completion:*:hosts' hosts $hosts
 zstyle ':completion:*:(rsync|scp|ssh|sshz):argument-1:*' tag-order hosts
 bindkey '^[[Z' reverse-menu-complete
