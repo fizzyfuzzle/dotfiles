@@ -19,7 +19,7 @@ if [[ -r ~/.ssh/known_hosts ]]; then
     hosts=(${${${${(f)"$(<~/.ssh/known_hosts)"}:#([0-9]|\[)*}%%\ *}%%,*})
 fi
 if [[ -r ~/.ssh/known_hosts_managed ]]; then
-    hosts=($hosts ${${${${(f)"$(<~/.ssh/known_hosts_managed)"}:#([0-9]|\[)*}%%\ *}%%,*})
+    hosts=($hosts ${${${${(f)"$(<~/.ssh/known_hosts_managed)"}:#([0-9]|\[|#)*}%%\ *}%%,*})
 fi
 if [[ -r ~/.ssh/config ]]; then
     hosts=($hosts ${${${${(@M)${(f)"$(<~/.ssh/config)"}:#Host *}#Host }:#*[*?]*}%" "*})
