@@ -15,9 +15,10 @@ zstyle ':completion:*' menu select
 zstyle ':completion:*' special-dirs true
 zstyle ':completion:*' matcher-list 'm:{a-zA-Z-_}={A-Za-z_-}' 'r:|[._-]=* r:|=*' 'l:|=* r:|=*'
 zstyle ':completion:*' list-colors "${(s.:.)LS_COLORS}"
-hosts=(${${${${(f)"$(<$HOME/.ssh/known_hosts <$HOME/.ssh/known_hosts_fixed)"}:#[0-9]*}%%\ *}%%,*})
+hosts=(${${${${(f)"$(<$HOME/.ssh/known_hosts <$HOME/.ssh/known_hosts_managed)"}:#([0-9]|\[)*}%%\ *}%%,*})
+hosts=($hosts ${${${(@M)${(f)"$(<$HOME/.ssh/config)"}:#Host *}#Host }:#*[*?]*})
 zstyle ':completion:*:hosts' hosts $hosts
-zstyle ':completion:*:(ssh|sshz):argument-1:*' tag-order hosts
+zstyle ':completion:*:(rsync|scp|ssh|sshz):argument-1:*' tag-order hosts
 bindkey '^[[Z' reverse-menu-complete
 
 # History
