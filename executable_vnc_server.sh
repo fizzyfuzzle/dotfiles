@@ -4,7 +4,7 @@ SCREEN_REAL="DP-1"
 SCREEN_FAKE="HEADLESS-1"
 
 # SWAY ENVIRONMENT
-export SWAYSOCK=/run/user/$(id -u)/sway-ipc.$(id -u).$(pgrep -x sway).sock
+export SWAYSOCK=/run/user/$(id -u)/sway-ipc.$(id -u).$(pgrep -ox sway).sock
 export WAYLAND_DISPLAY=wayland-1
 
 #echo "Disabling SLEEP"
