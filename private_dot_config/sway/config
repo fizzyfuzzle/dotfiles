@@ -3,7 +3,7 @@
 ###############
 
 # Disable Xwayland
-xwayland disable
+#xwayland disable
 
 ## Variables
 #
