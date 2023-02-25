@@ -15,3 +15,5 @@ export XDG_CURRENT_DESKTOP=sway
 # Set WAYLAND backend
 export GDK_BACKEND=wayland
 export QT_QPA_PLATFORM=wayland
+# Set pass directory
+export PASSWORD_STORE_DIR=/$HOME/repositories/password-store
