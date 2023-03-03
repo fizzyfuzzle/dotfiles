@@ -1,2 +1,0 @@
-#!/bin/bash
-nc $(dig +short $1 @ns1.digitalocean.com | tail -n1) $2
