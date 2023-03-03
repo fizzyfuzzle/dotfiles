@@ -58,8 +58,8 @@
     rmr = "!git checkout main && git branch --merged | egrep -v '(master|main)' | xargs git branch -d"
     up = "!git add -A && git commit -m \"Commit from $(uname -n) on $(date '+%d-%m-%Y @ %H:%M:%S')\" && git push"
 [user]
-    name = {{ .name }}
-    email = {{ .email }}
+    name = {{ .name | quote }}
+    email = {{ .email | quote }}
 [format]
     pretty = %h - %cd: %s
 [log]
