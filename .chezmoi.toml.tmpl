@@ -21,7 +21,7 @@
 {{-   $mobile = true -}}
 {{- end -}}
 
-{{- if (or .home .work) -}}
+{{- if (or $home $work) -}}
 {{-   $name = promptStringOnce . "name" "Full name: " -}}
 {{-   $email = promptStringOnce . "email" "Email address: " -}}
 {{- end -}}
