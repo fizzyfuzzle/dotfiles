@@ -1,6 +1,5 @@
-{{- $name := promptStringOnce . "name" "Full name: " -}}
-{{- $email := promptStringOnce . "email" "Email address: " -}}
-{{- $recipient := "" -}}
+{{- $name := "John Do" -}}
+{{- $email := "nobody@home.now" -}}
 
 {{- $home := false -}}
 {{- if (and (eq .chezmoi.os "linux") (eq .chezmoi.osRelease.id "ubuntu") (eq .chezmoi.hostname "surface-pro")) -}}
@@ -20,6 +19,11 @@
 {{- $mobile := false -}}
 {{- if (eq .chezmoi.os "android") -}}
 {{-   $mobile = true -}}
+{{- end -}}
+
+{{- if (or .home .work) -}}
+{{-   $name = promptStringOnce . "name" "Full name: " -}}
+{{-   $email = promptStringOnce . "email" "Email address: " -}}
 {{- end -}}
 
 encryption = "gpg"
