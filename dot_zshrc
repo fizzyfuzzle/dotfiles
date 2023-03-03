@@ -75,8 +75,8 @@ alias t='vim ~/todo.md'
 alias tm='tmux attach -t $(hostname) || tmux new -s $(hostname)'
 alias v='vim'
 
-# Prepend local bin folder to path
-path=("$HOME/bin" $path)
+# Prepend local bin folders to path
+path=("$HOME/bin" "$HOME/.local/bin" $path)
 export PATH
 
 # Use zshrc.remote config on remote machines
