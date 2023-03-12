@@ -1,9 +1,6 @@
 README.md
-{{- if .server }}
-.ssh/config
-{{- end }}
 {{- if (or .work .server) }}
-.ssh/known_hosts_managed
+.ssh
 {{- end }}
 {{- if (or .mobile .server) }}
 background.png
