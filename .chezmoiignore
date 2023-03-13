@@ -2,7 +2,7 @@ README.md
 {{- if .server }}
 .ssh
 {{- end }}
-{- if .work }}
+{{- if .work }}
 .ssh/known_hosts_managed
 {{- end }}
 {{- if (or .mobile .server) }}
