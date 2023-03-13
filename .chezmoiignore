@@ -18,5 +18,4 @@ background.png
 {{- end }}
 {{- if not .home }}
 vnc_server.sh
-.config/mpd
 {{- end }}
