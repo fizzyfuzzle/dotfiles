@@ -110,7 +110,7 @@ for_window [app_id="kitty-menu"] floating enable, resize set height 250 px, resi
 bindsym $mod+Return exec kitty --single-instance
 #
 # Start internet browser
-bindsym $mod+i exec firefox
+bindsym $mod+i exec $BROWSER
 #
 # Start Visual Studio Code
 bindsym $mod+c exec code --enable-features=UseOzonePlatform --ozone-platform=wayland
