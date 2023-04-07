@@ -3,9 +3,11 @@ skip_global_compinit=1
 # Set default editor
 export EDITOR=vim
 # Set default browser
-{{ if .work }}export BROWSER=chromium{{ end }}
-export TEST={{ .name }}
+{{ if .work -}}
+export BROWSER=chromium
+{{- else -}}
 export BROWSER=firefox
+{{- end }}
 # Set cache to RAM disk
 export XDG_CACHE_HOME=/dev/shm
 # Set config directory
