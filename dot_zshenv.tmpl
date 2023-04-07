@@ -5,7 +5,7 @@ export EDITOR=vim
 # Set default browser
 {{ if .work -}}
 export BROWSER=chromium
-{{ else}}
+{{- else -}}
 export BROWSER=firefox
 {{- end }}
 # Set cache to RAM disk
