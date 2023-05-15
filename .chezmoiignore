@@ -1,5 +1,5 @@
 README.md
-{{- if .server }}
+{{- if (or .home .server) }}
 .ssh
 {{- end }}
 {{- if .work }}
