@@ -1,8 +1,5 @@
-{{- $name := "John Do" -}}
-{{- $email := "nobody@home.now" -}}
-
 {{- $home := false -}}
-{{- if (and (eq .chezmoi.os "linux") (eq .chezmoi.osRelease.id "ubuntu") (eq .chezmoi.hostname "surface-pro")) -}}
+{{- if (and (eq .chezmoi.os "linux") (eq .chezmoi.osRelease.id "ubuntu") (or (eq .chezmoi.hostname "hyperion") (eq .chezmoi.hostname "surface-pro"))) -}}
 {{-   $home = true -}}
 {{- end -}}
 
@@ -12,18 +9,13 @@
 {{- end -}}
 
 {{- $server := false -}}
-{{- if (and (eq .chezmoi.os "linux") (eq .chezmoi.osRelease.id "ubuntu") (ne .chezmoi.hostname "surface-pro")) -}}
+{{- if (and (eq .chezmoi.os "linux") (eq .chezmoi.osRelease.id "ubuntu") (ne .chezmoi.hostname "hyperion") (ne .chezmoi.hostname "surface-pro")) -}}
 {{-   $server = true -}}
 {{- end -}}
 
 {{- $mobile := false -}}
 {{- if (eq .chezmoi.os "android") -}}
 {{-   $mobile = true -}}
-{{- end -}}
-
-{{- if (or $home $work) -}}
-{{-   $name = promptStringOnce . "name" "Full name: " -}}
-{{-   $email = promptStringOnce . "email" "Email address: " -}}
 {{- end -}}
 
 encryption = "gpg"
@@ -40,8 +32,8 @@ encryption = "gpg"
     exclude = ["scripts"]
 
 [data]
-    name = {{ $name | quote }}
-    email = {{ $email | quote }}
+    name = "Marco"
+    email = "nobody@home.now"
     home = {{ $home }}
     work = {{ $work }}
     server = {{ $server }}
