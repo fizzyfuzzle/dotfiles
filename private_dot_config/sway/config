@@ -103,11 +103,11 @@ exec swaymsg create_output HEADLESS-1
 ## Key bindings
 #
 # Application launcher
-bindsym $mod+d exec kitty --class kitty-menu --override background_opacity=0.8 bash -c "compgen -c | sort -u | fzf | xargs -r swaymsg -t command exec"
-for_window [app_id="kitty-menu"] floating enable, resize set height 250 px, resize set width 800 px, move position center
+bindsym $mod+d exec foot -a foot-menu bash -c "compgen -c | sort -u | fzf | xargs -r swaymsg -t command exec"
+for_window [app_id="foot-menu"] floating enable, resize set height 250 px, resize set width 800 px, move position center
 #
 # Start a terminal
-bindsym $mod+Return exec kitty --single-instance
+bindsym $mod+Return exec foot
 #
 # Start internet browser
 bindsym $mod+i exec $BROWSER
@@ -241,9 +241,9 @@ bar {
 
 ## Scratchpad terminal
 #
-bindsym $mod+Shift+t exec kitty --class kitty-scratch --override background_opacity=0.8
-for_window [app_id="kitty-scratch"] floating enable, resize set height 500 px, resize set width 800 px, move position center, move scratchpad
-bindsym $mod+t [app_id="kitty-scratch"] scratchpad show
+bindsym $mod+Shift+t exec foot -a foot-scratch
+for_window [app_id="foot-scratch"] floating enable, resize set height 500 px, resize set width 800 px, move position center, move scratchpad
+bindsym $mod+t [app_id="foot-scratch"] scratchpad show
 
 ## Application manipulations
 #
@@ -261,7 +261,6 @@ exec swayidle -w \
     resume 'swaymsg "output * dpms on"' \
     before-sleep '$lock'
 
-## X11 systemd environment
+## DBUS
 #
-#exec systemctl --user import-environment DBUS_SESSION_BUS_ADDRESS DISPLAY XAUTHORITY XDG_CURRENT_DESKTOP WAYLAND_DISPLAY
 exec dbus-update-activation-environment WAYLAND_DISPLAY
