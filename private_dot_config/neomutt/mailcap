@@ -1,6 +1,9 @@
-text/html; sensible-browser %s; description=HTML Text; nametemplate=%s.html
-text/html; w3m -T text/html %s; needsterminal; description=HTML Text; nametemplate=%s.html
-text/html; lynx -force_html %s; needsterminal; description=HTML Text; nametemplate=%s.html
+# Text
+text/plain; nvim '%s'
+
+# HTML
+text/html; firefox '%s' & x-neomutt-keep; test=test -n "$DISPLAY"; nametemplate=%s.html;
+text/html; w3m -I %{charset} -T text/html; copiousoutput;
 
 # Calendar
 application/ics; cat '%s'; copiousoutput
