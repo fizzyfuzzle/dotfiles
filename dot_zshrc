@@ -34,7 +34,7 @@ bindkey '^[[Z' reverse-menu-complete
 
 # History
 HISTFILE=~/.zsh_history
-HISTORY_IGNORE="(gpg*|ssh*|tomb*)"
+HISTORY_IGNORE="(gpg*|ssh*|tomb*|pass*|oath*|ykman*)"
 HISTSIZE=4000
 SAVEHIST=$HISTSIZE
 setopt hist_ignore_all_dups
