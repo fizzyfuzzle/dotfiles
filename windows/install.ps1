@@ -122,17 +122,15 @@ function Winget-Install
 
   # Install Packages
   $install = @(
-    @{ id = "Cloudflare.cloudflared" },
     @{ id = "Git.Git" },
     @{ id = "lsd-rs.lsd" },
     @{ id = "Microsoft.PowerShell" },
     @{ id = "Microsoft.VisualStudioCode" },
     @{ id = "Mozilla.Firefox" },
-    @{ id = "MullvadVPN.MullvadVPN" },
     @{ id = "Neovim.Neovim" },
+    @{ id = "Plex.Plex" },
     @{ id = "RealVNC.VNCViewer" },
     @{ id = "Spotify.Spotify" },
-    @{ id = "TeamViewer.TeamViewer" },
     @{ id = "TradingView.TradingViewDesktop" }
   );
   $appList = [String]::Join("", $(winget list))
