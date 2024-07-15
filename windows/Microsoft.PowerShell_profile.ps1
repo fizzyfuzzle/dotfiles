@@ -21,3 +21,5 @@ function prompt {
 Set-Alias -Name g -Value git
 Set-Alias -Name ls -Value lsd
 Set-Alias -Name v -Value nvim
+function ssh_workstation {ssh workstation}
+Set-Alias -Name ws -Value ssh_workstation
