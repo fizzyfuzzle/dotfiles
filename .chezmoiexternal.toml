@@ -24,13 +24,12 @@
     stripComponents = 1
     refreshPeriod = "168h"
 {{- end}}
-{{if .android -}}
+{{if (or .workstation .tablet) -}}
+[".fonts/MesloLGS NF Regular.ttf"]
+{{else if .android -}}
 [".termux/font.ttf"]
 {{- end}}
-{{if .workstation -}}
-[".fonts/MesloLGS NF Regular.ttf"]
-{{- end}}
-{{if (or .android .workstation) -}}
+{{if (or .android .workstation .tablet) -}}
     type = "file"
     url = "https://raw.githubusercontent.com/romkatv/powerlevel10k-media/master/MesloLGS NF Regular.ttf"
     refreshPeriod = "4380h"
