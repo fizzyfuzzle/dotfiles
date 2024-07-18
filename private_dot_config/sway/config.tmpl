@@ -47,11 +47,13 @@ focus_follows_mouse no
 # Hide mouse pointer after timeout
 seat * hide_cursor 5000
 
+{{- if .tablet }}
 # Touchpad
 input type:touchpad {
     tap enabled
     natural_scroll disabled
 }
+{{- end }}
 
 ## Outputs
 #
@@ -62,7 +64,7 @@ output * {
     scale 1.5
 }
 
-{{ if .workstation -}}
+{{- if .workstation }}
 # HEADLESS VNC
 output "HEADLESS-1" {
     scale 1.0
