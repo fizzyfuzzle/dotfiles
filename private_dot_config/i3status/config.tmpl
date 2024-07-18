@@ -10,12 +10,11 @@ general {
 order += "read_file status"
 order += "load"
 order += "memory"
-order += "cpu_temperature 1"
+order += "cpu_temperature {{ if .tablet }}9{{ else }}1{{ end }}
 order += "disk /"
 order += "ethernet _first_"
 order += "wireless _first_"
 order += "path_exists WG"
-order += "path_exists OVPN"
 order += "volume master"
 order += "battery 1"
 order += "time"
@@ -39,7 +38,7 @@ memory {
     threshold_critical = "10%"
 }
 
-cpu_temperature 1 {
+cpu_temperature {{ if .tablet }}9{{ else }}1{{ end }}{
     format = "T: %degrees°C"
     max_threshold = 60
 }
@@ -65,12 +64,6 @@ path_exists WG {
     format = "[%title]"
     format_down = ""
     path = "/proc/sys/net/ipv4/conf/wg0"
-}
-
-path_exists OVPN {
-    format = "[%title]"
-    format_down = ""
-    path = "/proc/sys/net/ipv4/conf/tun0"
 }
 
 volume master {
