@@ -1,12 +1,8 @@
 # vim: ft=swayconfig
-###############
-# Sway config #
-###############
-{{- if .tablet }}
+{{if .tablet -}}
 # Disable Xwayland
 xwayland disable
-{{ end }}
-
+{{- end }}
 ## Variables
 #
 # Modifier key 1 (WIN)
@@ -66,7 +62,7 @@ output * {
     scale 1.5
 }
 
-{{ if .workstation }}
+{{ if .workstation -}}
 # HEADLESS VNC
 output "HEADLESS-1" {
     scale 1.0
@@ -75,7 +71,7 @@ output "HEADLESS-1" {
 exec swaymsg create_output "HEADLESS-1"
 # Start WayVNC
 exec XKB_DEFAULT_OPTIONS="altwin:swap_lalt_lwin" wayvnc --output=HEADLESS-1 --max-fps=30 127.0.0.1 5900
-{{ end }}
+{{- end }}
 
 ## Key bindings
 #
