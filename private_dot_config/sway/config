@@ -49,6 +49,12 @@ focus_follows_mouse no
 # Hide mouse pointer after timeout
 seat * hide_cursor 5000
 
+# Touchpad
+input type:touchpad {
+    tap enabled
+    natural_scroll disabled
+}
+
 ## Outputs
 #
 # [swaymsg -t get_outputs]
