@@ -60,6 +60,9 @@ lockPref("browser.newtabpage.activity-stream.asrouter.userprefs.cfr.features", f
 lockPref("privacy.donottrackheader.enabled", true);
 lockPref("privacy.globalprivacycontrol.enabled", true);
 
+// Browser Privacy
+lockPref("browser.contentblocking.category", "strict");
+
 // Disable Sign On
 lockPref("signon.autofillForms", false);
 lockPref("signon.firefoxRelay.feature", "disabled");
