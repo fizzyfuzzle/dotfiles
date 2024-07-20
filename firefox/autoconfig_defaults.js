@@ -25,6 +25,8 @@ lockPref("browser.newtabpage.activity-stream.showSearch", false);
 lockPref("browser.newtabpage.activity-stream.showSponsoredTopSites", false);
 lockPref("browser.newtabpage.enabled", false);
 
+lockPref("browser.toolbars.bookmarks.visibility", "newtab");
+
 // Disable Spell Checker
 lockPref("layout.spellcheckDefault", 0);
 
@@ -138,3 +140,6 @@ lockPref("browser.newtabpage.activity-stream.feeds.discoverystreamfeed", false);
 lockPref("browser.newtabpage.activity-stream.showSponsored", false);
 lockPref("browser.newtabpage.activity-stream.showSponsoredTopSites", false);
 lockPref("browser.newtabpage.activity-stream.default.sites", "");
+
+// Layout
+pref("browser.uiCustomization.state", "{\"placements\":{\"widget-overflow-fixed-list\":[],\"unified-extensions-area\":[],\"nav-bar\":[\"back-button\",\"forward-button\",\"stop-reload-button\",\"customizableui-special-spring1\",\"urlbar-container\",\"customizableui-special-spring2\",\"save-to-pocket-button\",\"downloads-button\",\"unified-extensions-button\"],\"toolbar-menubar\":[\"menubar-items\"],\"TabsToolbar\":[\"tabbrowser-tabs\",\"new-tab-button\",\"alltabs-button\"],\"PersonalToolbar\":[\"personal-bookmarks\"]},\"seen\":[\"developer-button\"],\"dirtyAreaCache\":[\"nav-bar\",\"toolbar-menubar\",\"TabsToolbar\",\"PersonalToolbar\"],\"currentVersion\":20,\"newElementCount\":2}");
