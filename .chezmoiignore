@@ -1,5 +1,6 @@
 README.md
 chezmoi.key.age
+firefox
 scripts
 windows
 {{- if .server }}
@@ -11,7 +12,6 @@ windows
 .config/mutt
 .config/sway
 .gnupg
-firefox
 {{- end }}
 {{- if not .android }}
 .termux
