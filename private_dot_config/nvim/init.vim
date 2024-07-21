@@ -34,10 +34,6 @@ if lsp_enabled
   " COQ
   Plug 'ms-jpq/coq_nvim', {'branch': 'coq'}
   Plug 'ms-jpq/coq.artifacts', {'branch': 'artifacts'}
-  " TreeSitter
-  if has('nvim-0.8')
-    Plug 'nvim-treesitter/nvim-treesitter', {'do': ':TSUpdate'}
-  endif
 endif
 
 call plug#end()
@@ -115,7 +111,6 @@ let g:jellybeans_overrides = {
     \ 'background': { 'guibg': '#000000' }
 \ }
 silent! colorscheme jellybeans
-"exec 'source ' . stdpath('config') . '/theme.vim'
 
 " Lightline
 let g:lightline = {
@@ -192,18 +187,6 @@ for _, server in pairs(servers) do
   }))
 end
 EOF
-
-" Treesitter
-if has('nvim-0.8')
-lua <<EOF
-require 'nvim-treesitter.configs'.setup {
-  ensure_installed = { "bash", "c", "lua", "python", "vim", "vimdoc", "query" },
-  highlight = {
-    enable = true,
-  },
-}
-EOF
-endif
 
 " Start COQ
 autocmd VimEnter * COQnow --shut-up
