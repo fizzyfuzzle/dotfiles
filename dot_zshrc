@@ -4,6 +4,11 @@ export XDG_CONFIG_HOME="${HOME}/.config"
 export XDG_DATA_HOME="${HOME}/.local/share"
 export ELECTRON_OZONE_PLATFORM_HINT="auto"
 
+# PATH
+typeset -Ux PATH path
+path=("${HOME}/bin" $path)
+path=("${HOME}/.local/bin" $path)
+
 # Powerlevel10k instant prompt
 if [[ -r "${XDG_CACHE_HOME}/p10k-instant-prompt-${(%):-%n}.zsh" ]]; then
   source "${XDG_CACHE_HOME}/p10k-instant-prompt-${(%):-%n}.zsh"
