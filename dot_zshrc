@@ -54,6 +54,7 @@ export VISUAL="${EDITOR}"
 # Pass
 if [[ -d "${HOME}/repositories/password-store" ]]; then
     export PASSWORD_STORE_DIR="${HOME}/repositories/password-store"
+    export PASSWORD_STORE_GPG_OPTS="--quiet"
     alias p='pass'
 fi
 
