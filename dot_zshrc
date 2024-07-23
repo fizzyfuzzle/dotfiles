@@ -156,6 +156,4 @@ if [[ -f ~/.gnupg/gpg-agent.conf ]] && (( $+commands[gpgconf] )); then
     fi
     export GPG_TTY=$TTY
     gpg-connect-agent updatestartuptty /bye >/dev/null 2>&1
-    export GPG_EXTRA_SOCK="$(gpgconf --list-dirs agent-extra-socket)"
-    export SSH_AUTH_SOCK="$(gpgconf --list-dirs agent-ssh-socket)"
 fi
