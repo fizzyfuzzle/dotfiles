@@ -16,15 +16,13 @@
     exact = true
     stripComponents = 1
     refreshPeriod = "168h"
-{{if not .server -}}
+{{if (or .workstation .tablet) -}}
 [".submodules/zsh-powerlevel10k"]
     type = "archive"
     url = "https://github.com/romkatv/powerlevel10k/archive/master.tar.gz"
     exact = false
     stripComponents = 1
     refreshPeriod = "168h"
-{{- end}}
-{{if (or .workstation .tablet) -}}
 [".fonts/MesloLGS NF Regular.ttf"]
 {{else if .android -}}
 [".termux/font.ttf"]
