@@ -37,7 +37,7 @@ memory {
     threshold_critical = "10%"
 }
 
-cpu_temperature {{ if .tablet }}9{{ else }}1{{ end }} {
+cpu_temperature {{ if .tablet }}18{{ else }}1{{ end }} {
     format = "T: %degrees°C"
     max_threshold = 60
 }
