@@ -9,6 +9,8 @@ set $mod Mod4
 # Device lock
 set $lock swaylock -c 000000 -f -F
 #
+# Menu
+#
 # Moving around
 set $up Up
 set $left Left
@@ -45,13 +47,11 @@ focus_follows_mouse no
 # Hide mouse pointer after timeout
 seat * hide_cursor 5000
 
-{{- if .tablet }}
 # Touchpad
 input type:touchpad {
     tap enabled
     natural_scroll disabled
 }
-{{- end }}
 
 ## Outputs
 #
@@ -61,12 +61,9 @@ input type:touchpad {
 output * {
     scale 1.5
 }
-{{- if .tablet }}
 bindswitch --locked lid:on output "*" disable
 bindswitch --locked lid:off output "*" enable
-{{- end }}
 
-{{- if .workstation }}
 # HEADLESS VNC
 output "HEADLESS-1" {
     scale 1.0
@@ -75,13 +72,13 @@ output "HEADLESS-1" {
 exec swaymsg create_output "HEADLESS-1"
 # Start WayVNC
 exec XKB_DEFAULT_OPTIONS="altwin:swap_lalt_lwin" wayvnc --output=HEADLESS-1 --max-fps=30 127.0.0.1 5900
-{{- end }}
 
 ## Key bindings
 #
 # Application launcher
-bindsym $mod+d exec foot -a foot-menu bash -c "compgen -c | sort -u | fzf | xargs -r swaymsg -t command exec"
-for_window [app_id="foot-menu"] floating enable, resize set height 250 px, resize set width 800 px, move position center
+bindsym $mod+d exec bemenu-run --prompt "❯" --fn "MesloLGS NF bold" --tf "#4c7899" --hf "#4c7899"
+#bindsym $mod+d exec foot -a foot-menu bash -c "compgen -c | sort -u | fzf | xargs -r swaymsg -t command exec"
+#for_window [app_id="foot-menu"] floating enable, resize set height 250 px, resize set width 800 px, move position center
 #
 # Start terminal
 bindsym $mod+Return exec foot
