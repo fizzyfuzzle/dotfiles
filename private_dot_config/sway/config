@@ -74,9 +74,7 @@ exec XKB_DEFAULT_OPTIONS="altwin:swap_lalt_lwin" wayvnc --output=HEADLESS-1 --ma
 ## Key bindings
 #
 # Application launcher
-bindsym $mod+d exec bemenu-run --prompt "❯" --fn "MesloLGS NF bold" --tf "#4c7899" --hf "#4c7899"
-#bindsym $mod+d exec foot -a foot-menu bash -c "compgen -c | sort -u | fzf | xargs -r swaymsg -t command exec"
-#for_window [app_id="foot-menu"] floating enable, resize set height 250 px, resize set width 800 px, move position center
+bindsym $mod+d exec tofi-run | xargs swaymsg exec --
 #
 # Start terminal
 bindsym $mod+Return exec foot
