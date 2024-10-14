@@ -1,0 +1,25 @@
+# Font
+font = "~/.fonts/MesloLGS NF Bold.ttf"
+font-size = 13
+
+# Color
+text-color = #888888
+background-color = #000000
+selection-color = #4c7899
+
+# Prompt
+prompt-text = " ❯ "
+min-input-width = 120
+result-spacing = 15
+
+# Size
+anchor = top
+width = 25%
+height = 24
+horizontal = true
+border-width = 0
+outline-width = 0
+padding-top = 0
+padding-bottom = 0
+padding-left = 0
+padding-right = 0
