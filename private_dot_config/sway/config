@@ -7,7 +7,7 @@ xwayland disable
 set $mod Mod4
 #
 # Device lock
-set $lock swaylock -c 000000 -f -F
+set $lock loginctl lock-session && swaylock -f -c 000000 -F
 #
 # Moving around
 set $up Up
