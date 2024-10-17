@@ -1,6 +1,6 @@
 # Font
-font = "FontAwesome bold"
-font-size = 13
+font = "Liberation Mono bold"
+font-size = 12
 
 # Color
 text-color = #888888
@@ -15,7 +15,7 @@ result-spacing = 15
 # Size
 anchor = top
 width = 25%
-height = 24
+height = 22
 horizontal = true
 border-width = 0
 outline-width = 0
