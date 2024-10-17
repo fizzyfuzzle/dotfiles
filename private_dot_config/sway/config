@@ -21,7 +21,7 @@ set $down Down
 output * bg #000000 solid_color
 #
 # Font
-font pango:FontAwesome bold 7
+font pango:Liberation Mono bold 7
 #
 # Colors
 #
@@ -195,7 +195,7 @@ bar {
         separator #888888
     }
     separator_symbol " "
-    font pango:FontAwesome bold 10
+    font pango:Liberation Mono bold 10
 }
 
 ## Scratchpad terminal

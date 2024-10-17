@@ -16,13 +16,3 @@
     exact = true
     stripComponents = 1
     refreshPeriod = "168h"
-{{if (or .workstation .tablet) -}}
-[".fonts/MesloLGS NF Regular.ttf"]
-    type = "file"
-    url = "https://raw.githubusercontent.com/romkatv/powerlevel10k-media/master/MesloLGS NF Regular.ttf"
-    refreshPeriod = "4380h"
-[".fonts/MesloLGS NF Bold.ttf"]
-    type = "file"
-    url = "https://raw.githubusercontent.com/romkatv/powerlevel10k-media/master/MesloLGS NF Bold.ttf"
-    refreshPeriod = "4380h"
-{{- end}}
