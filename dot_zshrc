@@ -86,6 +86,7 @@ alias sz='sudo HOME=$HOME /bin/zsh'
 alias sshz=sshz
 alias t="${EDITOR} ~/todo.md"
 (( $+commands[tmux] )) && alias tm='tmux attach -t $(hostname) || tmux new -s $(hostname)'
+alias up='sudo apt update && sudo apt upgrade && sudo apt autoremove --purge && sudo apt autoclean'
 alias v="${EDITOR}"
 
 # Use zshrc.remote config on remote machines
