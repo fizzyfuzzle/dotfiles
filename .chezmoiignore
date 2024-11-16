@@ -1,6 +1,6 @@
 README.md
 chezmoi.key.age
-windows
+firefox
 {{- if .server }}
 .ssh
 {{- end }}
@@ -10,12 +10,8 @@ windows
 .config/mutt
 .config/sway
 .gnupg
-firefox
 {{- end }}
 {{- if not .android }}
 .termux
 .hushlogin
-{{- end }}
-{{- if not .workstation }}
-vnc_server.sh
 {{- end }}
