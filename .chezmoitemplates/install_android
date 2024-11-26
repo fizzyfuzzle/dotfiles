@@ -13,8 +13,8 @@ $APT update
 $APT upgrade
 
 # Install packages
-$APT install age curl dnsutils git gzip inetutils \
-    lsd net-tools openssh rsync tmux neovim zsh
+$APT install age dnsutils git gzip inetutils \
+    net-tools openssh rsync neovim zsh
 
 # Cleanup
 $APT autoremove
