@@ -5,6 +5,7 @@ firefox
 .ssh
 {{- end }}
 {{- if (or .android .server) }}
+bin
 .config/foot
 .config/i3status
 .config/mutt
