@@ -1,0 +1,262 @@
+#!/usr/bin/env zsh
+#
+TARGETMOUNT="${LUKS_TARGETMOUNT:-$HOME/luks}"
+DEPENDENCIES=(age cryptsetup mkfs.ext4 e2fsck steghide)
+#
+function _info() {
+    print "\033[0;32m$1\033[0m"
+}
+function _warning() {
+    print "\033[0;33m$1\033[0m"
+}
+function _error() {
+    print "\033[0;31m$1\033[0m"
+    exit 1
+}
+
+# CHECK DEPENDENCIES
+function _check() {
+    for D in "${DEPENDENCIES[@]}"; do
+		command -v $D &>/dev/null || _error "DEPENDENCY MISSING: ${D}"
+	done
+}
+
+# EMBED KEY INTO IMAGE
+function _bury_key() {
+    local KEYFILE=$1
+    local IMAGE=$2
+
+    [[ ! -z $KEYFILE ]] || _error "NO KEY FILE SPECIFIED"
+    [[ -r $KEYFILE ]] || _error "KEY FILE NOT FOUND"
+    [[ ! -z $IMAGE ]] || _error "NO IMAGE FILE SPECIFIED"
+    [[ -r $IMAGE ]] || _error "IMAGE FILE NOT FOUND"
+    [[ $(file $IMAGE) =~ "JP.G" ]] || _error "IMAGE FILE NOT JPG"
+
+    # GET PASSWORD
+    print -n "Enter passphrase: "
+    read -s PASSWD
+    print
+
+    # REMOVE HEADER+FOOTER AND EMBED INTO IMAGE
+    cat "${KEYFILE}" \
+        | sed '/^-----/d' \
+        | steghide embed -q -ef - -cf "${IMAGE}" -p "${PASSWD}" -e serpent cbc -z 9
+    [[ $? == 0 ]] || _error "STEGHIDE EMBED FAILED"
+}
+
+# EXTRACT KEY FROM IMAGE
+function _exhume_key() {
+    local IMAGE=$1
+    local KEYFILE=$2
+
+    [[ ! -z $IMAGE ]] || _error "NO IMAGE FILE SPECIFIED"
+    [[ -r $IMAGE ]] || _error "IMAGE NOT FOUND"
+    [[ $(file $IMAGE) =~ "JP.G" ]] || _error "IMAGE FILE NOT JPG"
+    [[ ! -z $KEYFILE ]] || _error "NO KEY FILE SPECIFIED"
+    [[ ! -r $KEYFILE ]] || _error "KEY FILE ALREADY EXISTS"
+
+    # GET PASSWORD
+    print -n "Enter passphrase: "
+    read -s PASSWD
+    print
+
+    # EXTRACT FROM IMAGE AND ADD HEADER+FOOTER
+    EXTRACTED=$(steghide extract -q -sf "${IMAGE}" -xf - -p "${PASSWD}")
+    [[ $? == 0 ]] || _error "STEGHIDE EXTRACT FAILED"
+    KEY="-----BEGIN AGE ENCRYPTED FILE-----\n"
+	KEY+="$EXTRACTED\n"
+	KEY+="-----END AGE ENCRYPTED FILE-----\n"
+
+    # SAVE TO FILE
+    print -n - "${KEY}" > "${KEYFILE}"
+}
+
+# DIG TARGET
+function _dig() {
+    local TARGET=$1
+    local SIZE=${2:-100}
+
+    [[ ! -r $TARGET ]] || _error "TARGET ALREADY EXISTS"
+
+    # FILL TARGET WITH RANDOM DATA
+    dd if=/dev/urandom bs=1048576 count=$SIZE status=none of=$TARGET
+    [[ $? == 0 ]] || _error "DIG TARGET FAILED"
+}
+
+# FORGE KEY
+function _forge() {
+    local KEYFILE=$1
+
+    [[ ! -r $KEYFILE ]] || _error "KEY FILE ALREADY EXIST"
+
+    # GENERATE RANDOM KEYFILE AND ENCRYPT
+    dd if=/dev/urandom bs=1 count=512 status=none | age -a -p > "${KEYFILE}"
+    [[ $? == 0 ]] || _error "FORGE KEY FAILED"
+    chmod 0600 "${KEYFILE}"
+}
+
+# LOCK TARGET WITH KEY
+function _lock() {
+    local TARGET=$1
+    local KEYFILE=$2
+
+    [[ ! -z $TARGET ]] || _error "NO TARGET SPECIFIED"
+    [[ $TARGET =~ "/dev/" || -r $TARGET ]] || _error "TARGET NOT FOUND"
+    [[ ! -z $KEYFILE ]] || _error "NO KEY SPECIFIED"
+    [[ -r $KEYFILE ]] || _error "KEYFILE NOT FOUND"
+    local TARGETHASH=$(realpath ${TARGET} | sha256sum | cut -d " " -f1)
+    local TARGETMAPPER="luks.${TARGETHASH}"
+    [[ ! -e $TARGETMAPPER ]] || _error "TARGETMAPPER ALREADY EXISTS"
+
+    # DECRYPT KEYFILE
+    local SECRET=$(age -d ${KEYFILE})
+    [[ ! -z $SECRET ]] || _error "DECODING KEYFILE FAILED"
+
+    # LUKS FORMAT
+    print -R -n - "${SECRET}" | sudo cryptsetup --type luks2 --key-file - \
+        --cipher "aes-xts-plain64" --hash sha512 \
+        --batch-mode --key-size 512 --key-slot 0 \
+        luksFormat "${TARGET}"
+    [[ $? == 0 ]] || _error "LUKS FORMAT FAILED"
+
+    # LUKS OPEN
+    print -R -n - "${SECRET}" | sudo cryptsetup --key-file - \
+        luksOpen "${TARGET}" "${TARGETMAPPER}"
+    [[ $? == 0 ]] || _error "LUKS OPEN FAILED"
+
+    # FORMAT EXT4
+    sudo mkfs.ext4 -q -F -j -L "LUKS" "/dev/mapper/${TARGETMAPPER}"
+    [[ $? == 0 ]] || _error "EXT4 FORMAT FAILED"
+
+    # GIVE SOME TIME TO FINISH I/O
+    sleep 5
+
+    # LUKS CLOSE
+    sudo cryptsetup luksClose "${TARGETMAPPER}"
+    [[ $? == 0 ]] || _error "LUKS CLOSE FAILED"
+}
+
+# MOUNT CONTAINER
+function _mount() {
+    local TARGET=$1
+    local KEYFILE=$2
+
+    [[ ! -z $TARGET ]] || _error "NO TARGET SPECIFIED"
+    [[ $TARGET =~ "/dev/" || -r $TARGET ]] || _error "TARGET NOT FOUND"
+    [[ ! -z $KEYFILE ]] || _error "NO KEY SPECIFIED"
+    [[ -r $KEYFILE ]] || _error "KEYFILE NOT FOUND"
+    local TARGETHASH=$(realpath ${TARGET} | sha256sum | cut -d " " -f1)
+    local TARGETMAPPER="luks.${TARGETHASH}"
+    [[ ! -e $TARGETMAPPER ]] || _error "TARGETMAPPER ALREADY EXISTS"
+    [[ ! -e $TARGETMOUNT ]] || _error "MOUNTPOINT ALREADY EXISTS"
+
+    # CHECK TARGET
+    sudo cryptsetup isLuks ${TARGET} &>/dev/null
+    [[ $? == 0 ]] || _error "${TARGET} IS NO VALID LUKS CONTAINER"
+
+    # DECRYPT KEY FILE
+    local SECRET=$(age -d ${KEYFILE})
+    [[ ! -z $SECRET ]] || _error "DECODING KEYFILE FAILED"
+
+    # LUKS OPEN
+    print -R -n - "${SECRET}" | sudo cryptsetup --key-file - \
+        luksOpen "${TARGET}" "${TARGETMAPPER}"
+    [[ $? == 0 ]] || _error "LUKS OPEN FAILED"
+
+    # CHECK FILESYSTEM
+    sudo fsck -p -C0 "/dev/mapper/${TARGETMAPPER}" > /dev/null
+    [[ $? == 0 ]] || _error "FSCK FAILED"
+
+    # MOUNT
+    [[ -d "${TARGETMOUNT}" ]] || sudo mkdir -p "${TARGETMOUNT}"
+    sudo mount -o "rw,noatime,nodev" "/dev/mapper/${TARGETMAPPER}" "${TARGETMOUNT}"
+    [[ $? == 0 ]] || _error "MOUNT FAILED"
+
+    # UPDATE OWNER
+    sudo chown -R "$(id -u):$(id -g)" "${TARGETMOUNT}"
+    [[ $? == 0 ]] || _error "CHOWN FAILED"
+
+    # STATUS
+    STATUS=$(df -hP "${TARGETMOUNT}" | awk 'NR>1{print "FREE: " $4 " | USAGE: " $5}')
+    _info "[${TARGETMOUNT}] ${STATUS}"
+}
+
+# UMOUNT CONTAINER
+function _umount() {
+    local TARGET=$1
+
+    [[ ! -z $TARGET ]] || _error "NO TARGET SPECIFIED"
+    [[ $TARGET =~ "/dev/" || -r $TARGET ]] || _error "TARGET NOT FOUND"
+    local TARGETHASH=$(realpath ${TARGET} | sha256sum | cut -d " " -f1)
+    local TARGETMAPPER="luks.${TARGETHASH}"
+
+    # CHECK MOUNT
+    [[ -e "${TARGETMOUNT}" ]] || _error "TARGET NOT MOUNTED"
+
+    # UMOUNT
+    sudo umount "${TARGETMOUNT}"
+    [[ $? == 0 ]] || _error "UMOUNT FAILED"
+    sudo rmdir "${TARGETMOUNT}"
+    [[ $? == 0 ]] || _error "REMOVE MOUNTPOINT FAILED"
+
+    # LUKS CLOSE
+    sudo cryptsetup luksClose "${TARGETMAPPER}"
+    [[ $? == 0 ]] || _error "LUKS CLOSE FAILED"
+}
+
+function main() {
+    # CHECK FOR COMMAND AND ARGUMENT
+    [[ $# -ge 2 ]] || {
+        _warning "CMD\t\tARG1\t\tARG2"
+        print - "-----\t\t-----\t\t-----"
+        _info "dig\t\ttarget\t\t[size]"
+        _info "forge\t\tkey\t\t-"
+        _info "lock\t\ttarget\t\tkey"
+        _info "open\t\ttarget\t\tkey"
+        _info "close\t\ttarget\t\t-"
+        _info "bury\t\tkey\t\timage"
+        _info "exhume\t\timage\t\tkey"
+        exit 0
+    }
+
+    # CHECK DEPENDENCIES
+    _check
+
+	case $1 in
+		# DIG CONTAINER
+		dig)
+			_dig $2 $3
+			;;
+		# FORGE KEY
+		forge)
+			_forge $2
+			;;
+		# LOCK CONTAINER WITH KEY
+		lock)
+			_lock $2 $3
+			;;
+		# OPEN CONTAINER
+		open)
+			_mount $2 $3
+			;;
+		# CLOSE CONTAINER
+		close)
+			_umount $2
+			;;
+        # BURY KEY [KEYFILE, IMAGE]
+        bury)
+            _bury_key $2 $3
+            ;;
+        # EXHUME KEY
+        exhume)
+            _exhume_key $2 $3
+            ;;
+        # DEFAULT
+		*)
+            _warning "INVALID COMMAND"
+            ;;
+    esac
+    exit 0
+}
+
+main "$@"
