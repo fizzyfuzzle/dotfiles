@@ -17,8 +17,8 @@ function _error() {
 # CHECK DEPENDENCIES
 function _check() {
     for D in "${DEPENDENCIES[@]}"; do
-		command -v $D &>/dev/null || _error "DEPENDENCY MISSING: ${D}"
-	done
+        command -v $D &>/dev/null || _error "DEPENDENCY MISSING: ${D}"
+    done
 }
 
 # EMBED KEY INTO IMAGE
@@ -64,8 +64,8 @@ function _exhume_key() {
     EXTRACTED=$(steghide extract -q -sf "${IMAGE}" -xf - -p "${PASSWD}")
     [[ $? == 0 ]] || _error "STEGHIDE EXTRACT FAILED"
     KEY="-----BEGIN AGE ENCRYPTED FILE-----\n"
-	KEY+="$EXTRACTED\n"
-	KEY+="-----END AGE ENCRYPTED FILE-----\n"
+    KEY+="$EXTRACTED\n"
+    KEY+="-----END AGE ENCRYPTED FILE-----\n"
 
     # SAVE TO FILE
     print -n - "${KEY}" > "${KEYFILE}"
@@ -222,27 +222,27 @@ function main() {
     # CHECK DEPENDENCIES
     _check
 
-	case $1 in
-		# DIG CONTAINER
-		dig)
-			_dig $2 $3
-			;;
-		# FORGE KEY
-		forge)
-			_forge $2
-			;;
-		# LOCK CONTAINER WITH KEY
-		lock)
-			_lock $2 $3
-			;;
-		# OPEN CONTAINER
-		open)
-			_mount $2 $3
-			;;
-		# CLOSE CONTAINER
-		close)
-			_umount $2
-			;;
+    case $1 in
+        # DIG CONTAINER
+        dig)
+            _dig $2 $3
+            ;;
+        # FORGE KEY
+        forge)
+            _forge $2
+            ;;
+        # LOCK CONTAINER WITH KEY
+        lock)
+            _lock $2 $3
+            ;;
+        # OPEN CONTAINER
+        open)
+            _mount $2 $3
+            ;;
+        # CLOSE CONTAINER
+        close)
+            _umount $2
+            ;;
         # BURY KEY [KEYFILE, IMAGE]
         bury)
             _bury_key $2 $3
@@ -252,7 +252,7 @@ function main() {
             _exhume_key $2 $3
             ;;
         # DEFAULT
-		*)
+        *)
             _warning "INVALID COMMAND"
             ;;
     esac
