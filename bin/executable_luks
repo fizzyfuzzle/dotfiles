@@ -125,7 +125,7 @@ function _lock() {
     [[ $? == 0 ]] || _error "LUKS OPEN FAILED"
 
     # FORMAT EXT4
-    sudo mkfs.ext4 -q -F -j -L "LUKS" "/dev/mapper/${TARGETMAPPER}"
+    sudo mkfs.ext4 -q -L "LUKS" "/dev/mapper/${TARGETMAPPER}"
     [[ $? == 0 ]] || _error "EXT4 FORMAT FAILED"
 
     # GIVE SOME TIME TO FINISH I/O
