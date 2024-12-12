@@ -128,8 +128,8 @@ function _lock() {
     sudo mkfs.ext4 -q -L "LUKS" "/dev/mapper/${TARGETMAPPER}"
     [[ $? == 0 ]] || _error "EXT4 FORMAT FAILED"
 
-    # GIVE SOME TIME TO FINISH I/O
-    sleep 5
+    # SYNC CACHE TO TARGET
+    sync
 
     # LUKS CLOSE
     sudo cryptsetup luksClose "${TARGETMAPPER}"
