@@ -17,3 +17,4 @@ remoteusereval = get_user()
 remotepasseval = get_pass()
 ssl = yes
 sslcacertfile = /etc/ssl/certs/ca-certificates.crt
+subscribedonly = yes
