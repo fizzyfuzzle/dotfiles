@@ -8,8 +8,6 @@ if empty(glob(plug_path))
 endif
 unlet plug_path
 
-let lsp_enabled = has('nvim') && executable('python3')
-
 call plug#begin()
 " Theme
 Plug 'nanotech/jellybeans.vim'
@@ -27,15 +25,6 @@ Plug 'dense-analysis/ale'
 Plug 'jamessan/vim-gnupg'
 " NERD Commenter
 Plug 'preservim/nerdcommenter'
-
-if lsp_enabled
-  " LSP
-  Plug 'neovim/nvim-lspconfig'
-  " COQ
-  Plug 'ms-jpq/coq_nvim', {'branch': 'coq'}
-  Plug 'ms-jpq/coq.artifacts', {'branch': 'artifacts'}
-endif
-
 call plug#end()
 
 if plug_install
@@ -143,52 +132,3 @@ let g:ctrlp_custom_ignore = {
     \ 'file': '\v\.(pyc|swp|vim)$',
 \ }
 
-" Nvim-lspconfig and coq_nvim
-if lsp_enabled
-lua <<EOF
-
--- Mappings
-local opts = { noremap=true, silent=true }
-vim.api.nvim_set_keymap('n', '<space>e', '<cmd>lua vim.diagnostic.open_float()<CR>', opts)
-vim.api.nvim_set_keymap('n', '[d', '<cmd>lua vim.diagnostic.goto_prev()<CR>', opts)
-vim.api.nvim_set_keymap('n', ']d', '<cmd>lua vim.diagnostic.goto_next()<CR>', opts)
-vim.api.nvim_set_keymap('n', '<space>q', '<cmd>lua vim.diagnostic.setloclist()<CR>', opts)
-
--- Additional mapping after LSP server is attached
-local on_attach = function(client, bufnr)
-    vim.api.nvim_buf_set_option(bufnr, 'omnifunc', 'v:lua.vim.lsp.omnifunc')
-    vim.api.nvim_buf_set_keymap(bufnr, 'n', 'gD', '<cmd>lua vim.lsp.buf.declaration()<CR>', opts)
-    vim.api.nvim_buf_set_keymap(bufnr, 'n', 'gd', '<cmd>lua vim.lsp.buf.definition()<CR>', opts)
-    vim.api.nvim_buf_set_keymap(bufnr, 'n', 'K', '<cmd>lua vim.lsp.buf.hover()<CR>', opts)
-    vim.api.nvim_buf_set_keymap(bufnr, 'n', 'gi', '<cmd>lua vim.lsp.buf.implementation()<CR>', opts)
-    vim.api.nvim_buf_set_keymap(bufnr, 'n', '<C-k>', '<cmd>lua vim.lsp.buf.signature_help()<CR>', opts)
-    vim.api.nvim_buf_set_keymap(bufnr, 'n', '<space>wa', '<cmd>lua vim.lsp.buf.add_workspace_folder()<CR>', opts)
-    vim.api.nvim_buf_set_keymap(bufnr, 'n', '<space>wr', '<cmd>lua vim.lsp.buf.remove_workspace_folder()<CR>', opts)
-    vim.api.nvim_buf_set_keymap(bufnr, 'n', '<space>wl', '<cmd>lua print(vim.inspect(vim.lsp.buf.list_workspace_folders()))<CR>', opts)
-    vim.api.nvim_buf_set_keymap(bufnr, 'n', '<space>D', '<cmd>lua vim.lsp.buf.type_definition()<CR>', opts)
-    vim.api.nvim_buf_set_keymap(bufnr, 'n', '<space>rn', '<cmd>lua vim.lsp.buf.rename()<CR>', opts)
-    vim.api.nvim_buf_set_keymap(bufnr, 'n', '<space>ca', '<cmd>lua vim.lsp.buf.code_action()<CR>', opts)
-    vim.api.nvim_buf_set_keymap(bufnr, 'n', 'gr', '<cmd>lua vim.lsp.buf.references()<CR>', opts)
-    vim.api.nvim_buf_set_keymap(bufnr, 'n', '<space>f', '<cmd>lua vim.lsp.buf.formatting()<CR>', opts)
-end
-
--- Load LSP servers
-local servers = {
-  'bashls',
-  'dockerls',
-  'pyright',
-  'yamlls',
-}
-local lsp = require('lspconfig')
-local coq = require('coq')
-for _, server in pairs(servers) do
-  lsp[server].setup(coq.lsp_ensure_capabilities({
-    on_attach = on_attach,
-  }))
-end
-EOF
-
-" Start COQ
-autocmd VimEnter * COQnow --shut-up
-endif
-unlet lsp_enabled
