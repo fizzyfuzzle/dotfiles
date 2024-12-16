@@ -40,7 +40,7 @@ memory {
 cpu_temperature 0 {
     format = "T: %degrees°C"
     max_threshold = 60
-    path = "/sys/devices/platform/coretemp.0/hwmon/hwmon{{ if .tablet }}3{{ else }}5{{ end }}/temp1_input"
+    path = "/sys/devices/platform/coretemp.0/hwmon/hwmon*/temp1_input"
 }
 
 disk "/" {
