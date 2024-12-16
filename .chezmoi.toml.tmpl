@@ -3,7 +3,7 @@
 {{- $server := false -}}
 {{- $android := false -}}
 
-{{- if (and (eq .chezmoi.os "linux") (eq .chezmoi.osRelease.id "ubuntu")) -}}
+{{- if (eq .chezmoi.os "linux") -}}
 {{-   if (eq .chezmoi.hostname "hyperion") -}}
 {{-     $workstation = true -}}
 {{-   else if (eq .chezmoi.hostname "prometheus") -}}
