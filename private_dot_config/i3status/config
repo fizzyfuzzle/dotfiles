@@ -78,10 +78,6 @@ battery 1 {
     integer_battery_capacity = true
     low_threshold = 25
     threshold_type = "percentage"
-    status_chr = "C"
-    status_bat = "B"
-    status_unk = "?"
-    status_full = "F"
     format_down = ""
 }
 
