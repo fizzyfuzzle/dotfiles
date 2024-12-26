@@ -5,14 +5,10 @@
 EXTENSIONS=(
   pkief.material-icon-theme \
   ms-vscode-remote.remote-ssh \
-  ms-vscode.remote-explorer \
   ms-python.python \
-  ms-python.vscode-pylance \
-  ms-python.debugpy \
   ms-python.isort \
   hashicorp.terraform \
-  redhat.ansible \
-  redhat.vscode-yaml
+  redhat.ansible
 )
 
 # Check if CODE is installed
