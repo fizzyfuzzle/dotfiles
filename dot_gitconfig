@@ -4,7 +4,7 @@
     c = checkout
     b = branch
     cam = commit --amend
-    com = commit -m "Auto commit"
+    com = commit -m 'Auto commit'
     d = diff
     l = log -10
     lines = "!git ls-files | xargs wc -l"
