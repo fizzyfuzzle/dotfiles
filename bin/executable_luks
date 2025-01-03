@@ -103,11 +103,10 @@ function _lock() {
     local KEYFILE=$2
 
     [[ ! -z $TARGET ]] || _error "NO TARGET SPECIFIED"
-    [[ $TARGET =~ "/dev/" || -r $TARGET ]] || _error "TARGET NOT FOUND"
     [[ ! -z $KEYFILE ]] || _error "NO KEY SPECIFIED"
     [[ -r $KEYFILE ]] || _error "KEYFILE NOT FOUND"
     local TARGETHASH=$(realpath ${TARGET} | sha256sum | cut -d " " -f1)
-    local TARGETMAPPER="luks.${TARGETHASH}"
+    local TARGETMAPPER="/dev/mapper/luks.${TARGETHASH}"
     [[ ! -e $TARGETMAPPER ]] || _error "TARGETMAPPER ALREADY EXISTS"
 
     # DECRYPT KEYFILE
@@ -123,18 +122,18 @@ function _lock() {
 
     # LUKS OPEN
     print -R -n - "${SECRET}" | sudo cryptsetup --key-file - \
-        luksOpen "${TARGET}" "${TARGETMAPPER}"
+        luksOpen "${TARGET}" "${TARGETMAPPER##*/}"
     [[ $? == 0 ]] || _error "LUKS OPEN FAILED"
 
     # FORMAT EXT4
-    sudo mkfs.ext4 -q -L "LUKS" "/dev/mapper/${TARGETMAPPER}"
+    sudo mkfs.ext4 -q -L "LUKS" "${TARGETMAPPER}"
     [[ $? == 0 ]] || _error "EXT4 FORMAT FAILED"
 
     # SYNC CACHE TO TARGET
     sync
 
     # LUKS CLOSE
-    sudo cryptsetup luksClose "${TARGETMAPPER}"
+    sudo cryptsetup luksClose "${TARGETMAPPER##*/}"
     [[ $? == 0 ]] || _error "LUKS CLOSE FAILED"
 }
 
@@ -144,11 +143,10 @@ function _mount() {
     local KEYFILE=$2
 
     [[ ! -z $TARGET ]] || _error "NO TARGET SPECIFIED"
-    [[ $TARGET =~ "/dev/" || -r $TARGET ]] || _error "TARGET NOT FOUND"
     [[ ! -z $KEYFILE ]] || _error "NO KEY SPECIFIED"
     [[ -r $KEYFILE ]] || _error "KEYFILE NOT FOUND"
     local TARGETHASH=$(realpath ${TARGET} | sha256sum | cut -d " " -f1)
-    local TARGETMAPPER="luks.${TARGETHASH}"
+    local TARGETMAPPER="/dev/mapper/luks.${TARGETHASH}"
     [[ ! -e $TARGETMAPPER ]] || _error "TARGETMAPPER ALREADY EXISTS"
     [[ ! -e $TARGETMOUNT ]] || _error "MOUNTPOINT ALREADY EXISTS"
 
@@ -162,16 +160,16 @@ function _mount() {
 
     # LUKS OPEN
     print -R -n - "${SECRET}" | sudo cryptsetup --key-file - \
-        luksOpen "${TARGET}" "${TARGETMAPPER}"
+        luksOpen "${TARGET}" "${TARGETMAPPER##*/}"
     [[ $? == 0 ]] || _error "LUKS OPEN FAILED"
 
     # CHECK FILESYSTEM
-    sudo fsck -p -C0 "/dev/mapper/${TARGETMAPPER}" > /dev/null
+    sudo fsck -p -C0 "${TARGETMAPPER}" > /dev/null
     [[ $? == 0 ]] || _error "FSCK FAILED"
 
     # MOUNT
     [[ -d "${TARGETMOUNT}" ]] || sudo mkdir -p "${TARGETMOUNT}"
-    sudo mount -o "rw,noatime,nodev" "/dev/mapper/${TARGETMAPPER}" "${TARGETMOUNT}"
+    sudo mount -o "rw,noatime,nodev" "${TARGETMAPPER}" "${TARGETMOUNT}"
     [[ $? == 0 ]] || _error "MOUNT FAILED"
 
     # UPDATE OWNER
@@ -189,7 +187,7 @@ function _umount() {
 
     [[ ! -z $TARGET ]] || _error "NO TARGET SPECIFIED"
     local TARGETHASH=$(realpath ${TARGET} | sha256sum | cut -d " " -f1)
-    local TARGETMAPPER="luks.${TARGETHASH}"
+    local TARGETMAPPER="/dev/mapper/luks.${TARGETHASH}"
 
     # UMOUNT
     [[ -e "${TARGETMOUNT}" ]] && {
@@ -201,7 +199,7 @@ function _umount() {
 
     # LUKS CLOSE
     [[ -e "${TARGETMAPPER}" ]] && {
-        sudo cryptsetup luksClose "${TARGETMAPPER}"
+        sudo cryptsetup luksClose "${TARGETMAPPER##*/}"
         [[ $? == 0 ]] || _error "LUKS CLOSE FAILED"
     }
 }
