@@ -25,356 +25,356 @@ function _check() {
 }
 
 function _git_set() {
-	INNER_GIT_DIR="${1%/*}"
-	while [[ ! -d $INNER_GIT_DIR && "${INNER_GIT_DIR%/*}/" == "${PREFIX%/}/"* ]]; do
-		INNER_GIT_DIR="${INNER_GIT_DIR%/*}"
-	done
-	[[ $(git -C "${INNER_GIT_DIR}" rev-parse --is-inside-work-tree 2>/dev/null) == true ]] || INNER_GIT_DIR=""
+    INNER_GIT_DIR="${1%/*}"
+    while [[ ! -d $INNER_GIT_DIR && "${INNER_GIT_DIR%/*}/" == "${PREFIX%/}/"* ]]; do
+        INNER_GIT_DIR="${INNER_GIT_DIR%/*}"
+    done
+    [[ $(git -C "${INNER_GIT_DIR}" rev-parse --is-inside-work-tree 2>/dev/null) == true ]] || INNER_GIT_DIR=""
 }
 
 function _git_add() {
-	[[ -n $INNER_GIT_DIR ]] || return
-	git -C "${INNER_GIT_DIR}" add "$1" || return
-	[[ -n $(git -C "${INNER_GIT_DIR}" status --porcelain "$1") ]] || return
-	_git_commit "$2"
+    [[ -n $INNER_GIT_DIR ]] || return
+    git -C "${INNER_GIT_DIR}" add "$1" || return
+    [[ -n $(git -C "${INNER_GIT_DIR}" status --porcelain "$1") ]] || return
+    _git_commit "$2"
 }
 
 function _git_commit() {
-	[[ -n $INNER_GIT_DIR ]] || return
-	git -C "${INNER_GIT_DIR}" commit -m "$1"
+    [[ -n $INNER_GIT_DIR ]] || return
+    git -C "${INNER_GIT_DIR}" commit -m "$1"
 }
 
 function _confirm() {
-	[[ -t 0 ]] || return 0
-	local RESPONSE
-	print -n "$1 [y/N] "
-	read -r RESPONSE
-	[[ $RESPONSE == [yY] ]] || exit 1
+    [[ -t 0 ]] || return 0
+    local RESPONSE
+    print -n "$1 [y/N] "
+    read -r RESPONSE
+    [[ $RESPONSE == [yY] ]] || exit 1
 }
 
 function _set_recipients() {
-	local CURDIR="${PREFIX}/$1"
-	while [[ "${CURDIR}" != "${PREFIX}" && ! -f "${CURDIR}/.age-recipients" ]]; do
-		CURDIR="${CURDIR%/*}"
-	done
-	local RECIPIENTS="${CURDIR}/.age-recipients"
-	[[ -f "${RECIPIENTS}" ]] && AGE_RECIPIENT_ARGS=( "-R" "${RECIPIENTS}" ) || AGE_RECIPIENT_ARGS=( "-i" "${IDENTITIES_FILE}" )
+    local CURDIR="${PREFIX}/$1"
+    while [[ "${CURDIR}" != "${PREFIX}" && ! -f "${CURDIR}/.age-recipients" ]]; do
+        CURDIR="${CURDIR%/*}"
+    done
+    local RECIPIENTS="${CURDIR}/.age-recipients"
+    [[ -f "${RECIPIENTS}" ]] && AGE_RECIPIENT_ARGS=( "-R" "${RECIPIENTS}" ) || AGE_RECIPIENT_ARGS=( "-i" "${IDENTITIES_FILE}" )
 }
 
 function _reencrypt_path() {
-	local PASSFILE
-	while read -r -d '' PASSFILE; do
-		[[ -L $PASSFILE ]] && continue
-		local DIR="${PASSFILE%/*}"
-		DIR="${DIR#$PREFIX}"
-		DIR="${DIR#/}"
-		local TMPFILE="${PASSFILE}.tmp.${RANDOM}.${RANDOM}.${RANDOM}.${RANDOM}.--"
-		_set_recipients "${DIR}"
-		print "${PASSFILE}: REENCRYPTING WITH: age ${AGE_RECIPIENT_ARGS[@]}"
-		age -d -i "${IDENTITIES_FILE}" "${PASSFILE}" | age -e "${AGE_RECIPIENT_ARGS[@]}" -o "${TMPFILE}" &&
-		mv "${TMPFILE}" "${PASSFILE}" || rm -f "${TMPFILE}"
-	done < <(find "$1" -path '*/.git' -prune -o -iname '*.age' -print0)
+    local PASSFILE
+    while read -r -d '' PASSFILE; do
+        [[ -L $PASSFILE ]] && continue
+        local DIR="${PASSFILE%/*}"
+        DIR="${DIR#$PREFIX}"
+        DIR="${DIR#/}"
+        local TMPFILE="${PASSFILE}.tmp.${RANDOM}.${RANDOM}.${RANDOM}.${RANDOM}.--"
+        _set_recipients "${DIR}"
+        print "${PASSFILE}: REENCRYPTING WITH: age ${AGE_RECIPIENT_ARGS[@]}"
+        age -d -i "${IDENTITIES_FILE}" "${PASSFILE}" | age -e "${AGE_RECIPIENT_ARGS[@]}" -o "${TMPFILE}" &&
+        mv "${TMPFILE}" "${PASSFILE}" || rm -f "${TMPFILE}"
+    done < <(find "$1" -path '*/.git' -prune -o -iname '*.age' -print0)
 }
 
 function _sneaky_paths() {
-	local TARGET
-	for TARGET in "$@"; do
-		[[ $TARGET =~ /\.\.$ || $TARGET =~ ^\.\./ || $TARGET =~ /\.\./ || $TARGET =~ ^\.\.$ ]] && _error "SNEAKY PATH FAILURE"
-	done
+    local TARGET
+    for TARGET in "$@"; do
+        [[ $TARGET =~ /\.\.$ || $TARGET =~ ^\.\./ || $TARGET =~ /\.\./ || $TARGET =~ ^\.\.$ ]] && _error "SNEAKY PATH FAILURE"
+    done
 }
 
 function _clip() {
-	pkill -f "^PASSAGE CLIP" 2>/dev/null && sleep 0.5
-	print -R -n - "$1" | wl-copy || _error "CLIPBOARD COPY FAILED"
-	(
-		( exec -a "PASSAGE CLIP" bash <<<"trap 'kill %1' TERM; sleep 10 & wait" )
-		wl-copy --clear
-	) >/dev/null 2>&1 & disown
-	_info "COPIED '$2' TO CLIPBOARD (CLEARED IN 10 SECONDS)"
+    pkill -f "^PASSAGE CLIP" 2>/dev/null && sleep 0.5
+    print -R -n - "$1" | wl-copy || _error "CLIPBOARD COPY FAILED"
+    (
+        ( exec -a "PASSAGE CLIP" bash <<<"trap 'kill %1' TERM; sleep 10 & wait" )
+        wl-copy --clear
+    ) >/dev/null 2>&1 & disown
+    _info "COPIED '$2' TO CLIPBOARD (CLEARED IN 10 SECONDS)"
 }
 
 function _qrcode() {
-	print -R -n - "$1" | qrencode -t utf8
+    print -R -n - "$1" | qrencode -t utf8
 }
 
 function _create_tmpdir() {
-	[[ -n $SECURE_TMPDIR ]] && return
-	[[ -d /dev/shm && -w /dev/shm && -x /dev/shm ]] || _error "/dev/shm NOT AVAILABLE"
-	SECURE_TMPDIR=$(mktemp -d "/dev/shm/pass.XXXXXXXXXXXXX")
+    [[ -n $SECURE_TMPDIR ]] && return
+    [[ -d /dev/shm && -w /dev/shm && -x /dev/shm ]] || _error "/dev/shm NOT AVAILABLE"
+    SECURE_TMPDIR=$(mktemp -d "/dev/shm/pass.XXXXXXXXXXXXX")
 }
 
 function _remove_tmpdir() {
-	[[ -n $SECURE_TMPDIR ]] && rm -rf "${SECURE_TMPDIR}"
+    [[ -n $SECURE_TMPDIR ]] && rm -rf "${SECURE_TMPDIR}"
 }
 
 function _reencrypt() {
-	local TARGET="$1"
-	[[ ! -z $TARGET ]] || _error "NO TARGET SPECIFIED"
-	_sneaky_paths "${TARGET}"
-	[[ ! -d $PREFIX/$TARGET ]] && _error "'${PREFIX}/${TARGET}' NOT A FOLDER"
-	_git_set "${PREFIX}/${TARGET}"
-	_reencrypt_path "${PREFIX}/${TARGET}"
-	_git_add "${PREFIX}/${TARGET}" "Reencrypted ${TARGET}"
+    local TARGET="$1"
+    [[ ! -z $TARGET ]] || _error "NO TARGET SPECIFIED"
+    _sneaky_paths "${TARGET}"
+    [[ ! -d $PREFIX/$TARGET ]] && _error "'${PREFIX}/${TARGET}' NOT A FOLDER"
+    _git_set "${PREFIX}/${TARGET}"
+    _reencrypt_path "${PREFIX}/${TARGET}"
+    _git_add "${PREFIX}/${TARGET}" "Reencrypted ${TARGET}"
 }
 
 function _show() {
-	local OPTS CLIP=0 QRCODE=0 LINE
-	OPTS="$(getopt -o q::c:: -- "$@")"
-	[[ $? == 0 ]] || _error "GETOPT FAILED"
-	eval set -- "${OPTS}"
-	while true; do case $1 in
-		-q) QRCODE=1; LINE="${2:-1}"; shift 2 ;;
-		-c) CLIP=1; LINE="${2:-1}"; shift 2 ;;
-		--) shift; break ;;
-	esac done
+    local OPTS CLIP=0 QRCODE=0 LINE
+    OPTS="$(getopt -o q::c:: -- "$@")"
+    [[ $? == 0 ]] || _error "GETOPT FAILED"
+    eval set -- "${OPTS}"
+    while true; do case $1 in
+        -q) QRCODE=1; LINE="${2:-1}"; shift 2 ;;
+        -c) CLIP=1; LINE="${2:-1}"; shift 2 ;;
+        --) shift; break ;;
+    esac done
 
-	local PASS
-	local TARGET="$1"
-	local FILE="${PREFIX}/${TARGET}.age"
-	_sneaky_paths "${TARGET}"
-	[[ ! -f $FILE && ! -d $PREFIX/$TARGET ]] && _error "'${TARGET}' NOT FOUND IN STORE"
-	[[ -f $FILE ]] && {
-		if [[ $CLIP -eq 0 && $QRCODE -eq 0 ]]; then
-			PASS="$(age -d -i "${IDENTITIES_FILE}" "${FILE}")" || _error "DECRYPTING FAILED"
-			print -R - "${PASS}"
-		else
-			[[ $LINE =~ ^[0-9]+$ ]] || _error "'${LINE}' IS NOT A LINE NUMBER"
-			PASS="$(age -d -i "${IDENTITIES_FILE}" "${FILE}" | tail -n +${LINE} | head -n 1)" || _error "DECRYPTING FAILED"
-			[[ -n $PASS ]] || _error "'${LINE}' IS AN EMPTY LINE"
-			[[ $CLIP -eq 1 ]] && _clip "${PASS}" "${TARGET}"
-			[[ $QRCODE -eq 1 ]] && _qrcode "${PASS}" "${TARGET}"
-		fi
-	}
-	[[ -d $PREFIX/$TARGET ]] && {
-		find "${PREFIX}/${TARGET}" -path '.git' -prune -o -iname '*.age' -printf '%P\n' | sort | sed 's/\.age//'
-	}
+    local PASS
+    local TARGET="$1"
+    local FILE="${PREFIX}/${TARGET}.age"
+    _sneaky_paths "${TARGET}"
+    [[ ! -f $FILE && ! -d $PREFIX/$TARGET ]] && _error "'${TARGET}' NOT FOUND IN STORE"
+    [[ -f $FILE ]] && {
+        if [[ $CLIP -eq 0 && $QRCODE -eq 0 ]]; then
+            PASS="$(age -d -i "${IDENTITIES_FILE}" "${FILE}")" || _error "DECRYPTING FAILED"
+            print -R - "${PASS}"
+        else
+            [[ $LINE =~ ^[0-9]+$ ]] || _error "'${LINE}' IS NOT A LINE NUMBER"
+            PASS="$(age -d -i "${IDENTITIES_FILE}" "${FILE}" | tail -n +${LINE} | head -n 1)" || _error "DECRYPTING FAILED"
+            [[ -n $PASS ]] || _error "'${LINE}' IS AN EMPTY LINE"
+            [[ $CLIP -eq 1 ]] && _clip "${PASS}" "${TARGET}"
+            [[ $QRCODE -eq 1 ]] && _qrcode "${PASS}" "${TARGET}"
+        fi
+    }
+    [[ -d $PREFIX/$TARGET ]] && {
+        find "${PREFIX}/${TARGET}" -path '.git' -prune -o -iname '*.age' -printf '%P\n' | sort | sed 's/\.age//'
+    }
 }
 
 function _find() {
-	[[ -z $1 ]] && _error "NO SEARCH ARGUMENT"
-	find "${PREFIX}/${TARGET}" -path '.git' -prune -o -iname "*$1*.age" -printf '%P\n' | sort | sed 's/\.age//'
+    [[ -z $1 ]] && _error "NO SEARCH ARGUMENT"
+    find "${PREFIX}/${TARGET}" -path '.git' -prune -o -iname "*$1*.age" -printf '%P\n' | sort | sed 's/\.age//'
 }
 
 function _add() {
-	local OPTS MULTI=0 FORCE=0
-	OPTS="$(getopt -o mf -- "$@")"
-	[[ $? == 0 ]] || _error "GETOPT FAILED"
-	eval set -- "${OPTS}"
-	while true; do case $1 in
-		-m) MULTI=1; shift ;;
-		-f) FORCE=1; shift ;;
-		--) shift; break ;;
-	esac done
+    local OPTS MULTI=0 FORCE=0
+    OPTS="$(getopt -o mf -- "$@")"
+    [[ $? == 0 ]] || _error "GETOPT FAILED"
+    eval set -- "${OPTS}"
+    while true; do case $1 in
+        -m) MULTI=1; shift ;;
+        -f) FORCE=1; shift ;;
+        --) shift; break ;;
+    esac done
 
-	local TARGET="${1%/}"
-	[[ ! -z $TARGET ]] || _error "NO TARGET SPECIFIED"
-	local FILE="${PREFIX}/${TARGET}.age"
-	_sneaky_paths "${TARGET}"
-	_git_set "${FILE}"
-	[[ $FORCE -eq 0 && -e $FILE ]] && _confirm "'${TARGET}' ALREADY EXISTS. OVERWRITE?"
-	mkdir -p -v "${PREFIX}/$(dirname -- "${TARGET}")"
-	_set_recipients "$(dirname -- "${TARGET}")"
-	if [[ $MULTI -eq 1 ]]; then
-		print "PRESS CTRL+D WHEN FINISHED:"
-		print
-		age -e "${AGE_RECIPIENT_ARGS[@]}" -o "${FILE}" || _error "ENCRYPTION FAILED"
-	else
-		local PASS
-		print -n "ENTER PASSPHRASE: "
-		read -s PASS || exit 1
-		print
-		print -R -n - "${PASS}" | age -e "${AGE_RECIPIENT_ARGS[@]}" -o "${FILE}" || _error "ENCRYPTION FAILED"
-	fi
-	_git_add "${FILE}" "Add given password for '${TARGET}' to store."
+    local TARGET="${1%/}"
+    [[ ! -z $TARGET ]] || _error "NO TARGET SPECIFIED"
+    local FILE="${PREFIX}/${TARGET}.age"
+    _sneaky_paths "${TARGET}"
+    _git_set "${FILE}"
+    [[ $FORCE -eq 0 && -e $FILE ]] && _confirm "'${TARGET}' ALREADY EXISTS. OVERWRITE?"
+    mkdir -p -v "${PREFIX}/$(dirname -- "${TARGET}")"
+    _set_recipients "$(dirname -- "${TARGET}")"
+    if [[ $MULTI -eq 1 ]]; then
+        print "PRESS CTRL+D WHEN FINISHED:"
+        print
+        age -e "${AGE_RECIPIENT_ARGS[@]}" -o "${FILE}" || _error "ENCRYPTION FAILED"
+    else
+        local PASS
+        print -n "ENTER PASSPHRASE: "
+        read -s PASS || exit 1
+        print
+        print -R -n - "${PASS}" | age -e "${AGE_RECIPIENT_ARGS[@]}" -o "${FILE}" || _error "ENCRYPTION FAILED"
+    fi
+    _git_add "${FILE}" "Add given password for '${TARGET}' to store."
 }
 
 function _edit() {
-	local TARGET="${1%/}"
-	[[ ! -z $TARGET ]] || _error "NO TARGET SPECIFIED"
-	_sneaky_paths "${TARGET}"
-	mkdir -p -v "${PREFIX}/$(dirname -- "${TARGET}")"
-	_set_recipients "$(dirname -- "${TARGET}")"
-	local FILE="${PREFIX}/${TARGET}.age"
-	_git_set "${FILE}"
-	_create_tmpdir # Set $SECURE_TMPDIR
-	local TMPFILE="$(mktemp -u "$SECURE_TMPDIR/XXXXXX")-${TARGET//\//-}.txt"
-	local ACTION="Add"
-	if [[ -f $FILE ]]; then
-		age -d -o "${TMPFILE}" -i "${IDENTITIES_FILE}" "${FILE}" || _error "DECRYPTING FAILED"
-		ACTION="Edit"
-	fi
-	${EDITOR} "${TMPFILE}"
-	[[ -f $TMPFILE ]] || _error "NEW PASSWORD NOT SAVED"
-	age -e "${AGE_RECIPIENT_ARGS[@]}" -o "${FILE}" "${TMPFILE}" || _error "ENCRYPTION FAILED"
-	_git_add "${FILE}" "${ACTION} password for ${TARGET} using ${EDITOR}."
+    local TARGET="${1%/}"
+    [[ ! -z $TARGET ]] || _error "NO TARGET SPECIFIED"
+    _sneaky_paths "${TARGET}"
+    mkdir -p -v "${PREFIX}/$(dirname -- "${TARGET}")"
+    _set_recipients "$(dirname -- "${TARGET}")"
+    local FILE="${PREFIX}/${TARGET}.age"
+    _git_set "${FILE}"
+    _create_tmpdir # Set $SECURE_TMPDIR
+    local TMPFILE="$(mktemp -u "$SECURE_TMPDIR/XXXXXX")-${TARGET//\//-}.txt"
+    local ACTION="Add"
+    if [[ -f $FILE ]]; then
+        age -d -o "${TMPFILE}" -i "${IDENTITIES_FILE}" "${FILE}" || _error "DECRYPTING FAILED"
+        ACTION="Edit"
+    fi
+    ${EDITOR} "${TMPFILE}"
+    [[ -f $TMPFILE ]] || _error "NEW PASSWORD NOT SAVED"
+    age -e "${AGE_RECIPIENT_ARGS[@]}" -o "${FILE}" "${TMPFILE}" || _error "ENCRYPTION FAILED"
+    _git_add "${FILE}" "${ACTION} password for ${TARGET} using ${EDITOR}."
 }
 
 function _generate() {
-	local OPTS FORCE=0 INPLACE=0 PASS
-	OPTS="$(getopt -o if -- "$@")"
-	[[ $? == 0 ]] || _error "GETOPT FAILED"
-	eval set -- "${OPTS}"
-	while true; do case $1 in
-		-f) FORCE=1; shift ;;
-		-i) INPLACE=1; shift ;;
-		--) shift; break ;;
-	esac done
+    local OPTS FORCE=0 INPLACE=0 PASS
+    OPTS="$(getopt -o if -- "$@")"
+    [[ $? == 0 ]] || _error "GETOPT FAILED"
+    eval set -- "${OPTS}"
+    while true; do case $1 in
+        -f) FORCE=1; shift ;;
+        -i) INPLACE=1; shift ;;
+        --) shift; break ;;
+    esac done
 
-	local TARGET="$1"
-	[[ ! -z $TARGET ]] || _error "NO TARGET SPECIFIED"
-	_sneaky_paths "${TARGET}"
-	mkdir -p -v "${PREFIX}/$(dirname -- "${TARGET}")"
-	_set_recipients "$(dirname -- "${TARGET}")"
-	local FILE="${PREFIX}/${TARGET}.age"
-	_git_set "$FILE"
-	[[ $INPLACE -eq 0 && $FORCE -eq 0 && -e $FILE ]] && _confirm "'${TARGET}' ALREADY EXISTS. OVERWRITE?"
-	local LENGTH=30
-	read -r -k $LENGTH -u 0 PASS < <(LC_ALL=C tr -dc '[:alnum:]!@#$%^&*()_+[];:,.?' < /dev/urandom)
-	[[ ${#PASS} -eq $LENGTH ]] || _error "PASSWORD GENERATION FAILED"
-	if [[ $INPLACE -eq 0 ]]; then
-		print -R - "${PASS}" | age -e "${AGE_RECIPIENT_ARGS[@]}" -o "${FILE}" || _error "ENCRYPTION FAILED"
-	else
-		local TMPFILE="${FILE}.tmp.${RANDOM}.${RANDOM}.${RANDOM}.${RANDOM}.--"
-		if { print -R - "${PASS}"; age -d -i "${IDENTITIES_FILE}" "${FILE}" | tail -n +2; } | age -e "${AGE_RECIPIENT_ARGS[@]}" -o "${TMPFILE}"; then
-			mv "${TMPFILE}" "${FILE}"
-		else
-			rm -f "${TMPFILE}"
-			_error "REENCRYPTION FAILED"
-		fi
-	fi
-	local VERB="Add"
-	[[ $INPLACE -eq 1 ]] && VERB="Replace"
-	_git_add "${FILE}" "${VERB} generated password for ${TARGET}."
-	printf "\e[1mTHE GENERATED PASSWORD FOR \e[4m%s\e[24m IS:\e[0m\n\e[1m\e[93m%s\e[0m\n" "${TARGET}" "${PASS}"
+    local TARGET="$1"
+    [[ ! -z $TARGET ]] || _error "NO TARGET SPECIFIED"
+    _sneaky_paths "${TARGET}"
+    mkdir -p -v "${PREFIX}/$(dirname -- "${TARGET}")"
+    _set_recipients "$(dirname -- "${TARGET}")"
+    local FILE="${PREFIX}/${TARGET}.age"
+    _git_set "$FILE"
+    [[ $INPLACE -eq 0 && $FORCE -eq 0 && -e $FILE ]] && _confirm "'${TARGET}' ALREADY EXISTS. OVERWRITE?"
+    local LENGTH=30
+    read -r -k $LENGTH -u 0 PASS < <(LC_ALL=C tr -dc '[:alnum:]!@#$%^&*()_+[];:,.?' < /dev/urandom)
+    [[ ${#PASS} -eq $LENGTH ]] || _error "PASSWORD GENERATION FAILED"
+    if [[ $INPLACE -eq 0 ]]; then
+        print -R - "${PASS}" | age -e "${AGE_RECIPIENT_ARGS[@]}" -o "${FILE}" || _error "ENCRYPTION FAILED"
+    else
+        local TMPFILE="${FILE}.tmp.${RANDOM}.${RANDOM}.${RANDOM}.${RANDOM}.--"
+        if { print -R - "${PASS}"; age -d -i "${IDENTITIES_FILE}" "${FILE}" | tail -n +2; } | age -e "${AGE_RECIPIENT_ARGS[@]}" -o "${TMPFILE}"; then
+            mv "${TMPFILE}" "${FILE}"
+        else
+            rm -f "${TMPFILE}"
+            _error "REENCRYPTION FAILED"
+        fi
+    fi
+    local VERB="Add"
+    [[ $INPLACE -eq 1 ]] && VERB="Replace"
+    _git_add "${FILE}" "${VERB} generated password for ${TARGET}."
+    printf "\e[1mTHE GENERATED PASSWORD FOR \e[4m%s\e[24m IS:\e[0m\n\e[1m\e[93m%s\e[0m\n" "${TARGET}" "${PASS}"
 }
 
 function _remove() {
-	local OPTS RECURSIVE="" FORCE=0
-	OPTS="$(getopt -o rf -- "$@")"
-	[[ $? == 0 ]] || _error "GETOPT FAILED"
-	eval set -- "${OPTS}"
-	while true; do case $1 in
-		-r) RECURSIVE="-r"; shift ;;
-		-f) FORCE=1; shift ;;
-		--) shift; break ;;
-	esac done
+    local OPTS RECURSIVE="" FORCE=0
+    OPTS="$(getopt -o rf -- "$@")"
+    [[ $? == 0 ]] || _error "GETOPT FAILED"
+    eval set -- "${OPTS}"
+    while true; do case $1 in
+        -r) RECURSIVE="-r"; shift ;;
+        -f) FORCE=1; shift ;;
+        --) shift; break ;;
+    esac done
 
-	local TARGET="$1"
-	[[ ! -z $TARGET ]] || _error "NO TARGET SPECIFIED"
-	_sneaky_paths "${TARGET}"
-	local PASSDIR="${PREFIX}/${TARGET%/}"
-	local PASSFILE="${PREFIX}/${TARGET}.age"
-	[[ -f $PASSFILE && -d $PASSDIR && $TARGET == */ || ! -f $PASSFILE ]] && PASSFILE="${PASSDIR%/}/"
-	[[ -e $PASSFILE ]] || _error "'${TARGET}' NOT FOUND IN STORE"
-	_git_set "$PASSFILE"
-	[[ $FORCE -eq 1 ]] || _confirm "DELETE '${TARGET}'?"
-	rm $RECURSIVE -f -v "${PASSFILE}"
-	_git_set "${PASSFILE}"
-	if [[ -n $INNER_GIT_DIR && ! -e $PASSFILE ]]; then
-		git -C "${INNER_GIT_DIR}" rm -qr "${PASSFILE}"
-		_git_set "${PASSFILE}"
-		_git_commit "Remove ${TARGET} from store."
-	fi
-	rmdir -p "${PASSFILE%/*}" 2>/dev/null
+    local TARGET="$1"
+    [[ ! -z $TARGET ]] || _error "NO TARGET SPECIFIED"
+    _sneaky_paths "${TARGET}"
+    local PASSDIR="${PREFIX}/${TARGET%/}"
+    local PASSFILE="${PREFIX}/${TARGET}.age"
+    [[ -f $PASSFILE && -d $PASSDIR && $TARGET == */ || ! -f $PASSFILE ]] && PASSFILE="${PASSDIR%/}/"
+    [[ -e $PASSFILE ]] || _error "'${TARGET}' NOT FOUND IN STORE"
+    _git_set "$PASSFILE"
+    [[ $FORCE -eq 1 ]] || _confirm "DELETE '${TARGET}'?"
+    rm $RECURSIVE -f -v "${PASSFILE}"
+    _git_set "${PASSFILE}"
+    if [[ -n $INNER_GIT_DIR && ! -e $PASSFILE ]]; then
+        git -C "${INNER_GIT_DIR}" rm -qr "${PASSFILE}"
+        _git_set "${PASSFILE}"
+        _git_commit "Remove ${TARGET} from store."
+    fi
+    rmdir -p "${PASSFILE%/*}" 2>/dev/null
 }
 
 function _move() {
-	local OPTS FORCE=0
-	OPTS="$(getopt -o f -- "$@")"
-	[[ $? == 0 ]] || _error "GETOPT FAILED"
-	eval set -- "${OPTS}"
-	while true; do case $1 in
-		-f) FORCE=1; shift ;;
-		--) shift; break ;;
-	esac done
+    local OPTS FORCE=0
+    OPTS="$(getopt -o f -- "$@")"
+    [[ $? == 0 ]] || _error "GETOPT FAILED"
+    eval set -- "${OPTS}"
+    while true; do case $1 in
+        -f) FORCE=1; shift ;;
+        --) shift; break ;;
+    esac done
 
-	[[ $# -ne 2 ]] && _error "SOURCE AND TARGET REQUIRED"
-	_sneaky_paths "$@"
-	local OLD_PATH="$PREFIX/${1%/}"
-	local OLD_DIR="$OLD_PATH"
-	local NEW_PATH="$PREFIX/$2"
-	if ! [[ -f "${OLD_PATH}.age" && -d $OLD_PATH && $1 == */ || ! -f "${OLD_PATH}.age" ]]; then
-		OLD_DIR="${OLD_PATH%/*}"
-		OLD_PATH="${OLD_PATH}.age"
-	fi
-	[[ -e $OLD_PATH ]] || _error "'$1' NOT FOUND IN STORE"
-	mkdir -p -v "${NEW_PATH%/*}"
-	[[ -d $OLD_PATH || -d $NEW_PATH || $NEW_PATH == */ ]] || NEW_PATH="${NEW_PATH}.age"
-	local INTERACTIVE="-i"
-	[[ ! -t 0 || $FORCE -eq 1 ]] && INTERACTIVE="-f"
-	_git_set "${NEW_PATH}"
-	mv $INTERACTIVE -v "${OLD_PATH}" "${NEW_PATH}" || exit 1
-	[[ -e "${NEW_PATH}" ]] && _reencrypt_path "${NEW_PATH}"
-	_git_set "${NEW_PATH}"
-	if [[ -n $INNER_GIT_DIR && ! -e "${OLD_PATH}" ]]; then
-		git -C "${INNER_GIT_DIR}" rm -qr "${OLD_PATH}" 2>/dev/null
-		_git_set "${NEW_PATH}"
-		_git_add "${NEW_PATH}" "Rename ${1} to ${2}."
-	fi
-	_git_set "${OLD_PATH}"
-	if [[ -n $INNER_GIT_DIR && ! -e "${OLD_PATH}" ]]; then
-		git -C "${INNER_GIT_DIR}" rm -qr "${OLD_PATH}" 2>/dev/null
-		_git_set "${OLD_PATH}"
-		[[ -n $(git -C "${INNER_GIT_DIR}" status --porcelain "${OLD_PATH}") ]] && _git_commit "Remove $1."
-	fi
-	rmdir -p "${OLD_DIR}" 2>/dev/null
+    [[ $# -ne 2 ]] && _error "SOURCE AND TARGET REQUIRED"
+    _sneaky_paths "$@"
+    local OLD_PATH="$PREFIX/${1%/}"
+    local OLD_DIR="$OLD_PATH"
+    local NEW_PATH="$PREFIX/$2"
+    if ! [[ -f "${OLD_PATH}.age" && -d $OLD_PATH && $1 == */ || ! -f "${OLD_PATH}.age" ]]; then
+        OLD_DIR="${OLD_PATH%/*}"
+        OLD_PATH="${OLD_PATH}.age"
+    fi
+    [[ -e $OLD_PATH ]] || _error "'$1' NOT FOUND IN STORE"
+    mkdir -p -v "${NEW_PATH%/*}"
+    [[ -d $OLD_PATH || -d $NEW_PATH || $NEW_PATH == */ ]] || NEW_PATH="${NEW_PATH}.age"
+    local INTERACTIVE="-i"
+    [[ ! -t 0 || $FORCE -eq 1 ]] && INTERACTIVE="-f"
+    _git_set "${NEW_PATH}"
+    mv $INTERACTIVE -v "${OLD_PATH}" "${NEW_PATH}" || exit 1
+    [[ -e "${NEW_PATH}" ]] && _reencrypt_path "${NEW_PATH}"
+    _git_set "${NEW_PATH}"
+    if [[ -n $INNER_GIT_DIR && ! -e "${OLD_PATH}" ]]; then
+        git -C "${INNER_GIT_DIR}" rm -qr "${OLD_PATH}" 2>/dev/null
+        _git_set "${NEW_PATH}"
+        _git_add "${NEW_PATH}" "Rename ${1} to ${2}."
+    fi
+    _git_set "${OLD_PATH}"
+    if [[ -n $INNER_GIT_DIR && ! -e "${OLD_PATH}" ]]; then
+        git -C "${INNER_GIT_DIR}" rm -qr "${OLD_PATH}" 2>/dev/null
+        _git_set "${OLD_PATH}"
+        [[ -n $(git -C "${INNER_GIT_DIR}" status --porcelain "${OLD_PATH}") ]] && _git_commit "Remove $1."
+    fi
+    rmdir -p "${OLD_DIR}" 2>/dev/null
 }
 
 function _git() {
-	_git_set "${PREFIX}/"
-	if [[ $1 == "init" ]]; then
-		INNER_GIT_DIR="${PREFIX}"
-		git -C "${INNER_GIT_DIR}" "$@" || exit 1
-		_git_add "${PREFIX}" "Add current contents of password store."
-		print '*.age diff=age' > "${PREFIX}/.gitattributes"
-		_git_add .gitattributes "Configure git repository for age file diff."
-		git -C "${INNER_GIT_DIR}" config --local diff.age.binary true
-		git -C "${INNER_GIT_DIR}" config --local diff.age.textconv "age -d -i ${IDENTITIES_FILE}"
-	elif [[ -n $INNER_GIT_DIR ]]; then
-		_create_tmpdir # Set $SECURE_TMPDIR
-		export TMPDIR="${SECURE_TMPDIR}"
-		git -C "${INNER_GIT_DIR}" "$@"
-	else
-		_error "NOT A GIT REPOSITORY"
-	fi
+    _git_set "${PREFIX}/"
+    if [[ $1 == "init" ]]; then
+        INNER_GIT_DIR="${PREFIX}"
+        git -C "${INNER_GIT_DIR}" "$@" || exit 1
+        _git_add "${PREFIX}" "Add current contents of password store."
+        print '*.age diff=age' > "${PREFIX}/.gitattributes"
+        _git_add .gitattributes "Configure git repository for age file diff."
+        git -C "${INNER_GIT_DIR}" config --local diff.age.binary true
+        git -C "${INNER_GIT_DIR}" config --local diff.age.textconv "age -d -i ${IDENTITIES_FILE}"
+    elif [[ -n $INNER_GIT_DIR ]]; then
+        _create_tmpdir # Set $SECURE_TMPDIR
+        export TMPDIR="${SECURE_TMPDIR}"
+        git -C "${INNER_GIT_DIR}" "$@"
+    else
+        _error "NOT A GIT REPOSITORY"
+    fi
 }
 
 function main() {
-	trap _remove_tmpdir EXIT HUP INT TERM
+    trap _remove_tmpdir EXIT HUP INT TERM
 
     # CHECK DEPENDENCIES
     _check
 
-	[[ -f "${IDENTITIES_FILE}" ]] || _error "IDENTITIES FILE NOT FOUND!"
+    [[ -f "${IDENTITIES_FILE}" ]] || _error "IDENTITIES FILE NOT FOUND!"
 
-	case "$1" in
-		show) shift; _show "$@" ;;
-		find) shift; _find "$@" ;;
-		add) shift; _add "$@" ;;
-		edit) shift; _edit "$@" ;;
-		generate) shift; _generate "$@" ;;
-		reencrypt) shift; _reencrypt "$@" ;;
-		mv) shift; _move "$@" ;;
-		rm) shift; _remove "$@" ;;
-		git) shift; _git "$@" ;;
-		help)
-		    _warning "CMD\t\tARG1\t\tARG2"
-			print - "-----\t\t-----\t\t-----"
-			_info "show\t\t[pass]\t\t-"
-			_info "find\t\tstring\t\t-"
-			_info "add\t\tpass\t\t[-f, -m]"
-			_info "edit\t\tpass\t\t-"
-			_info "generate\tpass\t\t[-f, -i]"
-			_info "reencrypt\tdir\t\t-"
-			_info "mv\t\tpass\t\t[-f]"
-			_info "rm\t\tpass\t\t[-f]"
-			_info "git\t\tcmd\t\t-"
-			_info "help\t\t-\t\t-"
-			exit 0
-			;;
-		*) _show "$@" ;;
-	esac
-	exit 0
+    case "$1" in
+        show) shift; _show "$@" ;;
+        find) shift; _find "$@" ;;
+        add) shift; _add "$@" ;;
+        edit) shift; _edit "$@" ;;
+        generate) shift; _generate "$@" ;;
+        reencrypt) shift; _reencrypt "$@" ;;
+        mv) shift; _move "$@" ;;
+        rm) shift; _remove "$@" ;;
+        git) shift; _git "$@" ;;
+        help)
+            _warning "CMD\t\tARG1\t\tARG2"
+            print - "-----\t\t-----\t\t-----"
+            _info "show\t\t[pass]\t\t-"
+            _info "find\t\tstring\t\t-"
+            _info "add\t\tpass\t\t[-f, -m]"
+            _info "edit\t\tpass\t\t-"
+            _info "generate\tpass\t\t[-f, -i]"
+            _info "reencrypt\tdir\t\t-"
+            _info "mv\t\tpass\t\t[-f]"
+            _info "rm\t\tpass\t\t[-f]"
+            _info "git\t\tcmd\t\t-"
+            _info "help\t\t-\t\t-"
+            exit 0
+            ;;
+        *) _show "$@" ;;
+    esac
+    exit 0
 }
 
 main "$@"
