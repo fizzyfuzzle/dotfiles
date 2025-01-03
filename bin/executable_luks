@@ -1,5 +1,7 @@
 #!/usr/bin/env zsh
 #
+set -o pipefail
+#
 TARGETMOUNT="${LUKS_TARGETMOUNT:-$HOME/luks}"
 DEPENDENCIES=(age cryptsetup mkfs.ext4 e2fsck steghide)
 #
@@ -10,7 +12,7 @@ function _warning() {
     print "\033[0;33m$1\033[0m"
 }
 function _error() {
-    print "\033[0;31m$1\033[0m"
+    print "\033[0;31m$1\033[0m" >&2
     exit 1
 }
 
@@ -186,74 +188,47 @@ function _umount() {
     local TARGET=$1
 
     [[ ! -z $TARGET ]] || _error "NO TARGET SPECIFIED"
-    [[ $TARGET =~ "/dev/" || -r $TARGET ]] || _error "TARGET NOT FOUND"
     local TARGETHASH=$(realpath ${TARGET} | sha256sum | cut -d " " -f1)
     local TARGETMAPPER="luks.${TARGETHASH}"
 
-    # CHECK MOUNT
-    [[ -e "${TARGETMOUNT}" ]] || _error "TARGET NOT MOUNTED"
-
     # UMOUNT
-    sudo umount "${TARGETMOUNT}"
-    [[ $? == 0 ]] || _error "UMOUNT FAILED"
-    sudo rmdir "${TARGETMOUNT}"
-    [[ $? == 0 ]] || _error "REMOVE MOUNTPOINT FAILED"
+    [[ -e "${TARGETMOUNT}" ]] && {
+        sudo umount "${TARGETMOUNT}"
+        [[ $? == 0 ]] || _warning "UMOUNT FAILED"
+        sudo rmdir "${TARGETMOUNT}"
+        [[ $? == 0 ]] || _warning "REMOVE MOUNTPOINT FAILED"
+    }
 
     # LUKS CLOSE
-    sudo cryptsetup luksClose "${TARGETMAPPER}"
-    [[ $? == 0 ]] || _error "LUKS CLOSE FAILED"
+    [[ -e "${TARGETMAPPER}" ]] && {
+        sudo cryptsetup luksClose "${TARGETMAPPER}"
+        [[ $? == 0 ]] || _error "LUKS CLOSE FAILED"
+    }
 }
 
 function main() {
-    # CHECK FOR COMMAND AND ARGUMENT
-    [[ $# -ge 2 ]] || {
-        _warning "CMD\t\tARG1\t\tARG2"
-        print - "-----\t\t-----\t\t-----"
-        _info "dig\t\ttarget\t\t[size]"
-        _info "forge\t\tkey\t\t-"
-        _info "lock\t\ttarget\t\tkey"
-        _info "open\t\ttarget\t\tkey"
-        _info "close\t\ttarget\t\t-"
-        _info "bury\t\tkey\t\timage"
-        _info "exhume\t\timage\t\tkey"
-        exit 0
-    }
-
     # CHECK DEPENDENCIES
     _check
 
-    case $1 in
-        # DIG CONTAINER
-        dig)
-            _dig $2 $3
-            ;;
-        # FORGE KEY
-        forge)
-            _forge $2
-            ;;
-        # LOCK CONTAINER WITH KEY
-        lock)
-            _lock $2 $3
-            ;;
-        # OPEN CONTAINER
-        open)
-            _mount $2 $3
-            ;;
-        # CLOSE CONTAINER
-        close)
-            _umount $2
-            ;;
-        # BURY KEY [KEYFILE, IMAGE]
-        bury)
-            _bury_key $2 $3
-            ;;
-        # EXHUME KEY
-        exhume)
-            _exhume_key $2 $3
-            ;;
-        # DEFAULT
+    case "$1" in
+    	dig) shift; _dig "$@" ;;
+        forge) shift; _forge "$@" ;;
+        lock) shift; _lock "$@" ;;
+        open) shift; _mount "$@" ;;
+        close) shift; _umount "$@" ;;
+        bury) shift; _bury_key "$@" ;;
+        exhume) shift; _exhume_key "$@" ;;
         *)
-            _warning "INVALID COMMAND"
+            _warning "CMD\t\tARG1\t\tARG2"
+            print - "-----\t\t-----\t\t-----"
+            _info "dig\t\ttarget\t\t[size]"
+            _info "forge\t\tkey\t\t-"
+            _info "lock\t\ttarget\t\tkey"
+            _info "open\t\ttarget\t\tkey"
+            _info "close\t\ttarget\t\t-"
+            _info "bury\t\tkey\t\timage"
+            _info "exhume\t\timage\t\tkey"
+            exit 0
             ;;
     esac
     exit 0
