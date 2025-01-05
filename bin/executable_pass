@@ -211,7 +211,7 @@ function _edit() {
 
 function _generate() {
     local OPTS FORCE=0 INPLACE=0 PASS
-    OPTS="$(getopt -o if -- "$@")"
+    OPTS="$(getopt -o fi -- "$@")"
     [[ $? == 0 ]] || _error "GETOPT FAILED"
     eval set -- "${OPTS}"
     while true; do case $1 in
