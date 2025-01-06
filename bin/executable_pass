@@ -150,21 +150,15 @@ function _add() {
     [[ ! -z $TARGET ]] || _error "NO TARGET SPECIFIED"
     local FILE="${PREFIX}/${TARGET}.age"
     _sneaky_paths "${TARGET}"
-    [[ $FORCE -eq 0 && -e $FILE ]] && {
-        read -r "CONFIRM?'${TARGET}' ALREADY EXISTS. OVERWRITE? [y/N] " && [[ $CONFIRM == [yY] ]] || exit 1
-    }
+    [[ $FORCE -eq 0 && -e $FILE ]] && { read -qs "?'${TARGET}' ALREADY EXISTS. OVERWRITE? [y/N] " && print || exit 1 }
     mkdir -p -v "${PREFIX}/$(dirname -- "${TARGET}")"
     _set_recipients "$(dirname -- "${TARGET}")"
     if [[ $MULTI -eq 1 ]]; then
         print "PRESS CTRL+D WHEN FINISHED:"
-        print
         age -e "${AGE_RECIPIENT_ARGS[@]}" -o "${FILE}" || _error "ENCRYPTION FAILED"
     else
-        local PASS
-        print -n "ENTER PASSPHRASE: "
-        read -s PASS || exit 1
-        print
-        print -R -n - "${PASS}" | age -e "${AGE_RECIPIENT_ARGS[@]}" -o "${FILE}" || _error "ENCRYPTION FAILED"
+        read -s "?ENTER PASSPHRASE: " && print
+        print -R -n - "${REPLY}" | age -e "${AGE_RECIPIENT_ARGS[@]}" -o "${FILE}" || _error "ENCRYPTION FAILED"
     fi
     _git_add "${FILE}" "Add given password for '${TARGET}' to store."
 }
@@ -206,9 +200,7 @@ function _generate() {
     mkdir -p -v "${PREFIX}/$(dirname -- "${TARGET}")"
     _set_recipients "$(dirname -- "${TARGET}")"
     local FILE="${PREFIX}/${TARGET}.age"
-    [[ $INPLACE -eq 0 && $FORCE -eq 0 && -e $FILE ]] && {
-        read -r "CONFIRM?'${TARGET}' ALREADY EXISTS. OVERWRITE? [y/N] " && [[ $CONFIRM == [yY] ]] || exit 1
-    }
+    [[ $INPLACE -eq 0 && $FORCE -eq 0 && -e $FILE ]] && { read -qs "?'${TARGET}' ALREADY EXISTS. OVERWRITE? [y/N] " && print || exit 1 }
     local LENGTH=30
     read -r -k $LENGTH -u 0 PASS < <(LC_ALL=C tr -dc '[:alnum:]!@#$%^&*()_+[];:,.?' < /dev/urandom)
     [[ ${#PASS} -eq $LENGTH ]] || _error "PASSWORD GENERATION FAILED"
