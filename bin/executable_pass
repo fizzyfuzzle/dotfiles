@@ -24,24 +24,26 @@ function _check() {
     done
 }
 
-function _git_set() {
-    INNER_GIT_DIR="${1%/*}"
-    while [[ ! -d $INNER_GIT_DIR && "${INNER_GIT_DIR%/*}/" == "${PREFIX%/}/"* ]]; do
-        INNER_GIT_DIR="${INNER_GIT_DIR%/*}"
-    done
-    [[ $(git -C "${INNER_GIT_DIR}" rev-parse --is-inside-work-tree 2>/dev/null) == true ]] || INNER_GIT_DIR=""
-}
+# function _git_set() {
+#     INNER_GIT_DIR="${1%/*}"
+#     while [[ ! -d $INNER_GIT_DIR && "${INNER_GIT_DIR%/*}/" == "${PREFIX%/}/"* ]]; do
+#         INNER_GIT_DIR="${INNER_GIT_DIR%/*}"
+#     done
+#     [[ $(git -C "${INNER_GIT_DIR}" rev-parse --is-inside-work-tree 2>/dev/null) == true ]] || INNER_GIT_DIR=""
+# }
 
 function _git_add() {
     [[ -n $INNER_GIT_DIR ]] || return
     git -C "${INNER_GIT_DIR}" add "$1" || return
     [[ -n $(git -C "${INNER_GIT_DIR}" status --porcelain "$1") ]] || return
-    _git_commit "$2"
+    git -C "${INNER_GIT_DIR}" commit -m "$2"
 }
 
-function _git_commit() {
+function _git_remove() {
     [[ -n $INNER_GIT_DIR ]] || return
-    git -C "${INNER_GIT_DIR}" commit -m "$1"
+    git -C "${INNER_GIT_DIR}" rm -qr "$1" 2>/dev/null || return
+    [[ -n $(git -C "${INNER_GIT_DIR}" status --porcelain "$1") ]] || return
+    git -C "${INNER_GIT_DIR}" commit -m "$2"
 }
 
 function _confirm() {
@@ -112,7 +114,6 @@ function _reencrypt() {
     [[ ! -z $TARGET ]] || _error "NO TARGET SPECIFIED"
     _sneaky_paths "${TARGET}"
     [[ ! -d $PREFIX/$TARGET ]] && _error "'${PREFIX}/${TARGET}' NOT A FOLDER"
-    _git_set "${PREFIX}/${TARGET}"
     _reencrypt_path "${PREFIX}/${TARGET}"
     _git_add "${PREFIX}/${TARGET}" "Reencrypted ${TARGET}"
 }
@@ -150,11 +151,6 @@ function _show() {
     }
 }
 
-function _find() {
-    [[ -z $1 ]] && _error "NO SEARCH ARGUMENT"
-    find "${PREFIX}/${TARGET}" -path '.git' -prune -o -iname "*$1*.age" -printf '%P\n' | sort | sed 's/\.age//'
-}
-
 function _add() {
     local OPTS MULTI=0 FORCE=0
     OPTS="$(getopt -o mf -- "$@")"
@@ -170,7 +166,6 @@ function _add() {
     [[ ! -z $TARGET ]] || _error "NO TARGET SPECIFIED"
     local FILE="${PREFIX}/${TARGET}.age"
     _sneaky_paths "${TARGET}"
-    _git_set "${FILE}"
     [[ $FORCE -eq 0 && -e $FILE ]] && _confirm "'${TARGET}' ALREADY EXISTS. OVERWRITE?"
     mkdir -p -v "${PREFIX}/$(dirname -- "${TARGET}")"
     _set_recipients "$(dirname -- "${TARGET}")"
@@ -195,7 +190,6 @@ function _edit() {
     mkdir -p -v "${PREFIX}/$(dirname -- "${TARGET}")"
     _set_recipients "$(dirname -- "${TARGET}")"
     local FILE="${PREFIX}/${TARGET}.age"
-    _git_set "${FILE}"
     _create_tmpdir # Set $SECURE_TMPDIR
     local TMPFILE="$(mktemp -u "$SECURE_TMPDIR/XXXXXX")-${TARGET//\//-}.txt"
     local ACTION="Add"
@@ -226,7 +220,6 @@ function _generate() {
     mkdir -p -v "${PREFIX}/$(dirname -- "${TARGET}")"
     _set_recipients "$(dirname -- "${TARGET}")"
     local FILE="${PREFIX}/${TARGET}.age"
-    _git_set "$FILE"
     [[ $INPLACE -eq 0 && $FORCE -eq 0 && -e $FILE ]] && _confirm "'${TARGET}' ALREADY EXISTS. OVERWRITE?"
     local LENGTH=30
     read -r -k $LENGTH -u 0 PASS < <(LC_ALL=C tr -dc '[:alnum:]!@#$%^&*()_+[];:,.?' < /dev/urandom)
@@ -245,83 +238,48 @@ function _generate() {
     local VERB="Add"
     [[ $INPLACE -eq 1 ]] && VERB="Replace"
     _git_add "${FILE}" "${VERB} generated password for ${TARGET}."
-    printf "\e[1mTHE GENERATED PASSWORD FOR \e[4m%s\e[24m IS:\e[0m\n\e[1m\e[93m%s\e[0m\n" "${TARGET}" "${PASS}"
+    print "\e[1mTHE GENERATED PASSWORD FOR \e[4m${TARGET}\e[24m IS:\e[0m\n\e[1m\e[93m${PASS}\e[0m"
 }
 
 function _remove() {
-    local OPTS RECURSIVE="" FORCE=0
-    OPTS="$(getopt -o rf -- "$@")"
-    [[ $? == 0 ]] || _error "GETOPT FAILED"
-    eval set -- "${OPTS}"
-    while true; do case $1 in
-        -r) RECURSIVE="-r"; shift ;;
-        -f) FORCE=1; shift ;;
-        --) shift; break ;;
-    esac done
-
     local TARGET="$1"
     [[ ! -z $TARGET ]] || _error "NO TARGET SPECIFIED"
     _sneaky_paths "${TARGET}"
-    local PASSDIR="${PREFIX}/${TARGET%/}"
     local PASSFILE="${PREFIX}/${TARGET}.age"
-    [[ -f $PASSFILE && -d $PASSDIR && $TARGET == */ || ! -f $PASSFILE ]] && PASSFILE="${PASSDIR%/}/"
-    [[ -e $PASSFILE ]] || _error "'${TARGET}' NOT FOUND IN STORE"
-    _git_set "$PASSFILE"
-    [[ $FORCE -eq 1 ]] || _confirm "DELETE '${TARGET}'?"
-    rm $RECURSIVE -f -v "${PASSFILE}"
-    _git_set "${PASSFILE}"
-    if [[ -n $INNER_GIT_DIR && ! -e $PASSFILE ]]; then
-        git -C "${INNER_GIT_DIR}" rm -qr "${PASSFILE}"
-        _git_set "${PASSFILE}"
-        _git_commit "Remove ${TARGET} from store."
+    [[ -e "${PASSFILE}" ]] || _error "'${TARGET}' NOT FOUND IN STORE"
+    rm -i -v "${PASSFILE}" || exit 1
+    if [[ ! -e "${PASSFILE}" ]]; then
+        _git_remove "${PASSFILE}" "Remove ${TARGET} from store."
     fi
     rmdir -p "${PASSFILE%/*}" 2>/dev/null
 }
 
 function _move() {
-    local OPTS FORCE=0
-    OPTS="$(getopt -o f -- "$@")"
-    [[ $? == 0 ]] || _error "GETOPT FAILED"
-    eval set -- "${OPTS}"
-    while true; do case $1 in
-        -f) FORCE=1; shift ;;
-        --) shift; break ;;
-    esac done
-
-    [[ $# -ne 2 ]] && _error "SOURCE AND TARGET REQUIRED"
+    local SOURCE="$1"
+    local TARGET="$2"
+    [[ ! -z $SOURCE ]] || _error "NO SOURCE SPECIFIED"
+    [[ ! -z $TARGET ]] || _error "NO TARGET SPECIFIED"
     _sneaky_paths "$@"
-    local OLD_PATH="$PREFIX/${1%/}"
-    local OLD_DIR="$OLD_PATH"
-    local NEW_PATH="$PREFIX/$2"
+    local OLD_PATH="${PREFIX}/${SOURCE%/}"
+    local OLD_DIR="${OLD_PATH}"
+    local NEW_PATH="${PREFIX}/${TARGET}"
     if ! [[ -f "${OLD_PATH}.age" && -d $OLD_PATH && $1 == */ || ! -f "${OLD_PATH}.age" ]]; then
         OLD_DIR="${OLD_PATH%/*}"
         OLD_PATH="${OLD_PATH}.age"
     fi
-    [[ -e $OLD_PATH ]] || _error "'$1' NOT FOUND IN STORE"
+    [[ -e $OLD_PATH ]] || _error "'${SOURCE}' NOT FOUND IN STORE"
     mkdir -p -v "${NEW_PATH%/*}"
     [[ -d $OLD_PATH || -d $NEW_PATH || $NEW_PATH == */ ]] || NEW_PATH="${NEW_PATH}.age"
-    local INTERACTIVE="-i"
-    [[ ! -t 0 || $FORCE -eq 1 ]] && INTERACTIVE="-f"
-    _git_set "${NEW_PATH}"
-    mv $INTERACTIVE -v "${OLD_PATH}" "${NEW_PATH}" || exit 1
+    mv -i -v "${OLD_PATH}" "${NEW_PATH}" || exit 1
     [[ -e "${NEW_PATH}" ]] && _reencrypt_path "${NEW_PATH}"
-    _git_set "${NEW_PATH}"
-    if [[ -n $INNER_GIT_DIR && ! -e "${OLD_PATH}" ]]; then
-        git -C "${INNER_GIT_DIR}" rm -qr "${OLD_PATH}" 2>/dev/null
-        _git_set "${NEW_PATH}"
-        _git_add "${NEW_PATH}" "Rename ${1} to ${2}."
-    fi
-    _git_set "${OLD_PATH}"
-    if [[ -n $INNER_GIT_DIR && ! -e "${OLD_PATH}" ]]; then
-        git -C "${INNER_GIT_DIR}" rm -qr "${OLD_PATH}" 2>/dev/null
-        _git_set "${OLD_PATH}"
-        [[ -n $(git -C "${INNER_GIT_DIR}" status --porcelain "${OLD_PATH}") ]] && _git_commit "Remove $1."
+    if [[ ! -e "${OLD_PATH}" ]]; then
+        _git_remove "${OLD_PATH}" "Remove ${SOURCE} from store."
+        _git_add "${NEW_PATH}" "Added ${TARGET} to store."
     fi
     rmdir -p "${OLD_DIR}" 2>/dev/null
 }
 
 function _git() {
-    _git_set "${PREFIX}/"
     if [[ $1 == "init" ]]; then
         INNER_GIT_DIR="${PREFIX}"
         git -C "${INNER_GIT_DIR}" "$@" || exit 1
@@ -341,15 +299,14 @@ function _git() {
 
 function main() {
     trap _remove_tmpdir EXIT HUP INT TERM
-
-    # CHECK DEPENDENCIES
     _check
 
     [[ -f "${IDENTITIES_FILE}" ]] || _error "IDENTITIES FILE NOT FOUND!"
+    git -C "${PREFIX}" rev-parse --is-inside-work-tree &>/dev/null
+    [[ $? == 0 ]] && INNER_GIT_DIR="${PREFIX}" || INNER_GIT_DIR=""
 
     case "$1" in
         show) shift; _show "$@" ;;
-        find) shift; _find "$@" ;;
         add) shift; _add "$@" ;;
         edit) shift; _edit "$@" ;;
         generate) shift; _generate "$@" ;;
@@ -361,13 +318,12 @@ function main() {
             _warning "CMD\t\tARG1\t\tARG2"
             print - "-----\t\t-----\t\t-----"
             _info "show\t\t[pass]\t\t-"
-            _info "find\t\tstring\t\t-"
             _info "add\t\tpass\t\t[-f, -m]"
             _info "edit\t\tpass\t\t-"
             _info "generate\tpass\t\t[-f, -i]"
             _info "reencrypt\tdir\t\t-"
-            _info "mv\t\tpass\t\t[-f]"
-            _info "rm\t\tpass\t\t[-f]"
+            _info "mv\t\tpass\t\t-"
+            _info "rm\t\tpass\t\t-"
             _info "git\t\tcmd\t\t-"
             _info "help\t\t-\t\t-"
             exit 0
