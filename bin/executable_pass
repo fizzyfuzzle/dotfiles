@@ -24,14 +24,6 @@ function _check() {
     done
 }
 
-# function _git_set() {
-#     INNER_GIT_DIR="${1%/*}"
-#     while [[ ! -d $INNER_GIT_DIR && "${INNER_GIT_DIR%/*}/" == "${PREFIX%/}/"* ]]; do
-#         INNER_GIT_DIR="${INNER_GIT_DIR%/*}"
-#     done
-#     [[ $(git -C "${INNER_GIT_DIR}" rev-parse --is-inside-work-tree 2>/dev/null) == true ]] || INNER_GIT_DIR=""
-# }
-
 function _git_add() {
     [[ -n $INNER_GIT_DIR ]] || return
     git -C "${INNER_GIT_DIR}" add "$1" || return
@@ -44,14 +36,6 @@ function _git_remove() {
     git -C "${INNER_GIT_DIR}" rm -qr "$1" 2>/dev/null || return
     [[ -n $(git -C "${INNER_GIT_DIR}" status --porcelain "$1") ]] || return
     git -C "${INNER_GIT_DIR}" commit -m "$2"
-}
-
-function _confirm() {
-    [[ -t 0 ]] || return 0
-    local RESPONSE
-    print -n "$1 [y/N] "
-    read -r RESPONSE
-    [[ $RESPONSE == [yY] ]] || exit 1
 }
 
 function _set_recipients() {
@@ -166,7 +150,9 @@ function _add() {
     [[ ! -z $TARGET ]] || _error "NO TARGET SPECIFIED"
     local FILE="${PREFIX}/${TARGET}.age"
     _sneaky_paths "${TARGET}"
-    [[ $FORCE -eq 0 && -e $FILE ]] && _confirm "'${TARGET}' ALREADY EXISTS. OVERWRITE?"
+    [[ $FORCE -eq 0 && -e $FILE ]] && {
+        read -r "CONFIRM?'${TARGET}' ALREADY EXISTS. OVERWRITE? [y/N] " && [[ $CONFIRM == [yY] ]] || exit 1
+    }
     mkdir -p -v "${PREFIX}/$(dirname -- "${TARGET}")"
     _set_recipients "$(dirname -- "${TARGET}")"
     if [[ $MULTI -eq 1 ]]; then
@@ -220,7 +206,9 @@ function _generate() {
     mkdir -p -v "${PREFIX}/$(dirname -- "${TARGET}")"
     _set_recipients "$(dirname -- "${TARGET}")"
     local FILE="${PREFIX}/${TARGET}.age"
-    [[ $INPLACE -eq 0 && $FORCE -eq 0 && -e $FILE ]] && _confirm "'${TARGET}' ALREADY EXISTS. OVERWRITE?"
+    [[ $INPLACE -eq 0 && $FORCE -eq 0 && -e $FILE ]] && {
+        read -r "CONFIRM?'${TARGET}' ALREADY EXISTS. OVERWRITE? [y/N] " && [[ $CONFIRM == [yY] ]] || exit 1
+    }
     local LENGTH=30
     read -r -k $LENGTH -u 0 PASS < <(LC_ALL=C tr -dc '[:alnum:]!@#$%^&*()_+[];:,.?' < /dev/urandom)
     [[ ${#PASS} -eq $LENGTH ]] || _error "PASSWORD GENERATION FAILED"
