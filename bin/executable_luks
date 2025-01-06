@@ -35,9 +35,7 @@ function _bury_key() {
     [[ $(file $IMAGE) =~ "JP.G" ]] || _error "IMAGE FILE NOT JPG"
 
     # GET PASSWORD
-    print -n "Enter passphrase: "
-    read -s PASSWD
-    print
+    read -s "PASSWD?ENTER PASSPHRASE: " && print
 
     # REMOVE HEADER+FOOTER AND EMBED INTO IMAGE
     cat "${KEYFILE}" \
@@ -58,9 +56,7 @@ function _exhume_key() {
     [[ ! -r $KEYFILE ]] || _error "KEY FILE ALREADY EXISTS"
 
     # GET PASSWORD
-    print -n "Enter passphrase: "
-    read -s PASSWD
-    print
+    read -s "PASSWD?ENTER PASSPHRASE: " && print
 
     # EXTRACT FROM IMAGE AND ADD HEADER+FOOTER
     EXTRACTED=$(steghide extract -q -sf "${IMAGE}" -xf - -p "${PASSWD}")
