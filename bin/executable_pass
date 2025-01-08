@@ -294,6 +294,7 @@ function main() {
         mv) shift; _move "$@" ;;
         rm) shift; _remove "$@" ;;
         git) shift; _git "$@" ;;
+        *) _show "$@" ;;
     esac
     exit 0
 }
