@@ -1,4 +1,5 @@
 #compdef pass
+# vim: filetype=zsh
 
 (( $+functions[_pass_files] )) ||
 _pass_files() {
