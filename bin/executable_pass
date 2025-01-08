@@ -3,7 +3,7 @@
 umask "077"
 set -o pipefail
 #
-PREFIX="${HOME}/.passage/store"
+PREFIX="${PASSAGE_DIR:-$HOME/.passage/store}"
 IDENTITIES_FILE="${HOME}/.passage/identities"
 DEPENDENCIES=(age git qrencode wl-copy)
 export GIT_CEILING_DIRECTORIES="${PREFIX}/.."
@@ -294,21 +294,6 @@ function main() {
         mv) shift; _move "$@" ;;
         rm) shift; _remove "$@" ;;
         git) shift; _git "$@" ;;
-        help)
-            _warning "CMD\t\tARG1\t\tARG2"
-            print - "-----\t\t-----\t\t-----"
-            _info "show\t\t[pass]\t\t-"
-            _info "add\t\tpass\t\t[-f, -m]"
-            _info "edit\t\tpass\t\t-"
-            _info "generate\tpass\t\t[-f, -i]"
-            _info "reencrypt\tdir\t\t-"
-            _info "mv\t\tpass\t\t-"
-            _info "rm\t\tpass\t\t-"
-            _info "git\t\tcmd\t\t-"
-            _info "help\t\t-\t\t-"
-            exit 0
-            ;;
-        *) _show "$@" ;;
     esac
     exit 0
 }
