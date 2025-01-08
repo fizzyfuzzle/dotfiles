@@ -1,0 +1,66 @@
+#compdef pass
+
+(( $+functions[_pass_files] )) ||
+_pass_files() {
+  local prefix="${PASSAGE_DIR:-$HOME/.passage/store}"
+  _path_files -W $prefix -g "**/*.age(:r)"
+}
+
+local curcontext="$curcontext" state line ret=1
+
+_arguments -C \
+  '1: :->cmds' \
+  '*: :->args' && ret=0
+
+case "$state" in
+  (cmds)
+    local -a cmds=(
+      'add:Add new password'
+      'edit:Edit password'
+      'generate:Generate new password'
+      'git:Call git on the password store'
+      'mv:Move password'
+      'reencrypt:Reencrypt password(s)'
+      'rm:Remove password'
+      'show:Show password'
+    )
+    _describe -t cmds 'pass cmds' cmds && ret=0
+  ;;
+  (args)
+    case "$line[1]" in
+      show)
+        _arguments '1::' \
+          '-c[clipboard \[line\]]' \
+          '-q[qrcode \[line\]]' \
+          '*:file:_pass_files' && ret=0
+        ;;
+      add)
+        _arguments '1::' \
+          '-f[force overwrite]' \
+          '-m[multiline]' \
+          '*:file:_pass_files' && ret=0
+        ;;
+      generate)
+        _arguments '1::' \
+          '-f[force overwrite]' \
+          '-i[replace first line]' \
+          '*:file:_pass_files' && ret=0
+        ;;
+      edit|mv|rm|reencrypt)
+        _arguments '1::' \
+          '*:file:_pass_files' && ret=0
+        ;;
+      git)
+        local -a cmds=(
+          'init:Initialize git repository'
+          'log:Show git log'
+          'pull:Pull from remote repository'
+          'push:Push to remote repository'
+        )
+        _describe -t cmds 'pass git cmds' cmds && ret=0
+        ;;
+    esac
+  ;;
+esac
+
+return ret
