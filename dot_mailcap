@@ -2,8 +2,8 @@
 text/plain; nvim '%s'
 
 # HTML
-text/html; firefox '%s' & x-neomutt-keep; test=test -n "$DISPLAY"; nametemplate=%s.html;
-text/html; w3m -I %{charset} -T text/html; copiousoutput;
+text/html; x-www-browser '%s'; test=test -n "$WAYLAND_DISPLAY"; nametemplate=%s.html;
+text/html; sensible-browser -I %{charset} -T text/html; copiousoutput;
 
 # Calendar
 application/ics; cat '%s'; copiousoutput
