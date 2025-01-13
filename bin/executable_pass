@@ -157,7 +157,7 @@ function _add() {
         print "PRESS CTRL+D WHEN FINISHED:"
         age -e "${AGE_RECIPIENT_ARGS[@]}" -o "${FILE}" || _error "ENCRYPTION FAILED"
     else
-        read -s "?ENTER PASSPHRASE: " && print
+        read -r -s "?ENTER PASSPHRASE: " && print
         print -R -n - "${REPLY}" | age -e "${AGE_RECIPIENT_ARGS[@]}" -o "${FILE}" || _error "ENCRYPTION FAILED"
     fi
     _git_add "${FILE}" "Add given password for '${TARGET}' to store."
