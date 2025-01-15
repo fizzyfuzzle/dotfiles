@@ -7,6 +7,25 @@
     "BlockAboutProfiles": false,
     "BlockAboutSupport": false,
     "CaptivePortal": false,
+    "Containers": {
+      "Default": [
+        {
+          "name": "Personal",
+          "icon": "fingerprint",
+          "color": "blue"
+        },
+        {
+          "name": "Anonymous",
+          "icon": "chill",
+          "color": "red"
+        }
+      ]
+    },
+    "Cookies": {
+      "Behavior": "reject-tracker-and-partition-foreign",
+      "BehaviorPrivateBrowsing": "reject-tracker-and-partition-foreign",
+      "Locked": false
+    },
     "DisableAppUpdate": true,
     "DisableFeedbackCommands": true,
     "DisableFirefoxAccounts": true,
@@ -26,6 +45,7 @@
       "Locked": true
     },
     "DontCheckDefaultBrowser": true,
+    "DownloadDirectory": "${home}/Downloads",
     "EnableTrackingProtection": {
       "Value": true,
       "Cryptomining": true,
@@ -50,28 +70,10 @@
       "uBlock0@raymondhill.net": {
         "installation_mode": "force_installed",
         "install_url": "https://addons.mozilla.org/firefox/downloads/latest/ublock-origin/latest.xpi"
-      }
-    },
-    "3rdparty": {
-      "Extensions": {
-        "uBlock0@raymondhill.net": {
-          "adminSettings": {
-            "selectedFilterLists": [
-              "ublock-filters",
-              "ublock-badware",
-              "ublock-privacy",
-              "ublock-quick-fixes",
-              "ublock-unbreak",
-              "easylist",
-              "easyprivacy",
-              "urlhaus-1",
-              "plowe-0",
-              "adguard-cookies",
-              "ublock-cookies-adguard",
-              "NLD-0"
-            ]
-          }
-        }
+      },
+      "@testpilot-containers": {
+        "installation_mode": "force_installed",
+        "install_url": "https://addons.mozilla.org/firefox/downloads/latest/multi-account-containers/latest.xpi"
       }
     },
     "ExtensionUpdate": true,
@@ -137,6 +139,7 @@
     "PostQuantumKeyAgreementEnabled": true,
     "PrimaryPassword": false,
     "PrintingEnabled": false,
+    "PrivateBrowsingModeAvailability": 0,
     "Proxy": {
       "Mode": "system",
       "UseProxyForDNS": true,
@@ -146,8 +149,17 @@
       "en-US",
       "en"
     ],
+    "SanitizeOnShutdown": {
+      "Cache": true,
+      "Cookies": false,
+      "History": true,
+      "Sessions": false,
+      "SiteSettings": true,
+      "Locked": false
+    },
     "SearchSuggestEnabled": true,
     "ShowHomeButton": false,
+    "SSLVersionMin": "tls1.3",
     "TranslateEnabled": false,
     "UserMessaging": {
       "ExtensionRecommendations": false,
@@ -155,6 +167,7 @@
       "UrlbarInterventions": false,
       "SkipOnboarding": true,
       "MoreFromMozilla": false,
+      "FirefoxLabs": false,
       "Locked": true
     },
     "WindowsSSO": false,
