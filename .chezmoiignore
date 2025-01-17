@@ -1,6 +1,5 @@
 README.md
 chezmoi.key.age
-firefox
 {{- if .server }}
 .ssh
 {{- end }}
@@ -13,7 +12,6 @@ bin
 .config/offlineimap
 .config/sway
 .config/tofi
-.gnupg
 {{- end }}
 {{- if not .android }}
 .termux

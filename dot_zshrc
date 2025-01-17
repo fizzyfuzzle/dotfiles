@@ -53,13 +53,6 @@ setopt pushdminus
 (( $+commands[nvim] )) && export EDITOR='nvim' || export EDITOR='vim'
 export VISUAL="${EDITOR}"
 
-# Pass
-if [[ -d "${HOME}/repositories/password-store" ]]; then
-    export PASSWORD_STORE_DIR="${HOME}/repositories/password-store"
-    export PASSWORD_STORE_GPG_OPTS="--quiet"
-    alias p='pass'
-fi
-
 # Aliases
 alias 1='cd -'
 alias 2='cd -2'
@@ -74,12 +67,12 @@ alias d='dirs -v | head -10'
 (( $+commands[rg] )) && alias f='rg -i' || alias f='grep -i'
 alias ff='find . -name'
 (( $+commands[git] )) && alias g='git'
-(( $+commands[gpg] )) && alias gpgl='gpg --list-only -v -d'
 alias j='journalctl -aq -u'
 alias jcf='journalctl -aq --no-pager --output=cat -n 25 -f -u'
 (( $+commands[lsd] )) && alias ls='lsd' || alias ls='ls --color -h'
 (( $+commands[neomutt] )) && alias m='neomutt'
 (( $+commands[ykman] )) && alias oath='ykman oath accounts code -s'
+(( $+commands[pass] )) && alias p='pass'
 (( $+commands[zbarimg] )) && alias qrdec='zbarimg -q --raw'
 (( $+commands[qrencode] )) && alias qren='qrencode -t ansiutf8'
 alias rip='dig TXT +short o-o.myaddr.l.google.com @ns1.google.com'
@@ -137,19 +130,6 @@ zstyle ':vcs_info:git:*' actionformats '%F{green}%b (%a)%f%c%u '
 setopt PROMPT_PERCENT
 setopt PROMPT_SUBST
 PROMPT='%(?..%F{red}[%?] )%f%F{blue}%2~%f ${vcs_info_msg_0_}%(!.%F{red}#%f.%F{green}❯%f) '
-
-# Update GPG variables
-if [[ -f ~/.gnupg/gpg-agent.conf ]] && (( $+commands[gpgconf] )); then
-    # Unset DBUS on SSH session to get Pinentry on console
-    if [[ -v SSH_CLIENT ]]; then
-        export DBUS_SESSION_BUS_ADDRESS=/dev/null
-    fi
-    export GPG_TTY=$TTY
-    if [[ ! -v SSH_AUTH_SOCK ]]; then
-        export SSH_AUTH_SOCK="$(gpgconf --list-dirs agent-ssh-socket)"
-    fi
-    gpg-connect-agent updatestartuptty /bye >/dev/null 2>&1
-fi
 
 # Start Sway
 if [[ -z "$WAYLAND_DISPLAY" ]] && [[ "$XDG_VTNR" -eq 1 ]]; then
