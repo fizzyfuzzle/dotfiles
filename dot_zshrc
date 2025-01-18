@@ -37,7 +37,7 @@ bindkey '^[[Z' reverse-menu-complete
 
 # History
 HISTFILE=~/.zsh_history
-HISTORY_IGNORE="(gpg*|ssh*|tomb*|pass*|oath*|ykman*)"
+HISTORY_IGNORE="(gpg*|ssh*|pass*|oath*|ykman*)"
 HISTSIZE=4000
 SAVEHIST=$HISTSIZE
 setopt hist_ignore_all_dups
@@ -72,7 +72,7 @@ alias jcf='journalctl -aq --no-pager --output=cat -n 25 -f -u'
 (( $+commands[lsd] )) && alias ls='lsd' || alias ls='ls --color -h'
 (( $+commands[neomutt] )) && alias m='neomutt'
 (( $+commands[ykman] )) && alias oath='ykman oath accounts code -s'
-(( $+commands[pass] )) && alias p='pass'
+(( $+commands[pass] )) && alias p='pass show'
 (( $+commands[zbarimg] )) && alias qrdec='zbarimg -q --raw'
 (( $+commands[qrencode] )) && alias qren='qrencode -t ansiutf8'
 alias rip='dig TXT +short o-o.myaddr.l.google.com @ns1.google.com'
