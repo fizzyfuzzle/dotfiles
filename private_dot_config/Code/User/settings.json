@@ -25,5 +25,6 @@
         "source.unusedImports": "always"
     },
     "workbench.iconTheme": "material-icon-theme",
-    "window.menuBarVisibility": "toggle"
+    "window.menuBarVisibility": "toggle",
+    "ansible.executionEnvironment.enabled": true
 }
