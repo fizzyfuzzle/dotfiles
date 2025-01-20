@@ -8,7 +8,7 @@ export ELECTRON_OZONE_PLATFORM_HINT="auto"
 typeset -Ux PATH path
 path=("${HOME}/bin" $path)
 path=("${HOME}/.local/bin" $path)
-typeset -Ux FPATH fpath
+typeset -U FPATH fpath
 fpath=("${HOME}/bin" $fpath)
 
 # Colors
