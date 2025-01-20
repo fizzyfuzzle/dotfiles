@@ -132,8 +132,10 @@ setopt PROMPT_SUBST
 PROMPT='%(?..%F{red}[%?] )%f%F{blue}%2~%f ${vcs_info_msg_0_}%(!.%F{red}#%f.%F{green}❯%f) '
 
 # SSH Agent
-export SSH_AUTH_SOCK="${XDG_RUNTIME_DIR}/ssh-agent.sock"
-[[ -e "$SSH_AUTH_SOCK" ]] || DISPLAY=:0 ssh-agent -t 1h -a "$SSH_AUTH_SOCK" >/dev/null
+if [[ -z "${SSH_CONNECTION}" ]]; then
+    export SSH_AUTH_SOCK="${XDG_RUNTIME_DIR}/ssh-agent.sock"
+    [[ -e "${SSH_AUTH_SOCK}" ]] || DISPLAY=:0 ssh-agent -t 1h -a "$SSH_AUTH_SOCK" >/dev/null
+fi
 
 # Start Sway
 if [[ -z "$WAYLAND_DISPLAY" ]] && [[ "$XDG_VTNR" -eq 1 ]]; then
