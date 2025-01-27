@@ -132,7 +132,7 @@ setopt PROMPT_SUBST
 PROMPT='%(?..%F{red}[%?] )%f%F{blue}%2~%f ${vcs_info_msg_0_}%(!.%F{red}#%f.%F{green}❯%f) '
 
 # SSH Agent
-if [[ -z "${SSH_CONNECTION}" ]]; then
+if [[ -z "${SSH_CONNECTION}" && -n "${XDG_RUNTIME_DIR}" ]]; then
     export SSH_AUTH_SOCK="${XDG_RUNTIME_DIR}/ssh-agent.sock"
     [[ -e "${SSH_AUTH_SOCK}" ]] || DISPLAY=:0 ssh-agent -t 1h -a "$SSH_AUTH_SOCK" >/dev/null
 fi
