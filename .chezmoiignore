@@ -1,5 +1,6 @@
 README.md
 chezmoi.key.age
+firefox
 {{- if .server }}
 .ssh
 {{- end }}
