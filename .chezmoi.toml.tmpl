@@ -1,18 +1,18 @@
 {{- $workstation := false -}}
-{{- $tablet := false -}}
+{{- $laptop := false -}}
 {{- $server := false -}}
-{{- $android := false -}}
+{{- $mobile := false -}}
 
 {{- if (eq .chezmoi.os "linux") -}}
 {{-   if (eq .chezmoi.hostname "hyperion") -}}
 {{-     $workstation = true -}}
 {{-   else if (eq .chezmoi.hostname "prometheus") -}}
-{{-     $tablet = true -}}
+{{-     $laptop = true -}}
+{{-   else if (eq .chezmoi.username "droid") -}}
+{{-     $mobile = true -}}
 {{-   else -}}
 {{-     $server = true -}}
 {{-   end -}}
-{{- else if (eq .chezmoi.os "android") -}}
-{{-   $android = true -}}
 {{- end -}}
 
 encryption = "age"
@@ -30,6 +30,6 @@ encryption = "age"
 
 [data]
     workstation = {{ $workstation }}
-    tablet = {{ $tablet }}
+    laptop = {{ $laptop }}
     server = {{ $server }}
-    android = {{ $android }}
+    mobile = {{ $mobile }}

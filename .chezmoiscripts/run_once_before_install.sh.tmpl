@@ -7,14 +7,14 @@
 {{ template "install_workstation" . }}
 {{ end -}}
 
-{{- if .tablet }}
-{{ template "install_tablet" . }}
+{{- if .laptop }}
+{{ template "install_laptop" . }}
 {{ end -}}
 
 {{- if .server }}
 {{ template "install_server" . }}
 {{ end -}}
 
-{{- if .android }}
-{{ template "install_android" . }}
+{{- if .mobile }}
+{{ template "install_mobile" . }}
 {{ end -}}

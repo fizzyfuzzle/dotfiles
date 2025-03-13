@@ -1,10 +1,9 @@
 README.md
 chezmoi.key.age
-firefox
 {{- if .server }}
 .ssh
 {{- end }}
-{{- if (or .android .server) }}
+{{- if (or .mobile .server) }}
 bin
 .config/Code
 .config/foot
@@ -13,8 +12,4 @@ bin
 .config/offlineimap
 .config/sway
 .config/tofi
-{{- end }}
-{{- if not .android }}
-.termux
-.hushlogin
 {{- end }}
