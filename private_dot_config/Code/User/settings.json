@@ -26,5 +26,6 @@
     },
     "workbench.iconTheme": "material-icon-theme",
     "window.menuBarVisibility": "toggle",
-    "ansible.executionEnvironment.enabled": true
+    "ansible.executionEnvironment.enabled": true,
+    "editor.renderWhitespace": "trailing"
 }
