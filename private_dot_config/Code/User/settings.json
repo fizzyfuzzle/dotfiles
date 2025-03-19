@@ -10,7 +10,8 @@
     "update.mode": "none",
     "update.showReleaseNotes": false,
     "workbench.colorCustomizations": {
-        "editorBracketMatch.border": "#ff0000"
+        "editorBracketMatch.border": "#ff0000",
+        "editorWhitespace.foreground": "#ff0000"
     },
     "editor.semanticHighlighting.enabled": false,
     "extensions.ignoreRecommendations": true,
