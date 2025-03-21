@@ -28,5 +28,6 @@
     "workbench.iconTheme": "material-icon-theme",
     "window.menuBarVisibility": "toggle",
     "ansible.executionEnvironment.enabled": true,
-    "editor.renderWhitespace": "trailing"
+    "editor.renderWhitespace": "trailing",
+    "chat.commandCenter.enabled": false
 }
