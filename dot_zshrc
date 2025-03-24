@@ -76,6 +76,7 @@ alias jcf='journalctl -aq --no-pager --output=cat -n 25 -f -u'
 (( $+commands[zbarimg] )) && alias qrdec='zbarimg -q --raw'
 (( $+commands[qrencode] )) && alias qren='qrencode -t ansiutf8'
 alias rip='dig TXT +short o-o.myaddr.l.google.com @ns1.google.com'
+(( $+commands[rsync] )) && alias rs='rsync --archive --delete --progress --exclude={".git",".gitignore"} --filter=":- .gitignore"'
 (( $+commands[shred] )) && alias sd='shred -u'
 alias sz='sudo HOME=$HOME /bin/zsh'
 alias sshz=sshz
