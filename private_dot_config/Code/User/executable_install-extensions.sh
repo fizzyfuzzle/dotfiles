@@ -3,11 +3,12 @@
 # Install VSCode Extensions
 #
 EXTENSIONS=(
-  pkief.material-icon-theme \
-  ms-vscode-remote.remote-ssh \
-  ms-python.python \
-  ms-python.isort \
   hashicorp.terraform \
+  ms-python.isort \
+  ms-python.flake8 \
+  ms-python.python \
+  ms-vscode-remote.remote-ssh \
+  pkief.material-icon-theme \
   redhat.ansible
 )
 
