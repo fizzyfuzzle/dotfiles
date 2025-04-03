@@ -28,5 +28,5 @@
     "workbench.iconTheme": "material-icon-theme",
     "window.menuBarVisibility": "toggle",
     "editor.renderWhitespace": "trailing",
-    "chat.commandCenter.enabled": false,
+    "chat.commandCenter.enabled": false
 }
