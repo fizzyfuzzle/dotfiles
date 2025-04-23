@@ -36,5 +36,11 @@
         "**/.mypy_cache/**": true,
         "**/*.log": true,
         "**/venv/**": true
+    },
+    "search.exclude": {
+        "**/__pycache__/**": true,
+        "**/.mypy_cache/**": true,
+        "**/*.log": true,
+        "**/venv/**": true
     }
 }
