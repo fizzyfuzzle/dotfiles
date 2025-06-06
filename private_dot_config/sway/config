@@ -211,6 +211,7 @@ bindsym $mod+t [app_id="foot-scratch"] scratchpad show
 for_window [app_id="firefox"] {
     inhibit_idle fullscreen
     floating enable
+    border none
 }
 
 ## Idle configuration
