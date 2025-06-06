@@ -208,9 +208,10 @@ bindsym $mod+t [app_id="foot-scratch"] scratchpad show
 #
 # [swaymsg -t get_tree]
 #
-# Inhibit Idle if a window is fullscreen
-for_window [app_id="^.*"] inhibit_idle fullscreen
-for_window [class="^.*"] inhibit_idle fullscreen
+for_window [app_id="firefox"] {
+    inhibit_idle fullscreen
+    floating enable
+}
 
 ## Idle configuration
 #
