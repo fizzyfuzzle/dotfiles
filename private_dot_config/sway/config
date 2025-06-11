@@ -34,7 +34,7 @@ client.placeholder      #000000 #0c0c0c #ffffff #000000   #0c0c0c
 client.background       #ffffff
 #
 # Border
-default_border pixel 1
+default_border none
 #
 # Use Mouse+$mod to drag floating windows
 floating_modifier $mod
@@ -208,11 +208,10 @@ bindsym $mod+t [app_id="foot-scratch"] scratchpad show
 #
 # [swaymsg -t get_tree]
 #
-for_window [app_id="firefox"] {
-    inhibit_idle fullscreen
-    floating enable
-    border none
-}
+for_window [all] inhibit_idle fullscreen
+for_window [app_id="foot"] border pixel 1
+for_window [app_id="firefox"] floating enable
+for_window [app_id="brave-browser"] floating enable
 
 ## Idle configuration
 #
