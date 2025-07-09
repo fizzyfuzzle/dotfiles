@@ -208,7 +208,7 @@ bindsym $mod+t [app_id="foot-scratch"] scratchpad show
 #
 # [swaymsg -t get_tree]
 #
-for_window [all] inhibit_idle fullscreen
+for_window [app_id="^.*"] inhibit_idle fullscreen
 for_window [app_id="foot"] border pixel 1
 for_window [app_id="brave.*"] floating enable
 
