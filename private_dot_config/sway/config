@@ -55,13 +55,9 @@ input type:touchpad {
 #
 # [swaymsg -t get_outputs]
 #
-# Primary screen
-output * {
+output "LG Electronics LG Ultra HD 0x00048ACB" {
     scale 1.5
 }
-bindswitch --locked lid:on output "*" disable
-bindswitch --locked lid:off output "*" enable
-
 # HEADLESS VNC
 output "HEADLESS-1" {
     scale 1.0
@@ -70,6 +66,10 @@ output "HEADLESS-1" {
 #exec swaymsg create_output "HEADLESS-1"
 # Start WayVNC
 #exec XKB_DEFAULT_OPTIONS="altwin:swap_lalt_lwin" wayvnc --output=HEADLESS-1 --max-fps=30 127.0.0.1 5900
+
+# Disable Output when lid is closed
+bindswitch --locked lid:on output "*" disable
+bindswitch --locked lid:off output "*" enable
 
 ## Key bindings
 #
