@@ -6,7 +6,9 @@ xwayland disable
 # Modifier key 1 (WIN)
 set $mod Mod4
 #
-# Device lock
+# External tools
+set $terminal foot
+set $menu wmenu-run -p '❯' -f 'DejaVu Sans Mono bold 12'
 set $lock loginctl lock-session && swaylock -f -c 000000 -F
 #
 # Moving around
@@ -74,10 +76,10 @@ bindswitch --locked lid:off output "*" enable
 ## Key bindings
 #
 # Application launcher
-bindsym $mod+d exec tofi-run | xargs swaymsg exec --
+bindsym $mod+d exec $menu
 #
 # Start terminal
-bindsym $mod+Return exec foot
+bindsym $mod+Return exec $terminal
 #
 # Kill focused window
 bindsym $mod+Shift+q kill
