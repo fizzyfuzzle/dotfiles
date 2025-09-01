@@ -8,7 +8,7 @@ set $mod Mod4
 #
 # External tools
 set $terminal foot
-set $menu wmenu-run -p '❯' -f 'DejaVu Sans Mono bold 12'
+set $menu bemenu-run -p '❯' --fn 'DejaVu Sans Mono bold 12' -H 25
 set $lock loginctl lock-session && swaylock -f -c 000000 -F
 #
 # Moving around
