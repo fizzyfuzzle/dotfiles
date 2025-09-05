@@ -42,5 +42,6 @@
         "**/.mypy_cache/**": true,
         "**/*.log": true,
         "**/venv/**": true
-    }
+    },
+    "remote.autoForwardPorts": false
 }
