@@ -1,7 +1,4 @@
 {
-    "remote.SSH.remotePlatform": {
-        "hyperion": "linux"
-    },
     "workbench.startupEditor": "newUntitledFile",
     "telemetry.telemetryLevel": "off",
     "window.zoomLevel": 0,
@@ -29,7 +26,9 @@
     "workbench.iconTheme": "material-icon-theme",
     "window.menuBarVisibility": "toggle",
     "editor.renderWhitespace": "trailing",
+    "chat.agent.enabled": false,
     "chat.commandCenter.enabled": false,
+    "chat.notifyWindowOnConfirmation": false,
     "ansible.lightspeed.enabled": false,
     "files.watcherExclude": {
         "**/__pycache__/**": true,
