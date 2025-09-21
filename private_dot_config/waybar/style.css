@@ -1,0 +1,41 @@
+* {
+  font-family: "DejaVu Sans Mono";
+  font-weight: bold;
+  font-size: 13px;
+}
+
+window#waybar {
+    color: #888888;
+    background: transparent;
+}
+
+#workspaces button {
+    padding: 0 5px;
+    background-color: transparent;
+}
+
+#workspaces button.focused {
+    background-color: #444444;
+}
+
+#workspaces button.urgent {
+    background-color: #eb4d4b;
+}
+
+.modules-left > widget:first-child > #workspaces {
+    margin-left: 0;
+}
+
+.modules-right > widget:last-child > #workspaces {
+    margin-right: 0;
+}
+
+#cpu,
+#load,
+#memory,
+#disk,
+#network,
+#custom-vpn,
+#temperature {
+    padding-right: 10;
+}
