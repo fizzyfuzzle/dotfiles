@@ -2,7 +2,7 @@
   "height": 24,
   "modules-left": ["sway/workspaces","sway/mode"],
   "modules-center": ["sway/window"],
-  "modules-right": ["load","memory","temperature","disk","network","custom/vpn","pulseaudio","battery","clock","tray"],
+  "modules-right": ["load","memory","temperature","disk","network","custom/vpn","pulseaudio","battery","tray","clock"],
   "sway/mode": {
     "format": "{}"
   },
@@ -59,6 +59,10 @@
     "format-plugged": "{icon} {capacity: >3}% ",
     "format-icons": ["", "", "", "", ""]
   },
+  "tray": {
+    "icon-size": 20,
+    "spacing": 10
+  },
   "clock": {
     "format": " {:%H:%M}",
     "format-alt": " {:%d-%m-%Y}",
@@ -69,9 +73,5 @@
         "today": "<span color='#ff6699'><b>{}</b></span>"
       }
     }
-  },
- "tray": {
-    "icon-size": 20,
-    "spacing": 10
-  },
+  }
 }
