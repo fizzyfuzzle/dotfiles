@@ -1,0 +1,79 @@
+{
+  "height": 24,
+  "modules-left": ["sway/workspaces","sway/mode"],
+  "modules-center": ["sway/window"],
+  "modules-right": ["load","memory","temperature","disk","network","custom/vpn","battery","pulseaudio","clock","tray"],
+  "sway/mode": {
+    "format": "{}"
+  },
+  "sway/window": {
+    "format": "{title}"
+  },
+  "load": {
+    "format": " {load1:0.2f}"
+  },
+  "memory": {
+    "format": " {}%"
+  },
+  "temperature": {
+    "format": " {temperatureC}°C",
+    "tooltip": false,
+  },
+  "disk": {
+    "format": " {percentage_free}%"
+  },
+  "network": {
+    "format": "{ifname}",
+    "format-wifi": " {essid}",
+    "format-ethernet": " {ipaddr}",
+    "format-disconnected": "",
+    "tooltip-format": "{ifname} via {gwaddr}",
+    "tooltip-format-wifi": " {essid} ({signalStrength}%)",
+    "tooltip-format-ethernet": " {ifname}",
+    "tooltip-format-disconnected": "Disconnected",
+    "format-alt": "{ifname}: {ipaddr}/{cidr}"
+  },
+  "custom/vpn": {
+    "format": "",
+    "tooltip-format": "VPN",
+    "exec": "echo '{\"class\": \"connected\"}'",
+    "exec-if": "test -d /proc/sys/net/ipv4/conf/wg0",
+    "return-type": "json",
+    "interval": 10
+  },
+  "battery": {
+    "bat": "BAT0",
+    "states": {
+      "good": 95,
+      "warning": 30,
+      "critical": 5
+    },
+    "format": "BAT0: {capacity}%",
+    "format-charging": "BAT0: {capacity}% (charging)",
+    "format-plugged": "BAT0: {capacity}% (plugged)",
+  },
+  "clock": {
+    "format": " {:%H:%M}",
+    "format-alt": " {:%d-%m-%Y}",
+    "tooltip-format": "<tt><small>{calendar}</small></tt>",
+    "calendar": {
+      "format": {
+        "months": "<span color='#ffead3'><b>{}</b></span>",
+        "today": "<span color='#ff6699'><b>{}</b></span>"
+      }
+    }
+  },
+  "pulseaudio": {
+    "format": "{icon} {volume}%",
+    "format-icons": {
+      "default": ["\uf026", "\uf027", "\uf028"]
+    },
+    "on-click": "pactl set-sink-mute @DEFAULT_SINK@ toggle",
+    "on-click-right": "pavucontrol",
+    "format-muted": "\uf00d {volume}%"
+  },
+  "tray": {
+    "icon-size": 20,
+    "spacing": 10
+  },
+}
