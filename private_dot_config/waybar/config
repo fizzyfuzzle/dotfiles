@@ -2,7 +2,7 @@
   "height": 24,
   "modules-left": ["sway/workspaces","sway/mode"],
   "modules-center": ["sway/window"],
-  "modules-right": ["load","memory","temperature","disk","network","custom/vpn","battery","pulseaudio","clock","tray"],
+  "modules-right": ["load","memory","temperature","disk","network","custom/vpn","pulseaudio","battery","clock","tray"],
   "sway/mode": {
     "format": "{}"
   },
@@ -41,16 +41,23 @@
     "return-type": "json",
     "interval": 10
   },
-  "battery": {
-    "bat": "BAT0",
-    "states": {
-      "good": 95,
-      "warning": 30,
-      "critical": 5
+  "pulseaudio": {
+    "format": "{icon} {volume}%",
+    "format-icons": {
+      "default": ["\uf026", "\uf027", "\uf028"]
     },
-    "format": "BAT0: {capacity}%",
-    "format-charging": "BAT0: {capacity}% (charging)",
-    "format-plugged": "BAT0: {capacity}% (plugged)",
+    "on-click": "pactl set-sink-mute @DEFAULT_SINK@ toggle",
+    "on-click-right": "pavucontrol",
+    "format-muted": "\uf00d {volume}%"
+  },
+  "battery": {
+    "states": {
+        "warning": 30,
+        "critical": 10
+    },
+    "format": "{icon} {capacity: >3}%",
+    "format-plugged": "{icon} {capacity: >3}% ",
+    "format-icons": ["", "", "", "", ""]
   },
   "clock": {
     "format": " {:%H:%M}",
@@ -63,16 +70,7 @@
       }
     }
   },
-  "pulseaudio": {
-    "format": "{icon} {volume}%",
-    "format-icons": {
-      "default": ["\uf026", "\uf027", "\uf028"]
-    },
-    "on-click": "pactl set-sink-mute @DEFAULT_SINK@ toggle",
-    "on-click-right": "pavucontrol",
-    "format-muted": "\uf00d {volume}%"
-  },
-  "tray": {
+ "tray": {
     "icon-size": 20,
     "spacing": 10
   },
