@@ -30,12 +30,12 @@ window#waybar {
     margin-right: 0;
 }
 
-#cpu,
 #load,
 #memory,
+#temperature,
 #disk,
 #network,
 #custom-vpn,
-#temperature {
+#tray {
     padding-right: 10;
 }
