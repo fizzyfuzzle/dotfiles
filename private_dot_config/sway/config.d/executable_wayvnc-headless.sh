@@ -35,6 +35,11 @@ connection_count_now() {
     fi
 }
 
+# Start WayVNC
+if ! pgrep -x "wayvnc" > /dev/null; then
+    wayvnc 127.0.0.1 5900 &
+fi
+
 # Start WayVNC Controller
 while IFS= read -r EVT; do
     case "$(jq -r '.method' <<<"$EVT")" in
@@ -45,6 +50,7 @@ while IFS= read -r EVT; do
         wayvnc-shutdown)
             echo "wayvncctl is no longer running"
             connection_count_now 0
+            exit 0
             ;;
         wayvnc-startup)
             echo "Ready to receive wayvnc events"
