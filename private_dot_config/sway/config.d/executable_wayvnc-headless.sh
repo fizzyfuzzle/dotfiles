@@ -1,28 +1,29 @@
 #!/bin/bash
 #
-HEADLESS="HEADLESS-1"
+exec &> "${HOME}/wayvnc.log"
+#
+HEADLESS="${1:-HEADLESS-1}"
 OUTPUTS_TO_RECONNECT=()
 
 restore_outputs() {
     [[ ${#OUTPUTS_TO_RECONNECT[@]} -ge 1 ]] || return
-    for output in "${OUTPUTS_TO_RECONNECT[@]}"; do
-        echo "Re-enabling output $output"
-        swaymsg output "$output" enable
+    for OUTPUT in "${OUTPUTS_TO_RECONNECT[@]}"; do
+        echo "ENABLE OUTPUT: ${OUTPUT}"
+        swaymsg output "${OUTPUT}" enable
     done
-    echo "Disabling virtual output $HEADLESS"
-    swaymsg output "$HEADLESS" disable
+    echo "DISABLE OUTPUT: ${HEADLESS}"
+    swaymsg output "${HEADLESS}" disable
     OUTPUTS_TO_RECONNECT=()
 }
-trap restore_outputs EXIT
 
 collapse_outputs() {
-    echo "Switching to preexisting virtual output $HEADLESS"
-    swaymsg output "$HEADLESS" enable
-    wayvncctl output-set "$HEADLESS"
-    for output in $(wayvncctl -j output-list | jq -r '.[] | select(.captured==false).name'); do
-        echo "Disabling extra output $output"
-        swaymsg output "$output" disable
-        OUTPUTS_TO_RECONNECT+=("$output")
+    echo "ENABLE OUTPUT: ${HEADLESS}"
+    swaymsg output "${HEADLESS}" enable
+    wayvncctl output-set "${HEADLESS}"
+    for OUTPUT in $(wayvncctl -j output-list | jq -r '.[] | select(.captured==false).name'); do
+        echo "DISABLE OUTPUT: ${OUTPUT}"
+        swaymsg output "${OUTPUT}" disable
+        OUTPUTS_TO_RECONNECT+=("${OUTPUT}")
     done
 }
 
@@ -35,10 +36,35 @@ connection_count_now() {
     fi
 }
 
-# Start WayVNC
-if ! pgrep -x "wayvnc" > /dev/null; then
-    wayvnc 127.0.0.1 5900 &
+start_wayvnc() {
+    if ! pgrep -x "wayvnc" > /dev/null; then
+        echo "STARTING WAYVNC"
+        wayvnc 127.0.0.1 5900 &
+        sleep 1
+    fi
+}
+
+stop_wayvnc() {
+    pid=$(pgrep -x "wayvnc")
+    if [ -n "${pid}" ]; then
+        echo "STOPPING WAYVNC (PID: ${pid})"
+        kill "${pid}"
+    fi
+    echo "DONE"
+    exit 0
+}
+
+# Only Start Once
+if pgrep -x "wayvncctl" > /dev/null; then
+    exit 0
 fi
+
+# Exit Traps
+trap restore_outputs EXIT
+trap stop_wayvnc SIGINT
+
+# Start WayVNC
+start_wayvnc
 
 # Start WayVNC Controller
 while IFS= read -r EVT; do
@@ -48,12 +74,15 @@ while IFS= read -r EVT; do
             connection_count_now "$count"
             ;;
         wayvnc-shutdown)
-            echo "wayvncctl is no longer running"
+            echo "WAYVNC STOPPED"
             connection_count_now 0
-            exit 0
+            start_wayvnc
             ;;
         wayvnc-startup)
-            echo "Ready to receive wayvnc events"
+            echo "WAYVNC STARTED"
+            ;;
+        *)
+            echo "EVENT: ${EVT}"
             ;;
     esac
 done < <(wayvncctl --wait --reconnect --json event-receive)
