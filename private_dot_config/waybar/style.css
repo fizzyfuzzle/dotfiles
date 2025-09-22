@@ -22,12 +22,8 @@ window#waybar {
     background-color: #eb4d4b;
 }
 
-.modules-left > widget:first-child > #workspaces {
-    margin-left: 0;
-}
-
-.modules-right > widget:last-child > #workspaces {
-    margin-right: 0;
+#scratchpad {
+    padding-left: 10;
 }
 
 #load,
