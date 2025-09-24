@@ -12,7 +12,7 @@ restore_outputs() {
         swaymsg output "${OUTPUT}" enable
     done
     echo "DISABLE OUTPUT: ${HEADLESS}"
-    wayvncctl detach
+    wayvncctl detach &>/dev/null
     swaymsg output "${HEADLESS}" disable
     OUTPUTS_TO_RECONNECT=()
 }
@@ -39,7 +39,7 @@ connection_count_now() {
 }
 
 start_wayvnc() {
-    if ! pgrep -x "wayvnc" > /dev/null; then
+    if ! pgrep -x "wayvnc" >/dev/null; then
         echo "STARTING WAYVNC"
         wayvnc -D 127.0.0.1 5900 &
         sleep 1
@@ -57,7 +57,7 @@ stop_wayvnc() {
 }
 
 # Only Start Once
-if pgrep -x "wayvncctl" > /dev/null; then
+if pgrep -x "wayvncctl" >/dev/null; then
     exit 0
 fi
 
@@ -78,6 +78,7 @@ while IFS= read -r EVT; do
         wayvnc-shutdown)
             echo "WAYVNC STOPPED"
             connection_count_now 0
+            start_wayvnc
             ;;
         wayvnc-startup)
             echo "WAYVNC STARTED"
