@@ -1,0 +1,81 @@
+# vim: syntax=sh
+
+fase_1()
+{
+    # Prevent installation of weak dependencies
+    run0 sed -i '/^install_weak_deps=/!s/$/\ninstall_weak_deps=False/' /etc/dnf/dnf.conf
+
+    # Add Brave Repository
+    run0 curl --tlsv1.3 -fsSLo /etc/yum.repos.d/brave-browser.repo https://brave-browser-rpm-release.s3.brave.com/brave-browser.repo
+
+    # Add Mullvad Repository
+    run0 curl --tlsv1.3 -fsSLo /etc/yum.repos.d/mullvad.repo https://repository.mullvad.net/rpm/stable/mullvad.repo
+
+    # Install Packages
+    run0 rpm-ostree update --install \
+        bemenu \
+        brave-browser \
+        flatpak \
+        fonts-dejavu \
+        grim \
+        mullvad-vpn \
+        neomutt \
+        neovim \
+        offlineimap \
+        playerctl \
+        pulseaudio-utils \
+        toolbox \
+        unzip \
+        wayvnc \
+        wl-clipboard \
+        yubikey-manager \
+        zsh
+
+    # DNS over TLS
+    run0 mkdir -p /etc/systemd/resolved.conf.d
+    run0 cat <<EOF >"/etc/systemd/resolved.conf.d/dns-over-tls.conf"
+[Resolve]
+DNS=193.110.81.9#zero.dns0.eu 185.253.5.9#zero.dns0.eu 2a0f:fc80::9#zero.dns0.eu 2a0f:fc81::9#zero.dns0.eu
+DNSOverTLS=yes
+EOF
+
+    # Update GRUB
+    run0 sed -i 's/^GRUB_TIMEOUT=.*/GRUB_TIMEOUT=0/' /etc/default/grub
+    run0 grub2-mkconfig -o /boot/grub2/grub.cfg
+
+    # Fase 1 Done
+    echo "fase 1 done" > "${HOME}/chezmoi_install"
+
+    # Reboot
+    systemctl reboot
+}
+
+fase_2()
+{
+    # Enable Mullvad VPN
+    systemctl enable --now mullvad-daemon.service
+    systemctl enable --now mullvad-early-boot-blocking.service
+
+    # Change Shell to ZSH
+    chsh --shell=/usr/bin/zsh
+
+    # Add Flathub
+    flatpak remote-add --if-not-exists flathub https://dl.flathub.org/repo/flathub.flatpakrepo
+
+    # Install Flatpaks
+    flatpak install flathub org.keepassxc.KeePassXC
+    flatpak install flathub org.libreoffice.LibreOffice
+    flatpak install flathub org.qbittorrent.qBittorrent
+    flatpak install flathub com.visualstudio.code
+
+    # Fase 2 Done
+    echo "fase 2 done" >> "${HOME}/chezmoi_install"
+}
+
+if [ ! -f "${HOME}/chezmoi_install" ]; then
+    echo "Chezmoi Auto Install: Fase 1"
+    #fase_1
+else
+    echo "Chezmoi Auto Install: Fase 2"
+    #fase_2
+fi
