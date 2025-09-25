@@ -16,11 +16,11 @@ window#waybar {
 }
 
 #workspaces button.focused {
-    background-color: #444444;
+    background-color: #888888;
 }
 
 #workspaces button.urgent {
-    background-color: #eb4d4b;
+    background-color: #900000;
 }
 
 #scratchpad {
