@@ -32,6 +32,8 @@ window#waybar {
 #disk,
 #network,
 #custom-vpn,
+#pulseaudio,
+#battery,
 #tray {
     padding-right: 10;
 }
