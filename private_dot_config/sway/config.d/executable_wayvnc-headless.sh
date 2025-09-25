@@ -11,10 +11,14 @@ restore_outputs() {
         echo "ENABLE OUTPUT: ${OUTPUT}"
         swaymsg output "${OUTPUT}" enable
     done
+
     echo "DISABLE OUTPUT: ${HEADLESS}"
     wayvncctl detach &>/dev/null
     swaymsg output "${HEADLESS}" disable
     OUTPUTS_TO_RECONNECT=()
+
+    # Lock Session
+    loginctl lock-session
 }
 
 collapse_outputs() {
