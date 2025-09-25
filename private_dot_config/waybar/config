@@ -27,7 +27,8 @@
     "tooltip": false,
   },
   "disk": {
-    "format": " {percentage_free}%"
+    "format": " {percentage_free}%",
+    "path": "/home"
   },
   "network": {
     "format": "{ifname}",
@@ -62,8 +63,8 @@
         "warning": 30,
         "critical": 10
     },
-    "format": "{icon} {capacity: >3}%",
-    "format-plugged": "{icon} {capacity: >3}% ",
+    "format": "{icon} {capacity: >3}% ",
+    "format-discharging": "{icon} {capacity: >3}%",
     "format-icons": ["", "", "", "", ""]
   },
   "tray": {
