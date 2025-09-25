@@ -10,8 +10,9 @@ window#waybar {
 }
 
 #workspaces button {
-    padding: 0 5px;
+    color: #ffffff;
     background-color: transparent;
+    padding: 0 5px;
 }
 
 #workspaces button.focused {
