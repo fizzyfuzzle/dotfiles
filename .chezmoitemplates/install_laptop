@@ -2,8 +2,8 @@
 
 fase_1()
 {
-    # Prevent installation of weak dependencies
-    run0 sed -i '/^install_weak_deps=/!s/$/\ninstall_weak_deps=False/' /etc/dnf/dnf.conf
+    # Do not install recommended packages
+    run0 sed -i 's/^#\?Recommends=.*/Recommends=false/' /etc/rpm-ostreed.conf
 
     # Add Brave Repository
     run0 curl --tlsv1.3 -fsSLo /etc/yum.repos.d/brave-browser.repo https://brave-browser-rpm-release.s3.brave.com/brave-browser.repo
@@ -12,36 +12,22 @@ fase_1()
     run0 curl --tlsv1.3 -fsSLo /etc/yum.repos.d/mullvad.repo https://repository.mullvad.net/rpm/stable/mullvad.repo
 
     # Install Packages
-    run0 rpm-ostree update --install \
+    rpm-ostree update --install \
         bemenu \
         brave-browser \
-        flatpak \
-        fonts-dejavu \
-        grim \
         mullvad-vpn \
         neomutt \
         neovim \
         offlineimap \
-        playerctl \
-        pulseaudio-utils \
-        toolbox \
-        unzip \
         wayvnc \
-        wl-clipboard \
         yubikey-manager \
         zsh
 
-    # DNS over TLS
-    run0 mkdir -p /etc/systemd/resolved.conf.d
-    run0 cat <<EOF >"/etc/systemd/resolved.conf.d/dns-over-tls.conf"
-[Resolve]
-DNS=193.110.81.9#zero.dns0.eu 185.253.5.9#zero.dns0.eu 2a0f:fc80::9#zero.dns0.eu 2a0f:fc81::9#zero.dns0.eu
-DNSOverTLS=yes
-EOF
+    # Disable Simple Desktop Display Manager
+    systemctl disable sddm.service
 
-    # Update GRUB
-    run0 sed -i 's/^GRUB_TIMEOUT=.*/GRUB_TIMEOUT=0/' /etc/default/grub
-    run0 grub2-mkconfig -o /boot/grub2/grub.cfg
+    # Update GRUB timeout
+    echo "set timeout=0" | run0 tee /boot/grub2/user.cfg
 
     # Fase 1 Done
     echo "fase 1 done" > "${HOME}/chezmoi_install"
