@@ -8,7 +8,7 @@ run0 curl --tlsv1.3 -fsSLo /etc/yum.repos.d/brave-browser.repo \
     https://brave-browser-rpm-release.s3.brave.com/brave-browser.repo
 
 # Overlay Additional Packages
-rpm-ostree install --idempotent --asumeyes \
+rpm-ostree install --idempotent --assumeyes \
     brave-browser \
     neovim \
     wayvnc \
@@ -25,7 +25,8 @@ systemctl mask \
 # Disable User Services
 systemctl --user mask \
     app-blueman@autostart.service \
-    app-geoclue\x2ddemo\x2dagent@autostart.service \
+    app-geoclue\\x2ddemo\\x2dagent@autostart.service \
+    at-spi-dbus-bus.service \
     blueman-applet.service \
     blueman-manager.service \
     mpris-proxy.service \
@@ -38,7 +39,9 @@ echo "set timeout=0" | run0 tee /boot/grub2/user.cfg
 command -v zsh &>/dev/null || systemctl reboot
 
 # Change Shell to ZSH
-chsh --shell=/usr/bin/zsh
+if [ "$SHELL" != "$(command -v zsh)" ]; then
+    chsh --shell "$(command -v zsh)"
+fi
 
 # Add Flathub
 flatpak remote-add --user --if-not-exists \
