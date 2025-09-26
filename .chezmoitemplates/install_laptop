@@ -6,25 +6,33 @@ fase_1()
     run0 sed -i 's/^#\?Recommends=.*/Recommends=false/' /etc/rpm-ostreed.conf
 
     # Add Brave Repository
-    run0 curl --tlsv1.3 -fsSLo /etc/yum.repos.d/brave-browser.repo https://brave-browser-rpm-release.s3.brave.com/brave-browser.repo
+    run0 curl --tlsv1.3 -fsSLo /etc/yum.repos.d/brave-browser.repo \
+        https://brave-browser-rpm-release.s3.brave.com/brave-browser.repo
 
     # Add Mullvad Repository
-    run0 curl --tlsv1.3 -fsSLo /etc/yum.repos.d/mullvad.repo https://repository.mullvad.net/rpm/stable/mullvad.repo
+    run0 curl --tlsv1.3 -fsSLo /etc/yum.repos.d/mullvad.repo \
+        https://repository.mullvad.net/rpm/stable/mullvad.repo
 
     # Install Packages
     rpm-ostree update --install \
-        bemenu \
         brave-browser \
         mullvad-vpn \
-        neomutt \
         neovim \
-        offlineimap \
         wayvnc \
-        yubikey-manager \
         zsh
 
-    # Disable Simple Desktop Display Manager
-    systemctl disable sddm.service
+    # Disable System Services
+    systemctl disable \
+        cups.service cups.socket cups.path \
+        ModemManager.service \
+        sddm.service
+
+    # TODO: Find a way to cleanly disable the following services
+    # blueman-mechanism.service
+    # bluetooth.service
+    # geoclue.service
+    # mpris-proxy.service
+    # obex.service
 
     # Update GRUB timeout
     echo "set timeout=0" | run0 tee /boot/grub2/user.cfg
@@ -46,13 +54,16 @@ fase_2()
     chsh --shell=/usr/bin/zsh
 
     # Add Flathub
-    flatpak remote-add --if-not-exists flathub https://dl.flathub.org/repo/flathub.flatpakrepo
+    flatpak remote-add --user --if-not-exists \
+        flathub https://dl.flathub.org/repo/flathub.flatpakrepo
 
     # Install Flatpaks
-    flatpak install flathub org.keepassxc.KeePassXC
-    flatpak install flathub org.libreoffice.LibreOffice
-    flatpak install flathub org.qbittorrent.qBittorrent
-    flatpak install flathub com.visualstudio.code
+    flatpak install --user --assumeyes \
+        com.github.tchx84.Flatseal \
+        org.keepassxc.KeePassXC \
+        org.libreoffice.LibreOffice \
+        org.qbittorrent.qBittorrent \
+        com.visualstudio.code
 
     # Fase 2 Done
     echo "fase 2 done" >> "${HOME}/chezmoi_install"
