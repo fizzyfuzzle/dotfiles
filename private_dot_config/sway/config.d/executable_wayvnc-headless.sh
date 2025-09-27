@@ -11,7 +11,7 @@ restore_outputs() {
         echo "ENABLE OUTPUT: ${OUTPUT}"
         swaymsg output "${OUTPUT}" enable
     done
-
+    sleep 2
     echo "DISABLE OUTPUT: ${HEADLESS}"
     wayvncctl detach &>/dev/null
     swaymsg output "${HEADLESS}" disable
@@ -26,6 +26,7 @@ collapse_outputs() {
     swaymsg output "${HEADLESS}" enable
     wayvncctl attach "${WAYLAND_DISPLAY}"
     wayvncctl output-set "${HEADLESS}"
+    sleep 2
     for OUTPUT in $(wayvncctl -j output-list | jq -r '.[] | select(.captured==false).name'); do
         echo "DISABLE OUTPUT: ${OUTPUT}"
         swaymsg output "${OUTPUT}" disable
