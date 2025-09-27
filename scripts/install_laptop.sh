@@ -11,6 +11,7 @@ run0 curl --tlsv1.3 -fsSLo /etc/yum.repos.d/brave-browser.repo \
 rpm-ostree install --idempotent --assumeyes \
     brave-browser \
     neovim \
+    papirus-icon-theme \
     wayvnc \
     wireguard-tools \
     zsh
@@ -47,6 +48,11 @@ command -v zsh &>/dev/null || systemctl reboot
 if [ "$SHELL" != "$(command -v zsh)" ]; then
     chsh --shell "$(command -v zsh)"
 fi
+
+# Set Theme
+gsettings set org.gnome.desktop.interface gtk-theme Adwaita-dark
+gsettings set org.gnome.desktop.interface cursor-theme Adwaita
+gsettings set org.gnome.desktop.interface icon-theme Papirus
 
 # Add Flathub
 flatpak remote-add --user --if-not-exists \
