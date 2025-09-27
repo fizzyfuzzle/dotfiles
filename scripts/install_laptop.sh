@@ -15,12 +15,17 @@ rpm-ostree install --idempotent --assumeyes \
     wireguard-tools \
     zsh
 
+# Overlay Remove Firefox
+command -v firefox &>/dev/null \
+    && rpm-ostree override remove firefox firefox-langpacks
+
 # Disable System Services
 systemctl mask \
     bluetooth.service \
     cups.service cups.socket cups.path \
     ModemManager.service \
-    sddm.service
+    sddm.service \
+    systemd-oomd.service systemd-oomd.socket
 
 # Disable User Services
 systemctl --user mask \
@@ -52,6 +57,5 @@ flatpak install --user --assumeyes \
     com.github.tchx84.Flatseal \
     org.keepassxc.KeePassXC \
     org.libreoffice.LibreOffice \
-    org.qbittorrent.qBittorrent \
     com.visualstudio.code
 
