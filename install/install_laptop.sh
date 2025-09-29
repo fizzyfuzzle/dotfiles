@@ -1,11 +1,18 @@
 #!/usr/bin/env bash
 
 # Do not install recommended packages
-run0 sed -i 's/^#\?Recommends=.*/Recommends=false/' /etc/rpm-ostreed.conf
+grep -q '^Recommends=false' /etc/rpm-ostreed.conf \
+    || run0 sed -i 's/^#\?Recommends=.*/Recommends=false/' /etc/rpm-ostreed.conf
 
 # Add Brave Repository
-run0 curl --tlsv1.3 -fsSLo /etc/yum.repos.d/brave-browser.repo \
+[ ! -f "/etc/yum.repos.d/brave-browser.repo" ] \ 
+    && run0 curl --tlsv1.3 -fsSLo /etc/yum.repos.d/brave-browser.repo \
     https://brave-browser-rpm-release.s3.brave.com/brave-browser.repo
+
+# Add Brave Policies
+[ ! -f "/etc/brave/policies/managed/brave.json" ] \ 
+    && run0 mkdir -p /etc/brave/policies/managed \
+    && run0 cp brave.json /etc/brave/policies/managed/
 
 # Overlay Additional Packages
 rpm-ostree install --idempotent --assumeyes \
