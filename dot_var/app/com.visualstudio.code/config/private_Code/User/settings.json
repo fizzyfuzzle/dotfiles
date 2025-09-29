@@ -41,5 +41,6 @@
         "**/*.log": true,
         "**/venv/**": true
     },
-    "remote.autoForwardPorts": false
+    "remote.autoForwardPorts": false,
+    "terminal.integrated.defaultProfile.linux": "bash"
 }
