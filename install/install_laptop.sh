@@ -1,18 +1,18 @@
 #!/usr/bin/env bash
 
 # Do not install recommended packages
-grep -q '^Recommends=false' /etc/rpm-ostreed.conf \
-    || run0 sed -i 's/^#\?Recommends=.*/Recommends=false/' /etc/rpm-ostreed.conf
+grep -q '^Recommends=false' /etc/rpm-ostreed.conf || \
+    run0 sed -i 's/^#\?Recommends=.*/Recommends=false/' /etc/rpm-ostreed.conf
 
 # Add Brave Repository
-[ ! -f "/etc/yum.repos.d/brave-browser.repo" ] \ 
-    && run0 curl --tlsv1.3 -fsSLo /etc/yum.repos.d/brave-browser.repo \
+[ ! -f "/etc/yum.repos.d/brave-browser.repo" ] && \
+    run0 curl --tlsv1.3 -fsSLo /etc/yum.repos.d/brave-browser.repo \
     https://brave-browser-rpm-release.s3.brave.com/brave-browser.repo
 
 # Add Brave Policies
-[ ! -f "/etc/brave/policies/managed/brave.json" ] \ 
-    && run0 mkdir -p /etc/brave/policies/managed \
-    && run0 cp brave.json /etc/brave/policies/managed/
+[ ! -f "/etc/brave/policies/managed/brave.json" ] && \
+    run0 mkdir -p /etc/brave/policies/managed && \
+    run0 cp brave.json /etc/brave/policies/managed/
 
 # Overlay Additional Packages
 rpm-ostree install --idempotent --assumeyes \
@@ -22,8 +22,8 @@ rpm-ostree install --idempotent --assumeyes \
     zsh
 
 # Overlay Remove Firefox
-command -v firefox &>/dev/null \
-    && rpm-ostree override remove firefox firefox-langpacks
+command -v firefox &>/dev/null && \
+    rpm-ostree override remove firefox firefox-langpacks
 
 # Disable System Services
 systemctl mask \

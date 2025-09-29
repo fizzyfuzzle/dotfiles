@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 # Do not install recommended packages
-echo "[main]\ninstall_weak_deps=False" | sudo tee /etc/dnf/dnf.conf
+echo -e "[main]\ninstall_weak_deps=False" | sudo tee /etc/dnf/dnf.conf
 
 # Install Packages
 sudo dnf install --assumeyes \
