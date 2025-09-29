@@ -81,6 +81,8 @@ alias rip='dig TXT +short o-o.myaddr.l.google.com @ns1.google.com'
 alias sz='sudo HOME=$HOME /bin/zsh'
 alias sshz=sshz
 alias t="${EDITOR} ~/todo.md"
+(( $+commands[toolbox] )) && alias tbe="toolbox enter"
+(( $+commands[toolbox] )) && alias tbr="toolbox run"
 (( $+commands[tmux] )) && alias tm='tmux attach -t $(hostname) || tmux new -s $(hostname)'
 alias up='sudo apt update && sudo apt upgrade && sudo apt autoremove --purge && sudo apt autoclean'
 alias v="${EDITOR}"
@@ -118,6 +120,11 @@ if [[ -a ~/.submodules/zsh-history-substring-search/zsh-history-substring-search
     bindkey '^[[1;5B' history-substring-search-down
 fi
 
+# Toolbox Info
+function toolbox_info() {
+  [[ -f /run/.toolboxenv ]] && echo "⬢ "
+}
+
 # Prompt
 autoload -Uz vcs_info
 precmd_vcs_info() { vcs_info }
@@ -130,7 +137,7 @@ zstyle ':vcs_info:git:*' formats '%F{green}%b%f%c%u '
 zstyle ':vcs_info:git:*' actionformats '%F{green}%b (%a)%f%c%u '
 setopt PROMPT_PERCENT
 setopt PROMPT_SUBST
-PROMPT='%(?..%F{red}[%?] )%f%F{blue}%2~%f ${vcs_info_msg_0_}%(!.%F{red}#%f.%F{green}❯%f) '
+PROMPT='%(?..%F{red}[%?] )%f%F{blue}%2~%f ${vcs_info_msg_0_}%F{cyan}$(toolbox_info)%f%(!.%F{red}#%f.%F{green}❯%f) '
 
 # SSH Agent
 if [[ -z "${SSH_CONNECTION}" && -n "${XDG_RUNTIME_DIR}" ]]; then
