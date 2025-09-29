@@ -23,7 +23,6 @@
         "source.organizeImports": "always",
         "source.unusedImports": "always"
     },
-    "workbench.iconTheme": "material-icon-theme",
     "window.menuBarVisibility": "toggle",
     "editor.renderWhitespace": "trailing",
     "chat.agent.enabled": false,
