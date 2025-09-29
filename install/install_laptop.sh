@@ -31,6 +31,7 @@ systemctl mask \
     cups.service cups.socket cups.path \
     ModemManager.service \
     sddm.service \
+    systemd-coredump.socket \
     systemd-oomd.service systemd-oomd.socket
 
 # Disable User Services
