@@ -2,7 +2,7 @@
   "height": 24,
   "modules-left": ["sway/workspaces","sway/mode","sway/scratchpad"],
   "modules-center": ["sway/window"],
-  "modules-right": ["load","memory","temperature","disk","network","custom/vpn","pulseaudio","battery","tray","clock"],
+  "modules-right": ["load","memory","temperature","disk","pulseaudio","battery","tray","clock"],
   "sway/mode": {
     "format": "{}"
   },
@@ -40,14 +40,6 @@
     "tooltip-format-ethernet": " {ifname}",
     "tooltip-format-disconnected": "Disconnected",
     "format-alt": "{ifname}: {ipaddr}/{cidr}"
-  },
-  "custom/vpn": {
-    "format": "",
-    "tooltip-format": "VPN",
-    "exec": "echo '{\"class\": \"connected\"}'",
-    "exec-if": "test -d /proc/sys/net/ipv4/conf/wg0",
-    "return-type": "json",
-    "interval": 10
   },
   "pulseaudio": {
     "format": "{icon} {volume}%",

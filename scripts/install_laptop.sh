@@ -11,9 +11,7 @@ run0 curl --tlsv1.3 -fsSLo /etc/yum.repos.d/brave-browser.repo \
 rpm-ostree install --idempotent --assumeyes \
     brave-browser \
     neovim \
-    papirus-icon-theme \
     wayvnc \
-    wireguard-tools \
     zsh
 
 # Overlay Remove Firefox
@@ -45,14 +43,12 @@ echo "set timeout=0" | run0 tee /boot/grub2/user.cfg
 command -v zsh &>/dev/null || systemctl reboot
 
 # Change Shell to ZSH
-if [ "$SHELL" != "$(command -v zsh)" ]; then
-    chsh --shell "$(command -v zsh)"
-fi
+[ "$SHELL" != "$(command -v zsh)" ] && chsh --shell "$(command -v zsh)"
 
-# Set Theme
+# Install Papirus Icon Theme
+[ ! -d "$HOME/.icons" ] && curl --tlsv1.3 -fsSL https://git.io/papirus-icon-theme-install | env DESTDIR="$HOME/.icons" sh
+gsettings set org.gnome.desktop.interface icon-theme Papirus-dark
 gsettings set org.gnome.desktop.interface gtk-theme Adwaita-dark
-gsettings set org.gnome.desktop.interface cursor-theme Adwaita
-gsettings set org.gnome.desktop.interface icon-theme Papirus
 
 # Add Flathub
 flatpak remote-add --user --if-not-exists \
