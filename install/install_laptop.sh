@@ -47,7 +47,7 @@ command -v zsh &>/dev/null || systemctl reboot
 
 # Install Papirus Icon Theme
 [ ! -d "$HOME/.icons" ] && curl --tlsv1.3 -fsSL https://git.io/papirus-icon-theme-install | env DESTDIR="$HOME/.icons" sh
-gsettings set org.gnome.desktop.interface icon-theme Papirus-dark
+gsettings set org.gnome.desktop.interface icon-theme Papirus-Dark
 gsettings set org.gnome.desktop.interface gtk-theme Adwaita-dark
 
 # Add Flathub
