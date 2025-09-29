@@ -1,6 +1,5 @@
 #!/bin/bash
 #
-CODE="flatpak run com.visualstudio.code"
 EXTENSIONS=(
   hashicorp.terraform \
   ms-python.isort \
@@ -12,5 +11,5 @@ EXTENSIONS=(
 
 # Install Extensions
 for E in "${EXTENSIONS[@]}"; do
-  "${CODE}" --install-extension "${E}"
+  flatpak run com.visualstudio.code --install-extension "${E}"
 done
