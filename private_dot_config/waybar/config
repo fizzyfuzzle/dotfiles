@@ -1,5 +1,6 @@
 {
   "height": 24,
+  "spacing": 12,
   "modules-left": ["sway/workspaces","sway/mode","sway/scratchpad"],
   "modules-center": ["sway/window"],
   "modules-right": ["load","memory","temperature","disk","pulseaudio","battery","tray","clock"],
@@ -61,8 +62,7 @@
     "format-icons": ["", "", "", "", ""]
   },
   "tray": {
-    "icon-size": 20,
-    "spacing": 10
+    "spacing": 5
   },
   "clock": {
     "format": " {:%H:%M}",
