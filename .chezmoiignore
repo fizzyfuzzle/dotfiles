@@ -5,12 +5,13 @@ install
 .ssh
 {{- end }}
 {{- if (or .mobile .server) }}
+.mailcap
 bin
-.config/Code
 .config/foot
-.config/i3status
 .config/neomutt
 .config/offlineimap
+.config/rofi
 .config/sway
-.config/tofi
+.config/waybar
+.var
 {{- end }}
