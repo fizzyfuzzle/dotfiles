@@ -1,12 +1,9 @@
 {
   "height": 24,
   "spacing": 12,
-  "modules-left": ["sway/workspaces","sway/mode","sway/scratchpad"],
-  "modules-center": ["sway/window"],
+  "modules-left": ["sway/workspaces","sway/scratchpad","sway/mode"],
+  "modules-center": [],
   "modules-right": ["load","memory","temperature","disk","pulseaudio","battery","tray","clock"],
-  "sway/mode": {
-    "format": "{}"
-  },
   "sway/scratchpad": {
     "format": "{icon} {count}",
     "show-empty": false,
@@ -14,8 +11,8 @@
     "tooltip": true,
     "tooltip-format": "{app}: {title}"
   },
-  "sway/window": {
-    "format": "{title}"
+   "sway/mode": {
+    "format": " {}"
   },
   "load": {
     "format": " {load1:0.2f}"
