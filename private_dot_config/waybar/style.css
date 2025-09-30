@@ -10,30 +10,13 @@ window#waybar {
 }
 
 #workspaces button {
-    color: #ffffff;
-    background-color: transparent;
     padding: 0 5px;
 }
 
 #workspaces button.focused {
-    background-color: #888888;
+    background-color: #444444;
 }
 
 #workspaces button.urgent {
-    background-color: #900000;
-}
-
-#scratchpad {
-    padding-left: 10;
-}
-
-#load,
-#memory,
-#temperature,
-#disk,
-#network,
-#pulseaudio,
-#battery,
-#tray {
-    padding-right: 10;
+    background-color: #800000;
 }
