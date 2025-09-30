@@ -1,13 +1,10 @@
 {{- $workstation := false -}}
-{{- $laptop := false -}}
 {{- $server := false -}}
 {{- $mobile := false -}}
 
 {{- if (eq .chezmoi.os "linux") -}}
-{{-   if (eq .chezmoi.hostname "hyperion") -}}
+{{-   if (eq .chezmoi.hostname "toolbx") -}}
 {{-     $workstation = true -}}
-{{-   else if (eq .chezmoi.hostname "prometheus") -}}
-{{-     $laptop = true -}}
 {{-   else if (eq .chezmoi.username "droid") -}}
 {{-     $mobile = true -}}
 {{-   else -}}
@@ -30,6 +27,5 @@ encryption = "age"
 
 [data]
     workstation = {{ $workstation }}
-    laptop = {{ $laptop }}
     server = {{ $server }}
     mobile = {{ $mobile }}

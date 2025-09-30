@@ -1,3 +1,5 @@
+#!/usr/bin/env bash
+
 # Set APT defaults
 cat <<EOF > "$PREFIX/etc/apt/apt.conf.d/local"
 Dpkg::Options {
@@ -25,5 +27,3 @@ chsh -s zsh
 
 # Generate SSH key
 [ ! -f "$HOME/.ssh/id_ed25519" ] && ssh-keygen -q -t ed25519 -f "$HOME/.ssh/id_ed25519" -N ""
-
-exit 0
