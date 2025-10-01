@@ -50,7 +50,7 @@ setopt pushd_ignore_dups
 setopt pushdminus
 
 # Editor
-(( $+commands[nvim] )) && export EDITOR='nvim' || export EDITOR='vim'
+(( $+commands[vim] )) && export EDITOR='vim' || export EDITOR='nano'
 export VISUAL="${EDITOR}"
 
 # Aliases
@@ -70,8 +70,6 @@ alias ff='find . -name'
 alias j='journalctl -aq -u'
 alias jcf='journalctl -aq --no-pager --output=cat -n 25 -f -u'
 (( $+commands[lsd] )) && alias ls='lsd' || alias ls='ls --color -h'
-(( $+commands[neomutt] )) && alias m='neomutt'
-(( $+commands[ykman] )) && alias oath='ykman oath accounts code -s'
 (( $+commands[pass] )) && alias p='pass show'
 (( $+commands[zbarimg] )) && alias qrdec='zbarimg -q --raw'
 (( $+commands[qrencode] )) && alias qren='qrencode -t ansiutf8'
