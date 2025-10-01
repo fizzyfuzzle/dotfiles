@@ -1,5 +1,10 @@
 #!/bin/bash
 #
+# Check if WayVNC is installed
+command -v wayvncctl &>/dev/null || exit 0
+# Only Start Once
+pgrep -x "wayvncctl" >/dev/null && exit 0
+#
 exec &> "${HOME}/wayvnc.log"
 #
 HEADLESS="${1:-HEADLESS-1}"
@@ -60,11 +65,6 @@ stop_wayvnc() {
     echo "DONE"
     exit 0
 }
-
-# Only Start Once
-if pgrep -x "wayvncctl" >/dev/null; then
-    exit 0
-fi
 
 # Exit Traps
 trap restore_outputs EXIT
