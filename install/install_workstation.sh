@@ -17,13 +17,12 @@ grep -q '^Recommends=false' /etc/rpm-ostreed.conf || \
 # Overlay Additional Packages
 rpm-ostree install --idempotent --assumeyes \
     brave-browser \
-    neovim \
-    wayvnc \
+    vim-enhanced \
     zsh
 
 # Overlay Remove Firefox
-command -v firefox &>/dev/null && \
-    rpm-ostree override remove firefox firefox-langpacks
+#command -v firefox &>/dev/null && \
+#    rpm-ostree override remove firefox firefox-langpacks
 
 # Disable System Services
 systemctl mask \
@@ -65,6 +64,7 @@ flatpak remote-add --user --if-not-exists \
 # Install Flatpaks
 flatpak install --user --assumeyes \
     com.github.tchx84.Flatseal \
+    io.mpv.Mpv \
     org.keepassxc.KeePassXC \
     org.libreoffice.LibreOffice \
     com.visualstudio.code
