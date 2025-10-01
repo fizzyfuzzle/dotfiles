@@ -118,9 +118,14 @@ if [[ -a ~/.submodules/zsh-history-substring-search/zsh-history-substring-search
     bindkey '^[[1;5B' history-substring-search-down
 fi
 
-# Toolbox Info
-function toolbox_info() {
-  [[ -f /run/.toolboxenv ]] && echo "⬢"
+# Remote Prompt
+function remote_prompt() {
+   [[ -n "$SSH_CLIENT" ]] || [[ -n "$SSH_TTY" ]] && echo "%F{red} %f"
+}
+
+# Toolbox Prompt
+function toolbox_prompt() {
+  [[ -f /run/.toolboxenv ]] && echo "%F{cyan}⬢ %f"
 }
 
 # Prompt
@@ -135,7 +140,7 @@ zstyle ':vcs_info:git:*' formats '%F{green}%b%f%c%u '
 zstyle ':vcs_info:git:*' actionformats '%F{green}%b (%a)%f%c%u '
 setopt PROMPT_PERCENT
 setopt PROMPT_SUBST
-PROMPT='%(?..%F{red}[%?] )%f%F{blue}%2~%f ${vcs_info_msg_0_}%F{cyan}$(toolbox_info)%f%(!.%F{red}#%f.%F{green}❯%f) '
+PROMPT='%(?..%F{red}[%?] )%f%F{blue}%2~%f ${vcs_info_msg_0_}$(remote_prompt)$(toolbox_prompt)%(!.%F{red}#%f.%F{green}❯%f) '
 
 # SSH Agent
 if [[ -z "${SSH_CONNECTION}" && -n "${XDG_RUNTIME_DIR}" ]]; then
