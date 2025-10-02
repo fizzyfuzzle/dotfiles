@@ -9,11 +9,12 @@ window#waybar {
 }
 
 #workspaces button {
+    color: #888888;
     padding: 0 5px;
 }
 
 #workspaces button.focused {
-    background-color: #444444;
+    color: #ffffff;
 }
 
 #workspaces button.urgent {

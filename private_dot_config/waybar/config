@@ -1,5 +1,4 @@
 {
-  "height": 24,
   "spacing": 12,
   "modules-left": ["sway/workspaces","sway/scratchpad","sway/mode"],
   "modules-center": [],
@@ -22,7 +21,7 @@
   },
   "temperature": {
     "format": " {temperatureC}°C",
-    "tooltip": false,
+    "tooltip": false
   },
   "disk": {
     "format": " {percentage_free}%",
@@ -42,11 +41,11 @@
   "pulseaudio": {
     "format": "{icon} {volume}%",
     "format-icons": {
-      "default": ["\uf026", "\uf027", "\uf028"]
+      "default": ["", "", ""]
     },
     "on-click": "pactl set-sink-mute @DEFAULT_SINK@ toggle",
     "on-click-right": "pavucontrol",
-    "format-muted": "\uf00d {volume}%"
+    "format-muted": " {volume}%"
   },
   "battery": {
     "states": {
