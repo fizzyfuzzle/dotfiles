@@ -41,7 +41,7 @@ bindkey '^[[Z' reverse-menu-complete
 
 # History
 HISTFILE=~/.zsh_history
-HISTORY_IGNORE="(gpg*|ssh*|pass*|oath*|ykman*)"
+HISTORY_IGNORE="(gpg*|ssh*|pass*)"
 HISTSIZE=4000
 SAVEHIST=$HISTSIZE
 setopt hist_ignore_all_dups
@@ -68,35 +68,21 @@ alias 7='cd -7'
 alias 8='cd -8'
 alias 9='cd -9'
 alias d='dirs -v | head -10'
-(( $+commands[rg] )) && alias f='rg -i' || alias f='grep -i'
-alias ff='find . -name'
+alias e="${EDITOR}"
 (( $+commands[git] )) && alias g='git'
 alias j='journalctl -aq -u'
 alias jcf='journalctl -aq --no-pager --output=cat -n 25 -f -u'
-(( $+commands[lsd] )) && alias ls='lsd' || alias ls='ls --color -h'
+alias ll='ls -lh --color=auto'
+alias ls='ls --color=auto'
 (( $+commands[pass] )) && alias p='pass show'
 (( $+commands[zbarimg] )) && alias qrdec='zbarimg -q --raw'
-(( $+commands[qrencode] )) && alias qren='qrencode -t ansiutf8'
+(( $+commands[qrencode] )) && alias qrenc='qrencode -t ansiutf8'
 alias rip='dig TXT +short o-o.myaddr.l.google.com @ns1.google.com'
 (( $+commands[rsync] )) && alias rs='rsync --archive --delete --progress --exclude={".git",".gitignore"} --filter=":- .gitignore"'
 (( $+commands[shred] )) && alias sd='shred -u'
-alias sz='sudo HOME=$HOME /bin/zsh'
-alias sshz=sshz
 alias t="${EDITOR} ~/todo.md"
 (( $+commands[toolbox] )) && alias tbe="toolbox enter"
 (( $+commands[toolbox] )) && alias tbr="toolbox run"
-(( $+commands[tmux] )) && alias tm='tmux attach -t $(hostname) || tmux new -s $(hostname)'
-alias up='sudo apt update && sudo apt upgrade && sudo apt autoremove --purge && sudo apt autoclean'
-alias v="${EDITOR}"
-
-# Use zshrc.remote config on remote machines
-function sshz() {
-    # Copy .zshrc.remote to remote node if we have a home folder
-    ssh $@ "test -d ~/ && cat > ~/.zshrc" < ~/.zshrc.remote 2>/dev/null
-    # Start zsh with copied .zshrc and remove on disconnect
-    ssh -t $@ "test -f ~/.zshrc && /bin/zsh && rm ~/.zshrc || echo 'Remote .zshrc not found ...'"
-}
-compdef sshz='ssh'
 
 # ZSH-syntax-highlighting
 if [[ -a ~/.submodules/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh ]]; then
@@ -147,10 +133,10 @@ setopt PROMPT_SUBST
 PROMPT='%(?..%F{red}[%?] )%f%F{blue}%2~%f ${vcs_info_msg_0_}$(remote_prompt)$(toolbox_prompt)%(!.%F{red}#%f.%F{green}❯%f) '
 
 # SSH Agent
-if [[ -z "${SSH_CONNECTION}" && -n "${XDG_RUNTIME_DIR}" ]]; then
-    export SSH_AUTH_SOCK="${XDG_RUNTIME_DIR}/ssh-agent.sock"
-    [[ -e "${SSH_AUTH_SOCK}" ]] || DISPLAY=/dev/null ssh-agent -t 1h -a "$SSH_AUTH_SOCK" >/dev/null
-fi
+#if [[ -z "${SSH_CONNECTION}" && -n "${XDG_RUNTIME_DIR}" ]]; then
+#    export SSH_AUTH_SOCK="${XDG_RUNTIME_DIR}/ssh-agent.sock"
+#    [[ -e "${SSH_AUTH_SOCK}" ]] || DISPLAY=/dev/null ssh-agent -t 1h -a "$SSH_AUTH_SOCK" >/dev/null
+#fi
 
 # Start Sway
 if [[ -z "$WAYLAND_DISPLAY" ]] && [[ "$XDG_VTNR" -eq 1 ]]; then
