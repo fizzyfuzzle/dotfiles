@@ -9,6 +9,7 @@ sudo dnf install --assumeyes \
     chezmoi \
     cryptsetup \
     mkfs.ext4 \
+    pcsc-lite-libs \
     qrencode \
     steghide \
     wl-clipboard \
