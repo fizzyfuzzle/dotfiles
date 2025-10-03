@@ -106,12 +106,12 @@ fi
 
 # Remote Prompt
 function remote_prompt() {
-   [[ -n "$SSH_CLIENT" ]] || [[ -n "$SSH_TTY" ]] && echo "%F{red} %f"
+   [[ -n "${SSH_CLIENT}" ]] && echo "%F{red} %f"
 }
 
 # Toolbox Prompt
 function toolbox_prompt() {
-  [[ -f /run/.toolboxenv ]] && echo "%F{cyan}⬢ %f"
+  [[ -n "${TOOLBOX_PATH}" ]] && echo "%F{cyan}⬢ %f"
 }
 
 # Prompt
