@@ -15,9 +15,9 @@ fpath=("${HOME}/bin" $fpath)
 if [[ -z "${LS_COLORS}" ]]; then
     (( $+commands[dircolors] )) && eval "$(dircolors -b)"
 fi
-
 # Completion
-autoload -Uz compinit && compinit
+autoload -Uz compinit
+[[ -n "${TOOLBOX_PATH}" ]] && compinit -d ~/.zcompdump.tb || compinit
 zstyle ':completion:*' menu select
 zstyle ':completion:*' special-dirs true
 zstyle ':completion:*' matcher-list 'm:{a-zA-Z-_}={A-Za-z_-}' 'r:|[._-]=* r:|=*' 'l:|=* r:|=*'
