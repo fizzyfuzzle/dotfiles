@@ -17,11 +17,7 @@ if [[ -z "${LS_COLORS}" ]]; then
 fi
 
 # Completion
-autoload -Uz compinit && compinit -C
-for dump in ~/.zcompdump(N.mh+24); do
-    echo "Running full compinit ..."
-    compinit
-done
+autoload -Uz compinit && compinit
 zstyle ':completion:*' menu select
 zstyle ':completion:*' special-dirs true
 zstyle ':completion:*' matcher-list 'm:{a-zA-Z-_}={A-Za-z_-}' 'r:|[._-]=* r:|=*' 'l:|=* r:|=*'
