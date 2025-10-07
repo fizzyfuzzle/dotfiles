@@ -5,7 +5,7 @@ set -o pipefail
 #
 PREFIX="${PASSAGE_DIR:-$HOME/.passage/store}"
 IDENTITIES_FILE="${HOME}/.passage/identities"
-DEPENDENCIES=(age git qrencode wl-copy)
+TBR="toolbox run -d fedora -r 43"
 export GIT_CEILING_DIRECTORIES="${PREFIX}/.."
 #
 function _info() {
@@ -17,11 +17,6 @@ function _warning() {
 function _error() {
     print "\033[0;31m$1\033[0m" >&2
     exit 1
-}
-function _check() {
-    for D in "${DEPENDENCIES[@]}"; do
-        command -v $D &>/dev/null || _error "DEPENDENCY MISSING: ${D}"
-    done
 }
 
 function _git_add() {
@@ -80,7 +75,7 @@ function _clip() {
 }
 
 function _qrcode() {
-    print -R -n - "$1" | qrencode -t utf8
+    print -R -n - "$1" | eval $TBR qrencode -t utf8
 }
 
 function _create_tmpdir() {
@@ -279,7 +274,6 @@ function _git() {
 
 function main() {
     trap _remove_tmpdir EXIT HUP INT TERM
-    _check
 
     [[ -f "${IDENTITIES_FILE}" ]] || _error "IDENTITIES FILE NOT FOUND!"
     git -C "${PREFIX}" rev-parse --is-inside-work-tree &>/dev/null
