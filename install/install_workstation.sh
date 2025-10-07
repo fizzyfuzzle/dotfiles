@@ -78,3 +78,7 @@ flatpak install --user --assumeyes \
     org.libreoffice.LibreOffice \
     com.visualstudio.code
 
+# Install Toolbox Packages
+# toolbox run sudo dnf install --setopt install_weak_deps=false --refresh --assumeyes \
+#    chezmoi qrencode steghide zsh
+
