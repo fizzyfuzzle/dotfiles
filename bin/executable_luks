@@ -3,7 +3,7 @@
 set -o pipefail
 #
 TARGETMOUNT="${LUKS_TARGETMOUNT:-$HOME/luks}"
-DEPENDENCIES=(age cryptsetup mkfs.ext4 e2fsck steghide)
+TBR="toolbox run -d fedora -r 43"
 #
 function _info() {
     print "\033[0;32m$1\033[0m"
@@ -14,13 +14,6 @@ function _warning() {
 function _error() {
     print "\033[0;31m$1\033[0m" >&2
     exit 1
-}
-
-# CHECK DEPENDENCIES
-function _check() {
-    for D in "${DEPENDENCIES[@]}"; do
-        command -v $D &>/dev/null || _error "DEPENDENCY MISSING: ${D}"
-    done
 }
 
 # EMBED KEY INTO IMAGE
@@ -40,7 +33,7 @@ function _bury_key() {
     # REMOVE HEADER+FOOTER AND EMBED INTO IMAGE
     cat "${KEYFILE}" \
         | sed '/^-----/d' \
-        | steghide embed -q -ef - -cf "${IMAGE}" -p "${PASSWD}" -e serpent cbc -z 9
+        | eval $TBR steghide embed -q -ef - -cf "${IMAGE}" -p "${PASSWD}" -e serpent cbc -z 9
     [[ $? == 0 ]] || _error "STEGHIDE EMBED FAILED"
 }
 
@@ -59,7 +52,7 @@ function _exhume_key() {
     read -s "PASSWD?ENTER PASSPHRASE: " && print
 
     # EXTRACT FROM IMAGE AND ADD HEADER+FOOTER
-    EXTRACTED=$(steghide extract -q -sf "${IMAGE}" -xf - -p "${PASSWD}")
+    EXTRACTED=$(eval $TBR steghide extract -q -sf "${IMAGE}" -xf - -p "${PASSWD}")
     [[ $? == 0 ]] || _error "STEGHIDE EXTRACT FAILED"
     KEY="-----BEGIN AGE ENCRYPTED FILE-----\n"
     KEY+="$EXTRACTED\n"
@@ -201,11 +194,8 @@ function _umount() {
 }
 
 function main() {
-    # CHECK DEPENDENCIES
-    _check
-
     case "$1" in
-    	dig) shift; _dig "$@" ;;
+        dig) shift; _dig "$@" ;;
         forge) shift; _forge "$@" ;;
         lock) shift; _lock "$@" ;;
         open) shift; _mount "$@" ;;
