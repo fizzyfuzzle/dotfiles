@@ -3,7 +3,7 @@
 set -o pipefail
 #
 TARGETMOUNT="${LUKS_TARGETMOUNT:-$HOME/luks}"
-TBR="toolbox run -d fedora -r 43"
+TBR="toolbox run"
 #
 function _info() {
     print "\033[0;32m$1\033[0m"
