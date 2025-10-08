@@ -8,10 +8,10 @@ install
 .mailcap
 bin
 .config/foot
-.config/neomutt
-.config/offlineimap
+.config/mutt
 .config/rofi
 .config/sway
+.config/swaylock
 .config/waybar
 .var
 {{- end }}
