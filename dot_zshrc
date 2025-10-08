@@ -16,8 +16,7 @@ if [[ -z "${LS_COLORS}" ]]; then
     (( $+commands[dircolors] )) && eval "$(dircolors -b)"
 fi
 # Completion
-autoload -Uz compinit
-[[ -n "${TOOLBOX_PATH}" ]] && compinit -d ~/.zcompdump.tb || compinit
+autoload -Uz compinit && compinit -d "${XDG_CACHE_HOME}/.zcompdump-${HOST}"
 zstyle ':completion:*' menu select
 zstyle ':completion:*' special-dirs true
 zstyle ':completion:*' matcher-list 'm:{a-zA-Z-_}={A-Za-z_-}' 'r:|[._-]=* r:|=*' 'l:|=* r:|=*'
@@ -36,7 +35,7 @@ zstyle ':completion:*:(rsync|scp|ssh|sshz):argument-1:*' tag-order hosts
 bindkey '^[[Z' reverse-menu-complete
 
 # History
-HISTFILE=~/.zsh_history
+HISTFILE="${XDG_CACHE_HOME}/.zsh_history"
 HISTORY_IGNORE="(gpg*|ssh*|pass*)"
 HISTSIZE=4000
 SAVEHIST=$HISTSIZE
