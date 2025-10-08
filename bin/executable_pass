@@ -5,7 +5,7 @@ set -o pipefail
 #
 PREFIX="${PASSAGE_DIR:-$HOME/.passage/store}"
 IDENTITIES_FILE="${HOME}/.passage/identities"
-TBR="toolbox run -d fedora -r 43"
+TBR="toolbox run"
 export GIT_CEILING_DIRECTORIES="${PREFIX}/.."
 #
 function _info() {
