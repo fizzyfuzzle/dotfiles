@@ -4,65 +4,39 @@ export XDG_CONFIG_HOME="${HOME}/.config"
 export XDG_DATA_HOME="${HOME}/.local/share"
 export ELECTRON_OZONE_PLATFORM_HINT="auto"
 
-# PATH
-typeset -Ux PATH path
-path=("${HOME}/bin" $path)
-path=("${HOME}/.local/bin" $path)
-typeset -U FPATH fpath
+# User Path
+typeset -U path
+path=("${HOME}/bin" "${HOME}/.local/bin" $path)
+typeset -U fpath
 fpath=("${HOME}/bin" $fpath)
 
 # Colors
 if [[ -z "${LS_COLORS}" ]]; then
     (( $+commands[dircolors] )) && eval "$(dircolors -b)"
 fi
+
 # Completion
 autoload -Uz compinit && compinit -d "${XDG_CACHE_HOME}/.zcompdump-${HOST}"
 zstyle ':completion:*' menu select
 zstyle ':completion:*' special-dirs true
 zstyle ':completion:*' matcher-list 'm:{a-zA-Z-_}={A-Za-z_-}' 'r:|[._-]=* r:|=*' 'l:|=* r:|=*'
 zstyle ':completion:*' list-colors "${(s.:.)LS_COLORS}"
-if [[ -r ~/.ssh/known_hosts ]]; then
-    hosts=(${${${${(f)"$(<~/.ssh/known_hosts)"}:#([0-9]|\[)*}%%\ *}%%,*})
-fi
-if [[ -r ~/.ssh/known_hosts_managed ]]; then
-    hosts=($hosts ${${${${(f)"$(<~/.ssh/known_hosts_managed)"}:#([0-9]|\[|#)*}%%\ *}%%,*})
-fi
-if [[ -r ~/.ssh/config ]]; then
-    hosts=($hosts ${${${${(@M)${(f)"$(<~/.ssh/config)"}:#Host *}#Host }:#*[*?]*}%" "*})
-fi
-zstyle ':completion:*:hosts' hosts $hosts
-zstyle ':completion:*:(rsync|scp|ssh|sshz):argument-1:*' tag-order hosts
-bindkey '^[[Z' reverse-menu-complete
+zstyle ':completion:*:(ssh|scp):*' hosts
+zstyle ':completion:*:(ssh|scp):*' users
 
 # History
 HISTFILE="${XDG_CACHE_HOME}/.zsh_history"
-HISTORY_IGNORE="(gpg*|ssh*|pass*)"
+HISTORY_IGNORE="(ls|cd|pwd|exit|ssh)*"
 HISTSIZE=4000
 SAVEHIST=$HISTSIZE
 setopt hist_ignore_all_dups
 setopt hist_ignore_space
-
-# Fast directory switching
-setopt autocd
-setopt auto_pushd
-setopt pushd_ignore_dups
-setopt pushdminus
 
 # Editor
 (( $+commands[vim] )) && export EDITOR='vim' || export EDITOR='nano'
 export VISUAL="${EDITOR}"
 
 # Aliases
-alias 1='cd -'
-alias 2='cd -2'
-alias 3='cd -3'
-alias 4='cd -4'
-alias 5='cd -5'
-alias 6='cd -6'
-alias 7='cd -7'
-alias 8='cd -8'
-alias 9='cd -9'
-alias d='dirs -v | head -10'
 alias e="${EDITOR}"
 (( $+commands[git] )) && alias g='git'
 alias j='journalctl -aq -u'
@@ -103,14 +77,18 @@ if [[ -a ~/.submodules/zsh-history-substring-search/zsh-history-substring-search
     bindkey '^[[1;5B' history-substring-search-down
 fi
 
-# Remote Prompt
-function remote_prompt() {
-   [[ -n "${SSH_CLIENT}" ]] && echo "%F{red} %f"
-}
-
-# Toolbox Prompt
-function toolbox_prompt() {
-  [[ -n "${TOOLBOX_PATH}" ]] && echo "%F{cyan}⬢ %f"
+# Prompt Builder
+function prompt_builder() {
+    local s="%(?..%F{red}[%?]%f )%F{blue}%2~%f "
+    # VCS Info
+    s+="${vcs_info_msg_0_}"
+    # Remote Session
+    [[ -n "${SSH_CLIENT}" ]] && s+="%F{red} %f"
+    # Toolbox Session
+    [[ -n "${TOOLBOX_PATH}" ]] && s+="%F{cyan}⬢ %f"
+    # Elevated Session
+    s+="%(!.%F{red}#%f.%F{green}❯%f) "
+    echo $s
 }
 
 # Prompt
@@ -125,13 +103,7 @@ zstyle ':vcs_info:git:*' formats '%F{green}%b%f%c%u '
 zstyle ':vcs_info:git:*' actionformats '%F{green}%b (%a)%f%c%u '
 setopt PROMPT_PERCENT
 setopt PROMPT_SUBST
-PROMPT='%(?..%F{red}[%?] )%f%F{blue}%2~%f ${vcs_info_msg_0_}$(remote_prompt)$(toolbox_prompt)%(!.%F{red}#%f.%F{green}❯%f) '
-
-# SSH Agent
-#if [[ -z "${SSH_CONNECTION}" && -n "${XDG_RUNTIME_DIR}" ]]; then
-#    export SSH_AUTH_SOCK="${XDG_RUNTIME_DIR}/ssh-agent.sock"
-#    [[ -e "${SSH_AUTH_SOCK}" ]] || DISPLAY=/dev/null ssh-agent -t 1h -a "$SSH_AUTH_SOCK" >/dev/null
-#fi
+PROMPT="$(prompt_builder)"
 
 # Start Sway
 if [[ -z "$WAYLAND_DISPLAY" ]] && [[ "$XDG_VTNR" -eq 1 ]]; then
