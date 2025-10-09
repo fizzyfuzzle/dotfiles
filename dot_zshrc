@@ -103,7 +103,7 @@ zstyle ':vcs_info:git:*' formats '%F{green}%b%f%c%u '
 zstyle ':vcs_info:git:*' actionformats '%F{green}%b (%a)%f%c%u '
 setopt PROMPT_PERCENT
 setopt PROMPT_SUBST
-PROMPT="$(prompt_builder)"
+PROMPT='$(prompt_builder)'
 
 # Start Sway
 if [[ -z "$WAYLAND_DISPLAY" ]] && [[ "$XDG_VTNR" -eq 1 ]]; then
