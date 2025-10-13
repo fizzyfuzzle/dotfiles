@@ -82,3 +82,6 @@ flatpak install --user --assumeyes \
 # toolbox run sudo dnf install --setopt install_weak_deps=false --refresh --assumeyes \
 #    chezmoi qrencode steghide zsh
 
+# Set Wireplumber Profile [disable mic]
+# pactl set-card-profile alsa_card.pci-0000_00_1f.3 output:analog-stereo
+
