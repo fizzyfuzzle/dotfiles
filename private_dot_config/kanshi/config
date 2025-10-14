@@ -6,7 +6,7 @@ output "LG Display 0x0555 0x100000A1" {
 
 output "LG Electronics LG Ultra HD 0x00048ACB" {
     mode 3840x2160
-    scal 1.5
+    scale 1.5
     alias $DESKTOP
 }
 
