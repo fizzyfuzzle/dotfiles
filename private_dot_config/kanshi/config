@@ -1,0 +1,35 @@
+output "LG Display 0x0555 0x100000A1" {
+    mode 2736x1824
+    scale 1.5
+    alias $INTERNAL
+}
+
+output "LG Electronics LG Ultra HD 0x00048ACB" {
+    mode 3840x2160
+    scal 1.5
+    alias $DESKTOP
+}
+
+output "ASUSTek COMPUTER INC MB16AHV R8LMQS206149" {
+    mode 1920x1080
+    scale 1.0
+    alias $ZENSCREEN
+}
+
+profile workstation {
+    output $DESKTOP enable
+}
+
+profile workstation_multi {
+    output $DESKTOP enable position 0,0
+    output $ZENSCREEN enable position 0,1824
+}
+
+profile surface {
+    output $INTERNAL enable
+}
+
+profile surface_multi {
+    output $ZENSCREEN enable position 0,0
+    output $INTERNAL enable position 48,1080
+}
