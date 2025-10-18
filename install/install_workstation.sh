@@ -2,21 +2,22 @@
 
 # Do not install recommended packages
 grep -q '^Recommends=false' /etc/rpm-ostreed.conf || \
-    run0 sed -i 's/^#\?Recommends=.*/Recommends=false/' /etc/rpm-ostreed.conf
+    sudo sed -i 's/^#\?Recommends=.*/Recommends=false/' /etc/rpm-ostreed.conf
 
 # Add Brave Repository
 [ ! -f "/etc/yum.repos.d/brave-browser.repo" ] && \
-    run0 curl --tlsv1.3 -fsSLo /etc/yum.repos.d/brave-browser.repo \
+    sudo curl --tlsv1.3 -fsSLo /etc/yum.repos.d/brave-browser.repo \
     https://brave-browser-rpm-release.s3.brave.com/brave-browser.repo
 
 # Add Brave Policies
 [ ! -f "/etc/brave/policies/managed/brave.json" ] && \
-    run0 mkdir -p /etc/brave/policies/managed && \
-    run0 cp brave.json /etc/brave/policies/managed/
+    sudo mkdir -pZ /etc/brave/policies/managed && \
+    sudo cp brave.json /etc/brave/policies/managed/
 
 # Overlay Additional Packages
 rpm-ostree install --idempotent --assumeyes \
     brave-browser \
+    iwd \
     vim-enhanced \
     zsh
 
@@ -31,7 +32,8 @@ systemctl mask \
     ModemManager.service \
     sddm.service \
     systemd-coredump.socket \
-    systemd-oomd.service systemd-oomd.socket
+    systemd-oomd.service systemd-oomd.socket \
+    wpa_supplicant.service
 
 # Disable User Services
 systemctl --user mask \
@@ -43,14 +45,24 @@ systemctl --user mask \
     mpris-proxy.service \
     obex.service
 
+# Switch NetworkManager to IWD
+sudo mkdir -Z /etc/NetworkManager/conf.d
+sudo cat > /etc/NetworkManager/conf.d/iwd.conf <<EOF
+[device]
+wifi.backend=iwd
+EOF
+
 # Update GRUB timeout
-echo "set timeout=0" | run0 tee /boot/grub2/user.cfg
+echo "set timeout=0" | sudo tee /boot/grub2/user.cfg
 
 # Reboot (Only needed on first run)
 command -v zsh &>/dev/null || systemctl reboot
 
 # Change Shell to ZSH
 [ "$SHELL" != "$(command -v zsh)" ] && chsh --shell "$(command -v zsh)"
+
+# Enable Kanshi
+systemctl --user enable kanshi.service
 
 # Install Age
 [ ! -f "$HOME/bin/age" ] && \
