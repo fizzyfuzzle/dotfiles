@@ -1,7 +1,6 @@
 #!/bin/bash
 #
 EXTENSIONS=(
-  hashicorp.terraform \
   ms-python.isort \
   ms-python.flake8 \
   ms-python.python \
