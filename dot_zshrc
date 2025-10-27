@@ -53,6 +53,7 @@ alias scu="systemctl --user"
 alias t="${EDITOR} ~/todo.md"
 (( $+commands[toolbox] )) && alias tbe="toolbox enter"
 (( $+commands[toolbox] )) && alias tbr="toolbox run"
+(( $+commands[rpm-ostree] )) && alias upgrade="rpm-ostree upgrade && flatpak upgrade --user --assumeyes"
 
 # ZSH-syntax-highlighting
 if [[ -a ~/.submodules/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh ]]; then
