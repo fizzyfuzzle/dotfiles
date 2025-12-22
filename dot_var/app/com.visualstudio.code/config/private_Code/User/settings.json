@@ -18,7 +18,6 @@
         "--max-complexity=16"
     ],
     "python.analysis.typeCheckingMode": "standard",
-    "editor.formatOnSave": true,
     "editor.codeActionsOnSave": {
         "source.organizeImports": "always",
         "source.unusedImports": "always"
