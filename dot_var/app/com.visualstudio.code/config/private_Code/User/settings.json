@@ -41,5 +41,6 @@
         "**/venv/**": true
     },
     "remote.autoForwardPorts": false,
-    "terminal.integrated.defaultProfile.linux": "bash"
+    "terminal.integrated.defaultProfile.linux": "bash",
+    "chat.disableAIFeatures": true
 }
