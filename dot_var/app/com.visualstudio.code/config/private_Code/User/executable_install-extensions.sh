@@ -5,6 +5,7 @@ EXTENSIONS=(
   ms-python.flake8 \
   ms-python.python \
   ms-vscode-remote.remote-ssh \
+  platformio.platformio-ide \
   redhat.ansible
 )
 
