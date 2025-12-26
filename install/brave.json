@@ -18,7 +18,6 @@
   "DefaultBrowserSettingEnabled": false,
   "DefaultClipboardSetting": 2,
   "DefaultSensorsSetting": 2,
-  "DefaultSerialGuardSetting": 2,
   "DefaultWebBluetoothGuardSetting": 2,
   "DeviceActivityHeartbeatEnabled": false,
   "DeviceMetricsReportingEnabled": false,
