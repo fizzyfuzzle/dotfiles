@@ -62,14 +62,6 @@ command -v zsh &>/dev/null || systemctl reboot
 # Enable Kanshi
 systemctl --user enable kanshi.service
 
-# Install Age
-[ ! -f "$HOME/bin/age" ] && \
-    curl --tlsv1.3 -fsSL "https://github.com/FiloSottile/age/releases/download/v1.2.1/age-v1.2.1-linux-amd64.tar.gz" | \
-    tar --strip-components=1 -zxf - -C "$HOME/bin"
-[ ! -f "$HOME/bin/age-plugin-yubikey" ] && \
-    curl --tlsv1.3 -fsSL "https://github.com/str4d/age-plugin-yubikey/releases/download/v0.5.0/age-plugin-yubikey-v0.5.0-x86_64-linux.tar.gz" | \
-    tar --strip-components=1 -zxf - -C "$HOME/bin"
-
 # Install Papirus Icon Theme
 [ ! -d "$HOME/.icons" ] && \
     curl --tlsv1.3 -fsSL https://git.io/papirus-icon-theme-install | env DESTDIR="$HOME/.icons" sh
