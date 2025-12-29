@@ -46,11 +46,9 @@ systemctl --user mask \
     obex.service
 
 # Switch NetworkManager to IWD
-sudo mkdir -Z /etc/NetworkManager/conf.d
-sudo cat > /etc/NetworkManager/conf.d/iwd.conf <<EOF
-[device]
-wifi.backend=iwd
-EOF
+sudo mkdir -pZ /etc/NetworkManager/conf.d
+echo "[device]
+wifi.backend=iwd" | sudo tee /etc/NetworkManager/conf.d/iwd.conf
 
 # Update GRUB timeout
 echo "set timeout=0" | sudo tee /boot/grub2/user.cfg
@@ -91,9 +89,12 @@ flatpak install --user --assumeyes \
     com.visualstudio.code
 
 # Install Toolbox Packages
-# toolbox run sudo dnf install --setopt install_weak_deps=false --refresh --assumeyes \
-#    chezmoi qrencode steghide zsh
+# > toolbox run sudo dnf install --setopt install_weak_deps=false --refresh --assumeyes \
+#    age chezmoi qrencode steghide zsh
 
 # Set Wireplumber Profile [disable mic]
-# pactl set-card-profile alsa_card.pci-0000_00_1f.3 output:analog-stereo
+# > pactl set-card-profile alsa_card.pci-0000_00_1f.3 output:analog-stereo
 
+# YUBIKEY REGENERATE:
+# > cd .ssh
+# > ssh-keygen -K

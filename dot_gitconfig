@@ -64,4 +64,5 @@
 [user]
     name = "Marco"
     email = "nobody@home.now"
-
+[url "git@github.com:fizzyfuzzle/"]
+    insteadOf = https://github.com/fizzyfuzzle/
