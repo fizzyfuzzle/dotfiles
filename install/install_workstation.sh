@@ -79,6 +79,10 @@ flatpak install --user --assumeyes \
     org.libreoffice.LibreOffice \
     com.visualstudio.code
 
+# Cleanup
+rm -rf .bash_profile .bashrc .bash_logout .bash_history \
+    Desktop Music Pictures Public Templates Videos
+
 # Install Toolbox Packages
 # > toolbox run sudo dnf install --setopt install_weak_deps=false --refresh --assumeyes \
 #    age chezmoi qrencode steghide zsh
