@@ -83,13 +83,16 @@ flatpak install --user --assumeyes \
 rm -rf .bash_profile .bashrc .bash_logout .bash_history \
     Desktop Music Pictures Public Templates Videos
 
-# Install Toolbox Packages
-# > toolbox run sudo dnf install --setopt install_weak_deps=false --refresh --assumeyes \
-#    age chezmoi qrencode steghide zsh
+# Create Default Toolbox + Packages
+toolbox create && toolbox run sudo dnf install --setopt install_weak_deps=false --refresh --assumeyes \
+    chezmoi qrencode steghide zsh
+
+# Apply Chezmoi
+[ ! -d "$HOME/.local/share/chezmoi" ] && \
+    toolbox run chezmoi init --apply fizzyfuzzle
 
 # Set Wireplumber Profile [disable mic]
 # > pactl set-card-profile alsa_card.pci-0000_00_1f.3 output:analog-stereo
 
-# YUBIKEY REGENERATE:
-# > cd .ssh
-# > ssh-keygen -K
+# Download resident keys from FIDO
+# > cd .ssh && ssh-keygen -K && cd
