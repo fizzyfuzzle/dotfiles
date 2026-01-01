@@ -39,6 +39,7 @@
     "format-alt": "{ifname}: {ipaddr}/{cidr}"
   },
   "pulseaudio": {
+    "ignored-sinks": ["Dummy Output"],
     "format": "{icon} {volume}%",
     "format-icons": {
       "default": ["", "", ""]
