@@ -26,7 +26,7 @@ rpm-ostree install --idempotent --assumeyes \
 #    rpm-ostree override remove firefox firefox-langpacks
 
 # Disable System Services
-systemctl mask \
+sudo systemctl mask \
     bluetooth.service \
     cups.service cups.socket cups.path \
     ModemManager.service \
@@ -84,7 +84,7 @@ rm -rf .bash_profile .bashrc .bash_logout .bash_history \
     Desktop Music Pictures Public Templates Videos
 
 # Create Default Toolbox + Packages
-toolbox create && toolbox run sudo dnf install --setopt install_weak_deps=false --refresh --assumeyes \
+toolbox create --assumeyes && toolbox run sudo dnf install --setopt install_weak_deps=false --refresh --assumeyes \
     chezmoi qrencode steghide zsh
 
 # Apply Chezmoi
