@@ -1,5 +1,8 @@
 #!/usr/bin/env bash
 
+# Check internet
+ping -c 1 -W 1 1.1.1.1 &>/dev/null || exit 1
+
 # Do not install recommended packages
 grep -q '^Recommends=false' /etc/rpm-ostreed.conf || \
     sudo sed -i 's/^#\?Recommends=.*/Recommends=false/' /etc/rpm-ostreed.conf
@@ -45,8 +48,9 @@ systemctl --user mask \
     obex.service
 
 # Switch NetworkManager to IWD
-sudo mkdir -pZ /etc/NetworkManager/conf.d
-echo "[device]
+[ ! -f "/etc/NetworkManager/conf.d/iwd.conf" ] && \
+    sudo mkdir -pZ /etc/NetworkManager/conf.d && \
+    echo "[device]
 wifi.backend=iwd" | sudo tee /etc/NetworkManager/conf.d/iwd.conf
 
 # Update GRUB timeout
