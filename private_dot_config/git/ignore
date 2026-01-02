@@ -1,5 +1,7 @@
 # Python cached file
-__pycache__/
+**/__pycache__/
+.mypy_cache/
+.venv/
 *.py[cod]
 
 # Compiled source
