@@ -95,6 +95,11 @@ toolbox create --assumeyes && toolbox run sudo dnf install --setopt install_weak
 [ ! -d "$HOME/.local/share/chezmoi" ] && \
     toolbox run chezmoi init --apply fizzyfuzzle
 
+# Add User to dialout group
+if ! grep -q "^dialout:" /etc/group; then
+    getent group | grep dialout | sudo tee -a /etc/group
+fi
+sudo usermod -aG dialout marco
+
 # Set Wireplumber Profile [disable mic]
 # > pactl set-card-profile alsa_card.pci-0000_00_1f.3 output:analog-stereo
-
