@@ -32,13 +32,13 @@
         "**/__pycache__/**": true,
         "**/.mypy_cache/**": true,
         "**/*.log": true,
-        "**/venv/**": true
+        "**/.venv/**": true
     },
     "search.exclude": {
         "**/__pycache__/**": true,
         "**/.mypy_cache/**": true,
         "**/*.log": true,
-        "**/venv/**": true
+        "**/.venv/**": true
     },
     "remote.autoForwardPorts": false,
     "terminal.integrated.defaultProfile.linux": "bash",

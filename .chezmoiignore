@@ -1,7 +1,6 @@
 README.md
 install
 {{- if (or .mobile .server) }}
-.mailcap
 bin
 .config/foot
 .config/kanshi
