@@ -88,8 +88,10 @@ rm -rf .bash_profile .bashrc .bash_logout .bash_history \
     Desktop Music Pictures Public Templates Videos
 
 # Create Default Toolbox + Packages
-toolbox create --assumeyes && toolbox run sudo dnf install --setopt install_weak_deps=false --refresh --assumeyes \
-    chezmoi qrencode steghide zsh
+toolbox create --assumeyes && \
+    toolbox run sudo dnf config-manager addrepo --from-repofile=https://rpm.releases.hashicorp.com/fedora/hashicorp.repo && \
+    toolbox run sudo dnf install --setopt install_weak_deps=false --refresh --assumeyes \
+        ansible chezmoi pcsc-lite-libs qrencode steghide terraform zsh
 
 # Apply Chezmoi
 [ ! -d "$HOME/.local/share/chezmoi" ] && \
