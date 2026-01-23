@@ -81,6 +81,7 @@ flatpak install --user --assumeyes \
     io.mpv.Mpv \
     org.keepassxc.KeePassXC \
     org.libreoffice.LibreOffice \
+    org.localsend.localsend_app \
     com.visualstudio.code
 
 # Cleanup
