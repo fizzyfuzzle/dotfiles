@@ -53,6 +53,11 @@ systemctl --user mask \
     echo "[device]
 wifi.backend=iwd" | sudo tee /etc/NetworkManager/conf.d/iwd.conf
 
+# Firewalld
+sudo firewall-cmd --permanent \
+    --remove-service=ssh \
+    --add-port=53317/udp --add-port=53317/tcp
+
 # Update GRUB timeout
 echo "set timeout=0" | sudo tee /boot/grub2/user.cfg
 
