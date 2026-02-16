@@ -44,5 +44,7 @@
     "chat.disableAIFeatures": true,
     "terminal.integrated.persistentSessionReviveProcess": "never",
     "terminal.integrated.hideOnStartup": "whenEmpty",
-    "terminal.integrated.defaultProfile.linux": "bash"
+    "terminal.integrated.defaultProfile.linux": "bash",
+    "editor.mouseWheelZoom": true,
+    "git.confirmSync": false
 }
