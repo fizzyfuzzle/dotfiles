@@ -97,7 +97,7 @@ rm -rf .bash_profile .bashrc .bash_logout .bash_history \
 toolbox create --assumeyes && \
     toolbox run sudo dnf config-manager addrepo --from-repofile=https://rpm.releases.hashicorp.com/fedora/hashicorp.repo && \
     toolbox run sudo dnf install --setopt install_weak_deps=false --refresh --assumeyes \
-        ansible chezmoi pcsc-lite-libs python3-dateutil python3-requests qrencode steghide terraform zsh
+        ansible chezmoi offlineimap pcsc-lite-libs python3-dateutil python3-requests qrencode steghide terraform zsh
 
 # Apply Chezmoi
 [ ! -d "$HOME/.local/share/chezmoi" ] && \
