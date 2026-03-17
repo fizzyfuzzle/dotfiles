@@ -55,7 +55,9 @@ wifi.backend=iwd" | sudo tee /etc/NetworkManager/conf.d/iwd.conf
 
 # Firewalld
 sudo firewall-cmd --permanent \
-    --remove-service=ssh \
+    --zone=home
+    --add-source=192.168.88.0/24
+    --remove-service=samba-client \
     --add-port=53317/udp --add-port=53317/tcp
 
 # Update GRUB timeout
