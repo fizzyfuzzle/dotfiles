@@ -47,6 +47,11 @@ systemctl --user mask \
     mpris-proxy.service \
     obex.service
 
+# Podman network-online fix
+# https://github.com/containers/podman/issues/24796
+sudo ln -sf /usr/lib/systemd/system/network-online.target \
+    /etc/systemd/system/multi-user.target.wants/network-online.target
+
 # Switch NetworkManager to IWD
 [ ! -f "/etc/NetworkManager/conf.d/iwd.conf" ] && \
     sudo mkdir -pZ /etc/NetworkManager/conf.d && \
