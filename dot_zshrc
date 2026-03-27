@@ -86,7 +86,7 @@ function prompt_builder() {
     # VCS Info
     s+="${vcs_info_msg_0_}"
     # Remote Session
-    [[ -n "${SSH_CLIENT}" ]] && s+="%F{red} %f"
+    [[ -n "${SSH_CLIENT}" ]] && s+="%F{red}☇ %f"
     # Toolbox Session
     [[ -n "${TOOLBOX_PATH}" ]] && s+="%F{cyan}⬢ %f"
     # Elevated Session
