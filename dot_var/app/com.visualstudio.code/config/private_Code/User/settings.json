@@ -26,7 +26,7 @@
     "editor.renderWhitespace": "trailing",
     "chat.agent.enabled": false,
     "chat.commandCenter.enabled": false,
-    "chat.notifyWindowOnConfirmation": false,
+    "chat.notifyWindowOnConfirmation": "off",
     "ansible.lightspeed.enabled": false,
     "files.watcherExclude": {
         "**/__pycache__/**": true,
@@ -46,5 +46,6 @@
     "terminal.integrated.hideOnStartup": "whenEmpty",
     "terminal.integrated.defaultProfile.linux": "bash",
     "editor.mouseWheelZoom": true,
-    "git.confirmSync": false
+    "git.confirmSync": false,
+    "workbench.colorTheme": "Dark Modern"
 }
