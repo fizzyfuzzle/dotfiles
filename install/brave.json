@@ -27,9 +27,6 @@
   "ExtensionInstallBlocklist": [
     "*"
   ],
-  "ExtensionInstallForcelist": [
-    "faeadnfmdfamenfhaipofoffijhlnkif"
-  ],
   "FeedbackSurveysEnabled": false,
   "GeminiSettings": 1,
   "GenAILocalFoundationalModelSettings": 1,
