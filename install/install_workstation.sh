@@ -89,6 +89,7 @@ flatpak remote-add --user --if-not-exists \
 
 # Install Flatpaks
 flatpak install --user --assumeyes \
+    com.calibre_ebook.calibre \
     com.github.tchx84.Flatseal \
     io.mpv.Mpv \
     org.keepassxc.KeePassXC \
