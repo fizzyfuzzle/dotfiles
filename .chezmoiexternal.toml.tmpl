@@ -16,7 +16,7 @@
     exact = true
     stripComponents = 1
     refreshPeriod = "168h"
-{{- if workstation }}
+{{- if .workstation }}
 [".local/bin/age"]
     type = "archive-file"
     url = {{ gitHubLatestReleaseAssetURL "FiloSottile/age" (printf "age-*-%s-%s.tar.gz" .chezmoi.os .chezmoi.arch) | quote }}
