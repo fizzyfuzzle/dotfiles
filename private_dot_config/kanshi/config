@@ -18,6 +18,7 @@ output "ASUSTek COMPUTER INC MB16AHV R8LMQS206149" {
 
 profile workstation {
     output $DESKTOP enable
+    output HEADLESS-1
 }
 
 profile workstation_multi {
