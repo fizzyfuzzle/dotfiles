@@ -1,7 +1,8 @@
 #!/bin/bash
+# vim: filetype=bash
 #
 # Check if WayVNC is installed
-command -v wayvncctl &>/dev/null || exit 0
+toolbox run command -v wayvncctl &>/dev/null || exit 0
 # Only Start Once
 pgrep -x "wayvncctl" >/dev/null && exit 0
 #
@@ -18,7 +19,7 @@ restore_outputs() {
     done
     sleep 2
     echo "DISABLE OUTPUT: ${HEADLESS}"
-    wayvncctl detach &>/dev/null
+    toolbox run wayvncctl detach &>/dev/null
     swaymsg output "${HEADLESS}" disable
     OUTPUTS_TO_RECONNECT=()
 
@@ -29,10 +30,10 @@ restore_outputs() {
 collapse_outputs() {
     echo "ENABLE OUTPUT: ${HEADLESS}"
     swaymsg output "${HEADLESS}" enable
-    wayvncctl attach "${WAYLAND_DISPLAY}"
-    wayvncctl output-set "${HEADLESS}"
+    toolbox run wayvncctl attach "${WAYLAND_DISPLAY}"
+    toolbox run wayvncctl output-set "${HEADLESS}"
     sleep 2
-    for OUTPUT in $(wayvncctl -j output-list | jq -r '.[] | select(.captured==false).name'); do
+    for OUTPUT in $(toolbox run wayvncctl -j output-list | jq -r '.[] | select(.captured==false).name'); do
         echo "DISABLE OUTPUT: ${OUTPUT}"
         swaymsg output "${OUTPUT}" disable
         OUTPUTS_TO_RECONNECT+=("${OUTPUT}")
@@ -51,7 +52,7 @@ connection_count_now() {
 start_wayvnc() {
     if ! pgrep -x "wayvnc" >/dev/null; then
         echo "STARTING WAYVNC"
-        wayvnc -D 127.0.0.1 5900 &
+        toolbox run wayvnc -D 127.0.0.1 5900 &
         sleep 1
     fi
 }
@@ -92,4 +93,4 @@ while IFS= read -r EVT; do
             echo "EVENT: ${EVT}"
             ;;
     esac
-done < <(wayvncctl --wait --reconnect --json event-receive)
+done < <(toolbox run wayvncctl --wait --reconnect --json event-receive)
