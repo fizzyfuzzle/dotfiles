@@ -31,7 +31,8 @@
     refreshPeriod = "168h"
 [".local/bin/age-plugin-yubikey"]
     type = "archive-file"
-    url = {{ gitHubLatestReleaseAssetURL "str4d/age-plugin-yubikey" (printf "age-plugin-yubikey-*-x86_64-%s.tar.gz" .chezmoi.os) | quote }}
+    #url = {{ gitHubLatestReleaseAssetURL "str4d/age-plugin-yubikey" (printf "age-plugin-yubikey-*-x86_64-%s.tar.gz" .chezmoi.os) | quote }}
+    url = {{ gitHubReleaseAssetURL "str4d/age-plugin-yubikey" "v0.5.0" (printf "age-plugin-yubikey-*-x86_64-%s.tar.gz" .chezmoi.os) | quote }}
     executable = true
     path = "age-plugin-yubikey/age-plugin-yubikey"
     refreshPeriod = "168h"
