@@ -13,6 +13,10 @@ rpm-ostree install --idempotent --assumeyes \
     vim-enhanced \
     zsh
 
+# Overlay Remove Firefox
+command -v firefox &>/dev/null && \
+    rpm-ostree override remove firefox firefox-langpacks
+
 # Disable System Services
 sudo systemctl mask \
     bluetooth.service \

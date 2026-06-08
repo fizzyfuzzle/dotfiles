@@ -1,0 +1,27 @@
+[global]
+    font = Monospace 8
+    markup = full
+    format = "<b>%s</b>\n%b"
+    enable_recursive_icon_lookup = true
+    icon_theme = Adwaita
+
+[urgency_low]
+    background = "#222222"
+    foreground = "#888888"
+    timeout = 10
+    default_icon = dialog-information
+
+[urgency_normal]
+    background = "#285577"
+    foreground = "#ffffff"
+    timeout = 10
+    override_pause_level = 30
+    default_icon = dialog-information
+
+[urgency_critical]
+    background = "#900000"
+    foreground = "#ffffff"
+    frame_color = "#ff0000"
+    timeout = 0
+    override_pause_level = 60
+    default_icon = dialog-warning
