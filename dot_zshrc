@@ -6,7 +6,7 @@ export ELECTRON_OZONE_PLATFORM_HINT="auto"
 
 # User Path
 typeset -U path
-path=("${HOME}/bin" "${HOME}/.local/bin" $path)
+path=("${HOME}/bin" "${HOME}/.local/bin" "${HOME}/.venv/bin" $path)
 typeset -U fpath
 fpath=("${HOME}/bin" $fpath)
 
