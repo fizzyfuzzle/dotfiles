@@ -46,7 +46,7 @@ alias ls='ls --color=auto'
 (( $+commands[pass] )) && alias p='pass show'
 (( $+commands[zbarimg] )) && alias qrdec='zbarimg -q --raw'
 (( $+commands[qrencode] )) && alias qrenc='qrencode -t ansiutf8'
-alias rip='dig TXT +short o-o.myaddr.l.google.com @ns1.google.com'
+(( $+commands[curl] )) && alias rip='curl -s ip.me'
 (( $+commands[rsync] )) && alias rs='rsync --archive --delete --progress --exclude={".git",".gitignore"} --filter=":- .gitignore"'
 (( $+commands[shred] )) && alias sd='shred -u'
 alias scu="systemctl --user"
