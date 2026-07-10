@@ -1,6 +1,7 @@
 [alias]
     a = add
     aa = add --all
+    apr = apply --reject
     b = branch
     c = commit
     ca = commit --amend
