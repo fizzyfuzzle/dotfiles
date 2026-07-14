@@ -41,6 +41,7 @@ alias e="${EDITOR}"
 (( $+commands[git] )) && alias g='git'
 alias j='journalctl -aq -u'
 alias jcf='journalctl -aq --no-pager --output=cat -n 25 -f -u'
+alias jcu='journalctl -aq --no-pager -n 25 --user-unit'
 alias ll='ls -lh --color=auto'
 alias ls='ls --color=auto'
 (( $+commands[pass] )) && alias p='pass show'
