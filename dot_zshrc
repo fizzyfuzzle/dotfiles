@@ -110,6 +110,6 @@ setopt PROMPT_SUBST
 PROMPT='$(prompt_builder)'
 
 # Start Sway
-if [[ -z "$WAYLAND_DISPLAY" ]] && [[ "$XDG_VTNR" -eq 1 ]]; then
+if (( $+commands[sway] )) && [[ -z "$WAYLAND_DISPLAY" ]] && [[ "$XDG_VTNR" -eq 1 ]]; then
     exec sway
 fi
