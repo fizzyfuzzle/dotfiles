@@ -47,5 +47,7 @@
     "terminal.integrated.defaultProfile.linux": "bash",
     "editor.mouseWheelZoom": true,
     "git.confirmSync": false,
-    "workbench.colorTheme": "Dark Modern"
+    "workbench.colorTheme": "Dark Modern",
+    "dev.containers.dockerPath": "podman",
+    "dev.containers.dockerComposePath": "podman-compose"
 }
