@@ -48,6 +48,5 @@
     "editor.mouseWheelZoom": true,
     "git.confirmSync": false,
     "workbench.colorTheme": "Dark Modern",
-    "dev.containers.dockerPath": "podman-remote",
-    "git.ignoreMissingGitWarning": true
+    "dev.containers.dockerPath": "podman-remote"
 }
