@@ -94,7 +94,7 @@ rm -rf .bash_profile .bashrc .bash_logout .bash_history \
 # Create Default Toolbox + Packages
 toolbox create --assumeyes && \
     toolbox run sudo dnf install --setopt install_weak_deps=false --refresh --assumeyes \
-        ansible chezmoi offlineimap opentofu pcsc-lite-libs python3-dateutil python3-requests qrencode sshfs steghide wayvnc zsh
+        ansible chezmoi offlineimap opentofu pcsc-lite-libs python3-dateutil python3-requests qrencode steghide zsh
 
 # Apply Chezmoi
 [ ! -d "$HOME/.local/share/chezmoi" ] && \
