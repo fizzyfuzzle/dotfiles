@@ -42,10 +42,29 @@ sudo ln -sf /usr/lib/systemd/system/network-online.target \
     /etc/systemd/system/multi-user.target.wants/network-online.target
 
 # Switch NetworkManager to IWD
-[ ! -f "/etc/NetworkManager/conf.d/iwd.conf" ] && \
-    sudo mkdir -pZ /etc/NetworkManager/conf.d && \
-    echo "[device]
-wifi.backend=iwd" | sudo tee /etc/NetworkManager/conf.d/iwd.conf
+file="/etc/NetworkManager/conf.d/iwd.conf"
+if ! sudo test -f "$file"; then
+    sudo mkdir -pZ "$(dirname "$file")"
+    sudo tee "$file" > /dev/null <<'EOF'
+[device]
+wifi.backend=iwd
+EOF
+fi
+
+# Add run0 Polkit rule
+file="/etc/polkit-1/rules.d/90-run0-wheel.rules"
+if ! sudo test -f "$file"; then
+    sudo tee "$file" > /dev/null <<'EOF'
+polkit.addRule(function(action, subject) {
+    if (action.id == "org.freedesktop.systemd1.manage-units") {
+        if (subject.isInGroup("wheel")) {
+            return polkit.Result.AUTH_ADMIN_KEEP;
+        }
+    }
+});
+EOF
+    sudo chmod 644 "$file"
+fi
 
 # Firewalld
 sudo firewall-cmd --permanent \
@@ -55,7 +74,10 @@ sudo firewall-cmd --permanent \
     --add-port=53317/udp --add-port=53317/tcp
 
 # Update GRUB timeout
-echo "set timeout=0" | sudo tee /boot/grub2/user.cfg
+file="/boot/grub2/user.cfg"
+sudo tee "$file" > /dev/null <<'EOF'
+set timeout=0
+EOF
 
 # Reboot (Only needed on first run)
 command -v zsh &>/dev/null || systemctl reboot
