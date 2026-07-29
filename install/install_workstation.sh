@@ -71,7 +71,7 @@ sudo firewall-cmd --permanent \
     --zone=home
     --add-source=192.168.88.0/24
     --remove-service=samba-client \
-    --add-port=53317/udp --add-port=53317/tcp
+    --add-service=syncthing
 
 # Update GRUB timeout
 file="/boot/grub2/user.cfg"
