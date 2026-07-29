@@ -2,7 +2,9 @@
 export XDG_CACHE_HOME="${HOME}/.cache"
 export XDG_CONFIG_HOME="${HOME}/.config"
 export XDG_DATA_HOME="${HOME}/.local/share"
+export XDG_STATE_HOME="${HOME}/.local/state"
 export ELECTRON_OZONE_PLATFORM_HINT="auto"
+export TZ="Europe/Amsterdam"
 
 # User Path
 typeset -U path
@@ -16,7 +18,13 @@ if [[ -z "${LS_COLORS}" ]]; then
 fi
 
 # Completion
-autoload -Uz compinit && compinit -d "${XDG_CACHE_HOME}/.zcompdump-${HOST}"
+autoload -Uz compinit
+zcompdump="${XDG_CACHE_HOME}/.zcompdump-${HOST}"
+if [[ -n "${zcompdump}"(#qN.mh+24) ]]; then
+    compinit -C -d "${zcompdump}"
+else
+    compinit -d "${zcompdump}"
+fi
 zstyle ':completion:*' menu select
 zstyle ':completion:*' special-dirs true
 zstyle ':completion:*' matcher-list 'm:{a-zA-Z-_}={A-Za-z_-}' 'r:|[._-]=* r:|=*' 'l:|=* r:|=*'
@@ -25,7 +33,7 @@ zstyle ':completion:*:(ssh|scp):*' hosts
 zstyle ':completion:*:(ssh|scp):*' users
 
 # History
-HISTFILE="${XDG_CACHE_HOME}/.zsh_history"
+HISTFILE="${XDG_STATE_HOME}/.zsh_history"
 HISTORY_IGNORE="(ls|cd|pwd|exit|ssh)*"
 HISTSIZE=4000
 SAVEHIST=$HISTSIZE
@@ -58,7 +66,7 @@ alias t="${EDITOR} ~/todo.md"
 (( $+commands[dnf] )) && alias upgrade="sudo dnf upgrade --refresh --assumeyes"
 
 # ZSH-syntax-highlighting
-if [[ -a ~/.submodules/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh ]]; then
+if [[ -e ~/.submodules/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh ]]; then
     source ~/.submodules/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
     ZSH_HIGHLIGHT_HIGHLIGHTERS=(main brackets cursor)
     ZSH_HIGHLIGHT_MAXLENGTH=250
@@ -69,13 +77,13 @@ if [[ -a ~/.submodules/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh ]]; t
 fi
 
 # ZSH-autosuggestions
-if [[ -a ~/.submodules/zsh-autosuggestions/zsh-autosuggestions.zsh ]]; then
+if [[ -e ~/.submodules/zsh-autosuggestions/zsh-autosuggestions.zsh ]]; then
     source ~/.submodules/zsh-autosuggestions/zsh-autosuggestions.zsh
     ZSH_AUTOSUGGEST_BUFFER_MAX_SIZE=20
 fi
 
 # ZSH-history-substring-search
-if [[ -a ~/.submodules/zsh-history-substring-search/zsh-history-substring-search.zsh ]]; then
+if [[ -e ~/.submodules/zsh-history-substring-search/zsh-history-substring-search.zsh ]]; then
     source ~/.submodules/zsh-history-substring-search/zsh-history-substring-search.zsh
     bindkey '^[[1;5A' history-substring-search-up
     bindkey '^[[1;5B' history-substring-search-down
@@ -87,7 +95,7 @@ function prompt_builder() {
     # VCS Info
     s+="${vcs_info_msg_0_}"
     # Remote Session
-    [[ -n "${SSH_CLIENT}" ]] && s+="%F{red}☍ %f"
+    [[ -n "${SSH_CLIENT}" ]] && s+="%F{red}☍ %m %f"
     # Toolbox Session
     [[ -n "${TOOLBOX_PATH}" ]] && s+="%F{cyan}⬢ %f"
     # Elevated Session
