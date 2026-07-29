@@ -8,9 +8,9 @@ export TZ="Europe/Amsterdam"
 
 # User Path
 typeset -U path
-path=("${HOME}/bin" "${HOME}/.local/bin" "${HOME}/.venv/bin" $path)
+path=("${HOME}/.local/bin" "${HOME}/.venv/bin" $path)
 typeset -U fpath
-fpath=("${HOME}/bin" $fpath)
+fpath=("${HOME}/.local/share/zsh/site-functions" $fpath)
 
 # Colors
 if [[ -z "${LS_COLORS}" ]]; then
@@ -59,7 +59,6 @@ alias ls='ls --color=auto'
 (( $+commands[rsync] )) && alias rs='rsync --archive --delete --progress --exclude={".git",".gitignore"} --filter=":- .gitignore"'
 (( $+commands[shred] )) && alias sd='shred -u'
 alias scu="systemctl --user"
-alias t="${EDITOR} ~/todo.md"
 (( $+commands[toolbox] )) && alias tbe="toolbox enter"
 (( $+commands[toolbox] )) && alias tbr="toolbox run"
 (( $+commands[rpm-ostree] )) && alias upgrade="rpm-ostree upgrade && flatpak upgrade --user --assumeyes"
