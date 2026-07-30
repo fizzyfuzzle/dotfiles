@@ -33,7 +33,7 @@ zstyle ':completion:*:(ssh|scp):*' hosts
 zstyle ':completion:*:(ssh|scp):*' users
 
 # History
-[[ -d "${XDG_STATE_HOME}" ]] || mkdir -p "${XDG_STATE_HOME}"
+[[ -d "${XDG_STATE_HOME}/zsh" ]] || mkdir -p "${XDG_STATE_HOME}/zsh"
 HISTFILE="${XDG_STATE_HOME}/zsh/history"
 HISTORY_IGNORE="(ls|cd|pwd|exit|ssh)*"
 HISTSIZE=4000
