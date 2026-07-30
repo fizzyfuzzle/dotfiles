@@ -34,7 +34,7 @@ zstyle ':completion:*:(ssh|scp):*' users
 
 # History
 [[ -d "${XDG_STATE_HOME}" ]] || mkdir -p "${XDG_STATE_HOME}"
-HISTFILE="${XDG_STATE_HOME}/.zsh_history"
+HISTFILE="${XDG_STATE_HOME}/zsh/history"
 HISTORY_IGNORE="(ls|cd|pwd|exit|ssh)*"
 HISTSIZE=4000
 SAVEHIST=$HISTSIZE
