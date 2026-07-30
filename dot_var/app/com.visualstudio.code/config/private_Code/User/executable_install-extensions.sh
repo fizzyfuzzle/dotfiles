@@ -6,6 +6,7 @@ EXTENSIONS=(
   ms-python.python \
   ms-vscode-remote.remote-ssh \
   ms-vscode-remote.remote-containers \
+  opentofu.vscode-opentofu \
   platformio.platformio-ide \
   redhat.ansible
 )
