@@ -1,14 +1,9 @@
-{{- $workstation := false -}}
-{{- $server := false -}}
-{{- $mobile := false -}}
-
-{{- if (eq .chezmoi.os "linux") -}}
-{{-   if (eq .chezmoi.hostname "toolbx") -}}
-{{-     $workstation = true -}}
-{{-   else if (eq .chezmoi.username "droid") -}}
-{{-     $mobile = true -}}
+{{- $role := env "CHEZMOI_ROLE" -}}
+{{- if not $role -}}
+{{-   if eq .chezmoi.hostname "hyperion" -}}
+{{-     $role = "workstation" -}}
 {{-   else -}}
-{{-     $server = true -}}
+{{-     $role = "server" -}}
 {{-   end -}}
 {{- end -}}
 
@@ -21,6 +16,5 @@
     exclude = ["scripts"]
 
 [data]
-    workstation = {{ $workstation }}
-    server = {{ $server }}
-    mobile = {{ $mobile }}
+    workstation = {{ eq $role "workstation" }}
+    server = {{ eq $role "server" }}
