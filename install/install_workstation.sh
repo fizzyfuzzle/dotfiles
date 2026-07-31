@@ -49,6 +49,7 @@ systemctl --user mask \
     app-nm\\x2dapplet@autostart.service \
     blueman-applet.service \
     blueman-manager.service \
+    gnome-keyring-daemon.service gnome-keyring-daemon.socket \
     mpris-proxy.service \
     obex.service
 
