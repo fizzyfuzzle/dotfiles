@@ -8,7 +8,7 @@ export TZ="Europe/Amsterdam"
 
 # User Path
 typeset -U path
-path=("${HOME}/.local/bin" "${HOME}/.venv/bin" $path)
+path=("${HOME}/.local/bin" $path)
 typeset -U fpath
 fpath=("${HOME}/.local/share/zsh/site-functions" $fpath)
 
