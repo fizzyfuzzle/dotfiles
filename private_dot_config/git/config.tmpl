@@ -1,6 +1,7 @@
 [alias]
     a = add
     aa = add --all
+    acm = "!f() { git add --all && git commit -m \"${1:-Updates}\"; }; f"
     apr = apply --reject
     b = branch
     c = commit
