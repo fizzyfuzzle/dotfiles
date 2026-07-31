@@ -68,8 +68,8 @@ fi
 
 # Firewalld
 sudo firewall-cmd --permanent \
-    --zone=home
-    --add-source=192.168.88.0/24
+    --zone=home \
+    --add-source=192.168.88.0/24 \
     --remove-service=samba-client \
     --add-service=syncthing
 
@@ -126,4 +126,4 @@ toolbox create --assumeyes && \
 if ! grep -q "^dialout:" /etc/group; then
     getent group | grep dialout | sudo tee -a /etc/group
 fi
-sudo usermod -aG dialout marco
+sudo usermod -aG dialout $(whoami)
