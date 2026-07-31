@@ -36,6 +36,7 @@ sudo systemctl mask \
 systemctl --user mask \
     app-blueman@autostart.service \
     app-geoclue\\x2ddemo\\x2dagent@autostart.service \
+    app-nm\\x2dapplet@autostart.service \
     blueman-applet.service \
     blueman-manager.service \
     mpris-proxy.service \
