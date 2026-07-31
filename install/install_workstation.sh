@@ -24,9 +24,12 @@ command -v firefox &>/dev/null && \
 
 # Disable System Services
 sudo systemctl mask \
+    avahi-daemon.service avahi-daemon.socket \
     bluetooth.service \
     cups.service cups.socket cups.path \
+    geoclue.service \
     ModemManager.service \
+    passim.service \
     sddm.service \
     systemd-coredump.socket \
     systemd-oomd.service systemd-oomd.socket \
