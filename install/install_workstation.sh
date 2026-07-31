@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
-
+set -euo pipefail
+#
 # Check internet
 ping -c 1 -W 1 1.1.1.1 &>/dev/null || exit 1
 
@@ -100,7 +101,6 @@ flatpak install --user --assumeyes \
     io.mpv.Mpv \
     org.keepassxc.KeePassXC \
     org.libreoffice.LibreOffice \
-    org.localsend.localsend_app \
     com.visualstudio.code
 
 # Cleanup
@@ -110,11 +110,16 @@ rm -rf .bash_profile .bashrc .bash_logout .bash_history \
 # Create Default Toolbox + Packages
 toolbox create --assumeyes && \
     toolbox run sudo dnf install --setopt install_weak_deps=false --refresh --assumeyes \
-        ansible chezmoi offlineimap opentofu pcsc-lite-libs python3-dateutil python3-requests qrencode steghide zsh
+        ansible offlineimap opentofu pcsc-lite-libs python3-dateutil python3-requests qrencode steghide zsh
 
-# Apply Chezmoi
-[ ! -d "$HOME/.local/share/chezmoi" ] && \
-    toolbox run chezmoi init --apply fizzyfuzzle
+# Bootstrap Chezmoi
+if [ ! -d "$HOME/.local/share/chezmoi" ]; then
+    curl -fsSL -o chezmoi.tar.gz \
+        https://github.com/twpayne/chezmoi/releases/download/v2.71.1/chezmoi_2.71.1_linux_amd64.tar.gz
+    echo "e1fb16c962644d57f4d451c324aa86163d00faf5d035500f41fb48943a66dfed chezmoi.tar.gz" | sha256sum -c -
+    tar -xzf chezmoi.tar.gz -C ~/.local/bin chezmoi
+    chezmoi init --apply fizzyfuzzle
+fi
 
 # Add User to dialout group
 if ! grep -q "^dialout:" /etc/group; then
