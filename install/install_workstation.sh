@@ -1,6 +1,10 @@
 #!/usr/bin/env bash
 set -euo pipefail
 #
+CHEZMOI_VERSION="2.71.1"
+CHEZMOI_SHA256="e1fb16c962644d57f4d451c324aa86163d00faf5d035500f41fb48943a66dfed"
+CHEZMOI_USER="fizzyfuzzle"
+#
 # Check internet
 ping -c 1 -W 1 1.1.1.1 &>/dev/null || exit 1
 
@@ -114,11 +118,16 @@ toolbox create --assumeyes && \
 
 # Bootstrap Chezmoi
 if [ ! -d "$HOME/.local/share/chezmoi" ]; then
-    curl -fsSL -o chezmoi.tar.gz \
-        https://github.com/twpayne/chezmoi/releases/download/v2.71.1/chezmoi_2.71.1_linux_amd64.tar.gz
-    echo "e1fb16c962644d57f4d451c324aa86163d00faf5d035500f41fb48943a66dfed chezmoi.tar.gz" | sha256sum -c -
-    tar -xzf chezmoi.tar.gz -C ~/.local/bin chezmoi
-    chezmoi init --apply fizzyfuzzle
+    tmpdir="$(mktemp -d)"
+    trap 'rm -rf "$tmpdir"' EXIT
+
+    curl -fsSL -o "$tmpdir/chezmoi.tar.gz" \
+        "https://github.com/twpayne/chezmoi/releases/download/v${CHEZMOI_VERSION}/chezmoi_${CHEZMOI_VERSION}_linux_amd64.tar.gz"
+    echo "$CHEZMOI_SHA256  $tmpdir/chezmoi.tar.gz" | sha256sum --check -
+
+    mkdir -p ~/.local/bin
+    tar -xzf "$tmpdir/chezmoi.tar.gz" -C ~/.local/bin chezmoi
+    chezmoi init --apply "$CHEZMOI_USER"
 fi
 
 # Add User to dialout group
