@@ -87,6 +87,7 @@ sudo firewall-cmd --permanent --zone=public \
     --remove-service=mdns \
     --remove-service=ssh
 sudo firewall-cmd --permanent --zone=public --remove-forward
+sudo firewall-cmd --reload
 
 # Update GRUB timeout
 file="/boot/grub2/user.cfg"
@@ -95,7 +96,7 @@ set timeout=0
 EOF
 
 # Reboot (Only needed on first run)
-command -v zsh &>/dev/null || systemctl reboot
+command -v zsh &>/dev/null || { systemctl reboot; exit 0; }
 
 # Change Shell to ZSH
 [ "$SHELL" != "$(command -v zsh)" ] && chsh --shell "$(command -v zsh)"
@@ -122,9 +123,9 @@ rm -rf .bash_profile .bashrc .bash_logout .bash_history \
     Desktop Music Pictures Public Templates Videos
 
 # Create Default Toolbox + Packages
-toolbox create --assumeyes && \
-    toolbox run sudo dnf install --setopt install_weak_deps=false --refresh --assumeyes \
-        ansible offlineimap opentofu pcsc-lite-libs python3-dateutil python3-requests qrencode steghide zsh
+toolbox create --assumeyes || true
+toolbox run sudo dnf install --setopt install_weak_deps=false --refresh --assumeyes \
+    ansible offlineimap opentofu pcsc-lite-libs python3-dateutil python3-requests qrencode steghide zsh
 
 # Bootstrap Chezmoi
 if [ ! -d "$HOME/.local/share/chezmoi" ]; then
@@ -141,7 +142,5 @@ if [ ! -d "$HOME/.local/share/chezmoi" ]; then
 fi
 
 # Add User to dialout group
-if ! grep -q "^dialout:" /etc/group; then
-    getent group | grep dialout | sudo tee -a /etc/group
-fi
-sudo usermod -aG dialout $(whoami)
+getent group dialout >/dev/null || sudo groupadd dialout
+sudo usermod -aG dialout "$(whoami)"
