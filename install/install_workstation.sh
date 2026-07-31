@@ -24,15 +24,22 @@ command -v firefox &>/dev/null && \
 
 # Disable System Services
 sudo systemctl mask \
+    accounts-daemon.service \
     avahi-daemon.service avahi-daemon.socket \
     bluetooth.service \
+    bolt.service \
     cups.service cups.socket cups.path \
     geoclue.service \
+    gssproxy.service \
     ModemManager.service \
+    NetworkManager-wait-online.service \
     passim.service \
     sddm.service \
     systemd-coredump.socket \
+    systemd-homed.service systemd-homed-activate.service \
     systemd-oomd.service systemd-oomd.socket \
+    tuned.service tuned-ppd.service \
+    upower.service \
     wpa_supplicant.service
 
 # Disable User Services
