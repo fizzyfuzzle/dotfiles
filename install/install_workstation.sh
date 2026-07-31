@@ -73,11 +73,17 @@ EOF
 fi
 
 # Firewalld
-sudo firewall-cmd --permanent \
-    --zone=home \
-    --add-source=192.168.88.0/24 \
-    --remove-service=samba-client \
-    --add-service=syncthing
+sudo firewall-cmd --permanent --zone=home --add-source=192.168.88.0/24
+sudo firewall-cmd --permanent --zone=home \
+    --remove-service=mdns \
+    --remove-service=samba-client
+sudo firewall-cmd --permanent --zone=home --add-service=syncthing
+sudo firewall-cmd --permanent --zone=home --remove-forward
+#
+sudo firewall-cmd --permanent --zone=public \
+    --remove-service=mdns \
+    --remove-service=ssh
+sudo firewall-cmd --permanent --zone=public --remove-forward
 
 # Update GRUB timeout
 file="/boot/grub2/user.cfg"
