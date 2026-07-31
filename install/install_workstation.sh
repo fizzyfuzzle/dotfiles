@@ -88,12 +88,6 @@ command -v zsh &>/dev/null || systemctl reboot
 # Enable Kanshi
 systemctl --user enable kanshi.service
 
-# Install Papirus Icon Theme
-[ ! -d "$HOME/.icons" ] && \
-    curl --tlsv1.3 -fsSL https://git.io/papirus-icon-theme-install | env DESTDIR="$HOME/.icons" sh
-gsettings set org.gnome.desktop.interface icon-theme Papirus-Dark
-gsettings set org.gnome.desktop.interface gtk-theme Adwaita-dark
-
 # Add Flathub
 flatpak remote-add --user --if-not-exists \
     flathub https://dl.flathub.org/repo/flathub.flatpakrepo

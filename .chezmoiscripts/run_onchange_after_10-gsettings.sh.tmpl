@@ -1,0 +1,8 @@
+{{- if .workstation -}}
+#!/usr/bin/env bash
+set -euo pipefail
+
+gsettings set org.gnome.desktop.interface gtk-theme 'Adwaita'
+gsettings set org.gnome.desktop.interface icon-theme 'Adwaita'
+gsettings set org.gnome.desktop.interface color-scheme 'prefer-dark'
+{{- end -}}
