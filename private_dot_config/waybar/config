@@ -2,7 +2,7 @@
   "spacing": 12,
   "modules-left": ["sway/workspaces","sway/scratchpad","sway/mode"],
   "modules-center": [],
-  "modules-right": ["load","memory","temperature","disk","pulseaudio","battery","tray","clock"],
+  "modules-right": ["load","memory","temperature","disk","battery","network","custom/vpn","tray","clock","pulseaudio"],
   "sway/scratchpad": {
     "format": "{icon} {count}",
     "show-empty": false,
@@ -39,17 +39,21 @@
     "tooltip-format-wifi": " {essid} ({signalStrength}%)",
     "tooltip-format-ethernet": " {ifname}",
     "tooltip-format-disconnected": "Disconnected",
-    "format-alt": "{ifname}: {ipaddr}/{cidr}"
+    "format-alt": "{ifname}: {ipaddr}/{cidr}",
+    "on-click-right": "nm-connection-editor"
   },
-  "pulseaudio": {
-    "ignored-sinks": ["Dummy Output"],
-    "format": "{icon} {volume}%",
+  "custom/vpn": {
+    "interval": 5,
+    "exec": "~/.config/waybar/vpn-helper.sh",
+    "format": "{icon}",
     "format-icons": {
-      "default": ["", "", ""]
+      "connected": "⇄",
+      "disconnected": ""
     },
-    "on-click": "pactl set-sink-mute @DEFAULT_SINK@ toggle",
-    "on-click-right": "pavucontrol",
-    "format-muted": " {volume}%"
+    "return-type": "json",
+    "hide-empty-text": true,
+    "tooltip": true,
+    "tooltip-format": "{text}"
   },
   "battery": {
     "states": {
@@ -74,5 +78,15 @@
         "today": "<span color='#ff6699'><b>{}</b></span>"
       }
     }
+  },
+  "pulseaudio": {
+    "ignored-sinks": ["Dummy Output"],
+    "format": "{icon} {volume}%",
+    "format-icons": {
+      "default": ["", "", ""]
+    },
+    "on-click": "pactl set-sink-mute @DEFAULT_SINK@ toggle",
+    "on-click-right": "pavucontrol",
+    "format-muted": " {volume}%"
   }
 }
