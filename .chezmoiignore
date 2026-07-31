@@ -1,13 +1,16 @@
 README.md
 install
 {{- if .server }}
-bin
+.config/dunst
 .config/foot
 .config/kanshi
 .config/mutt
 .config/rofi
+.config/gtk-3.0
+.config/rofi
 .config/sway
 .config/swaylock
 .config/waybar
+.local
 .var
 {{- end }}
