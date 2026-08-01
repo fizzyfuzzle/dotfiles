@@ -1,7 +1,9 @@
 {
+    "AmbientAuthenticationInPrivateModesEnabled": 0,
     "AudioCaptureAllowed": false,
     "AutofillAddressEnabled": false,
     "AutofillCreditCardEnabled": false,
+    "BackgroundModeEnabled": false,
     "BlockThirdPartyCookies": true,
     "BookmarkBarEnabled": true,
     "BrowserSignin": 0,
@@ -17,7 +19,6 @@
     "DefaultLocalFontsSetting": 2,
     "DefaultGeolocationSetting": 2,
     "DefaultJavaScriptOptimizerSetting": 2,
-    "DefaultMediaStreamSetting": 2,
     "DefaultPopupsSetting": 2,
     "DefaultSearchProviderEnabled": true,
     "DefaultSearchProviderName": "DuckDuckGo",
@@ -32,6 +33,7 @@
     "HttpsUpgradesEnabled": true,
     "MediaRecommendationsEnabled": false,
     "MemorySaverModeSavings": 1,
+    "NetworkPredictionOptions": 2,
     "PasswordManagerEnabled": false,
     "PasswordManagerPasskeysEnabled": false,
     "PaymentMethodQueryEnabled": false,
@@ -47,6 +49,7 @@
         }
     ],
     "SpellcheckEnabled": false,
+    "SSLErrorOverrideAllowed": false,
     "TranslateEnabled": false,
     "VideoCaptureAllowed": false,
     "WebAppInstallByUserEnabled": false,
