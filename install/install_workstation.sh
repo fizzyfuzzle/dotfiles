@@ -82,6 +82,10 @@ EOF
     sudo chmod 644 "$file"
 fi
 
+# Set ptrace_scope for Chromium sandboxing
+echo 'kernel.yama.ptrace_scope = 1' | sudo tee /etc/sysctl.d/99-yama-ptrace.conf
+sudo sysctl --system
+
 # Firewalld
 sudo firewall-cmd --permanent --zone=home --add-source=192.168.88.0/24
 sudo firewall-cmd --permanent --zone=home \
