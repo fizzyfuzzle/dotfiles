@@ -1,14 +1,13 @@
 #!/bin/bash
 #
 EXTENSIONS=(
-  ms-python.isort \
-  ms-python.flake8 \
-  ms-python.python \
   ms-vscode-remote.remote-ssh \
   ms-vscode-remote.remote-containers \
+  ms-python.python \
+  charliermarsh.ruff \
   opentofu.vscode-opentofu \
-  platformio.platformio-ide \
-  redhat.ansible
+  redhat.ansible \
+  platformio.platformio-ide
 )
 
 # Install Extensions
