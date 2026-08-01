@@ -108,11 +108,6 @@ EOF
 # Reboot (Only needed on first run)
 command -v zsh &>/dev/null || { systemctl reboot; exit 0; }
 
-# Create Default Toolbox + Packages
-toolbox create --assumeyes || true
-toolbox run sudo dnf install --setopt install_weak_deps=false --refresh --assumeyes \
-    ansible offlineimap opentofu pcsc-lite-libs python3-dateutil python3-requests qrencode steghide zsh
-
 # Bootstrap Chezmoi
 if [ ! -d "$HOME/.local/share/chezmoi" ]; then
     tmpdir="$(mktemp -d)"
