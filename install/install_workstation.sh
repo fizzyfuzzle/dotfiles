@@ -129,7 +129,7 @@ if [ ! -d "$HOME/.local/share/chezmoi" ]; then
     mkdir -p ~/.local/bin
     tar -xzf "$tmpdir/chezmoi.tar.gz" -C ~/.local/bin chezmoi
     chezmoi init "$CHEZMOI_USER"
-if
+fi
 
 # Reboot (Only needed on first run)
 command -v zsh &>/dev/null || systemctl reboot
