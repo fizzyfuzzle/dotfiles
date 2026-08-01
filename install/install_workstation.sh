@@ -153,5 +153,5 @@ if [ ! -d "$HOME/.local/share/chezmoi" ]; then
 fi
 
 # Add User to dialout group
-getent group dialout >/dev/null || sudo groupadd dialout
+grep -q '^dialout:' /etc/group || getent group dialout | sudo tee -a /etc/group
 sudo usermod -aG dialout "$(whoami)"
