@@ -1,0 +1,6 @@
+[Unit]
+Description=Toolbox container refresh
+
+[Service]
+Type=oneshot
+ExecStart=%h/.local/bin/toolbox-refresh.sh
