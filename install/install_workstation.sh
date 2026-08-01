@@ -12,6 +12,11 @@ ping -c 1 -W 1 1.1.1.1 &>/dev/null || exit 1
 grep -q '^Recommends=false' /etc/rpm-ostreed.conf || \
     sudo sed -i 's/^#\?Recommends=.*/Recommends=false/' /etc/rpm-ostreed.conf
 
+# Stage updates automatically
+grep -q '^AutomaticUpdatePolicy=stage' /etc/rpm-ostreed.conf || \
+    sudo sed -i 's/^#\?AutomaticUpdatePolicy=.*/AutomaticUpdatePolicy=stage/' /etc/rpm-ostreed.conf
+sudo systemctl enable --now rpm-ostreed-automatic.timer
+
 # Overlay Additional Packages
 rpm-ostree install --idempotent --assumeyes \
     iwd \
