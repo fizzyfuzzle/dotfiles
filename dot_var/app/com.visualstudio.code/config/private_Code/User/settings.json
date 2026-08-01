@@ -19,8 +19,8 @@
     ],
     "python.analysis.typeCheckingMode": "standard",
     "editor.codeActionsOnSave": {
-        "source.organizeImports": "always",
-        "source.unusedImports": "always"
+       "source.organizeImports": "explicit",
+       "source.fixAll.ruff": "explicit"
     },
     "window.menuBarVisibility": "toggle",
     "editor.renderWhitespace": "trailing",
@@ -48,5 +48,7 @@
     "editor.mouseWheelZoom": true,
     "git.confirmSync": false,
     "workbench.colorTheme": "Dark Modern",
-    "dev.containers.dockerPath": "podman-remote"
+    "dev.containers.dockerPath": "podman-remote",
+    "editor.formatOnSave": true,
+    "editor.defaultFormatter": "charliermarsh.ruff"
 }
