@@ -1,0 +1,25 @@
+[Context]
+shared=network;
+devices=all;
+filesystems=/run/udev:ro;xdg-download;!home;!~/.config/kioslaverc;!~/.local/share/applications;!~/.local/share/icons;!~/.config/dconf;!xdg-run/dconf;!xdg-desktop;!/run/.heim_org.h5l.kcm-socket;!xdg-run/pipewire-0;!/tmp;
+
+[Session Bus Policy]
+org.gnome.SessionManager=talk
+org.freedesktop.secrets=talk
+org.freedesktop.Notifications=talk
+org.freedesktop.FileManager1=talk
+org.mpris.MediaPlayer2.chromium.*=own
+org.xfce.ScreenSaver=none
+org.gnome.ScreenSaver=none
+org.freedesktop.ScreenSaver=none
+org.mate.ScreenSaver=none
+org.cinnamon.ScreenSaver=none
+org.gnome.Mutter.IdleMonitor.*=none
+org.kde.kwalletd5=none
+org.kde.kwalletd6=none
+com.canonical.AppMenu.Registrar=none
+
+[System Bus Policy]
+org.freedesktop.Avahi=none
+org.freedesktop.UPower=none
+org.bluez=none
