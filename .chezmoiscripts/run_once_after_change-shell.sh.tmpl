@@ -8,8 +8,8 @@ if [ "$SHELL" != "$(command -v zsh)" ]; then
 fi
 
 rm -rf -- \
-    "$HOME/.bash_profile" \
     "$HOME/.bashrc" \
+    "$HOME/.bash_history" \
     "$HOME/.bash_logout" \
-    "$HOME/.bash_history"
+    "$HOME/.bash_profile"
 {{- end -}}
