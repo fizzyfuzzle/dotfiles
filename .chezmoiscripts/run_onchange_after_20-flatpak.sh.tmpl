@@ -1,0 +1,23 @@
+{{- if .workstation -}}
+#!/usr/bin/env bash
+# vim: filetype=bash
+set -euo pipefail
+
+# flatpak-update.service hash: {{ include "dot_config/systemd/user/flatpak-update.service" | sha256sum }}
+# flatpak-update.timer hash: {{ include "dot_config/systemd/user/flatpak-update.timer" | sha256sum }}
+
+flatpak remote-add --user --if-not-exists \
+    flathub https://dl.flathub.org/repo/flathub.flatpakrepo
+
+flatpak install --user --assumeyes \
+    com.calibre_ebook.calibre \
+    com.github.tchx84.Flatseal \
+    io.github.ungoogled_software.ungoogled_chromium \
+    io.mpv.Mpv \
+    org.keepassxc.KeePassXC \
+    org.libreoffice.LibreOffice \
+    com.visualstudio.code
+
+systemctl --user daemon-reload
+systemctl --user enable --now flatpak-update.timer
+{{- end -}}

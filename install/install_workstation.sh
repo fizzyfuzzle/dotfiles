@@ -120,20 +120,6 @@ command -v zsh &>/dev/null || { systemctl reboot; exit 0; }
 # Enable Kanshi
 systemctl --user enable kanshi.service
 
-# Add Flathub
-flatpak remote-add --user --if-not-exists \
-    flathub https://dl.flathub.org/repo/flathub.flatpakrepo
-
-# Install Flatpaks
-flatpak install --user --assumeyes \
-    com.calibre_ebook.calibre \
-    com.github.tchx84.Flatseal \
-    io.github.ungoogled_software.ungoogled_chromium \
-    io.mpv.Mpv \
-    org.keepassxc.KeePassXC \
-    org.libreoffice.LibreOffice \
-    com.visualstudio.code
-
 # Cleanup
 rm -rf .bash_profile .bashrc .bash_logout .bash_history \
     Desktop Music Pictures Public Templates Videos
