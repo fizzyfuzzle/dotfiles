@@ -56,6 +56,17 @@ sudo usermod -aG dialout "$(whoami)"
 sudo ln -sf /usr/lib/systemd/system/network-online.target \
     /etc/systemd/system/multi-user.target.wants/network-online.target
 
+# Toolbox needs /run/avahi-daemon/socket to exist even with avahi masked
+# https://github.com/containers/toolbox/issues/1590
+file="/etc/tmpfiles.d/toolbox-avahi-workaround.conf"
+if ! sudo test -f "$file"; then
+    sudo tee "$file" > /dev/null <<'EOF'
+d /run/avahi-daemon 0755 root root -
+f /run/avahi-daemon/socket 0666 root root -
+EOF
+    sudo systemd-tmpfiles --create "$file"
+fi
+
 # Switch NetworkManager to IWD
 file="/etc/NetworkManager/conf.d/iwd.conf"
 if ! sudo test -f "$file"; then
