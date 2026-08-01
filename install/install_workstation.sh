@@ -116,10 +116,8 @@ sudo tee "$file" > /dev/null <<'EOF'
 set timeout=0
 EOF
 
-# Reboot (Only needed on first run)
-command -v zsh &>/dev/null || { systemctl reboot; exit 0; }
-
-# Bootstrap Chezmoi
+# Bootstrap Chezmoi (clone + init)
+# - manually 'chezmoi apply' after reboot
 if [ ! -d "$HOME/.local/share/chezmoi" ]; then
     tmpdir="$(mktemp -d)"
     trap 'rm -rf "$tmpdir"' EXIT
@@ -130,5 +128,8 @@ if [ ! -d "$HOME/.local/share/chezmoi" ]; then
 
     mkdir -p ~/.local/bin
     tar -xzf "$tmpdir/chezmoi.tar.gz" -C ~/.local/bin chezmoi
-    chezmoi init --apply "$CHEZMOI_USER"
-fi
+    chezmoi init "$CHEZMOI_USER"
+if
+
+# Reboot (Only needed on first run)
+command -v zsh &>/dev/null || systemctl reboot
