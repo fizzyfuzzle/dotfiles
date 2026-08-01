@@ -108,13 +108,6 @@ EOF
 # Reboot (Only needed on first run)
 command -v zsh &>/dev/null || { systemctl reboot; exit 0; }
 
-# Change Shell to ZSH
-[ "$SHELL" != "$(command -v zsh)" ] && chsh --shell "$(command -v zsh)"
-
-# Cleanup
-rm -rf .bash_profile .bashrc .bash_logout .bash_history \
-    Desktop Music Pictures Public Templates Videos
-
 # Create Default Toolbox + Packages
 toolbox create --assumeyes || true
 toolbox run sudo dnf install --setopt install_weak_deps=false --refresh --assumeyes \
