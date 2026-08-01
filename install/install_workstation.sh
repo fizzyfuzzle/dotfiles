@@ -47,16 +47,6 @@ sudo systemctl mask \
     upower.service \
     wpa_supplicant.service
 
-# Disable User Services
-systemctl --user mask \
-    app-blueman@autostart.service \
-    app-geoclue\\x2ddemo\\x2dagent@autostart.service \
-    app-nm\\x2dapplet@autostart.service \
-    blueman-applet.service \
-    blueman-manager.service \
-    mpris-proxy.service \
-    obex.service
-
 # Podman network-online fix
 # https://github.com/containers/podman/issues/24796
 sudo ln -sf /usr/lib/systemd/system/network-online.target \
