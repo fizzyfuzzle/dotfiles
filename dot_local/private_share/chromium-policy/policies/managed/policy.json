@@ -29,6 +29,11 @@
     "DefaultWebBluetoothGuardSetting": 2,
     "DefaultWindowManagementSetting": 2,
     "EnableMediaRouter": false,
+    "ExtensionInstallAllowlist": [
+        "cjpalhdlnbpafiamejdnhcphjbkeiagm",
+        "faeadnfmdfamenfhaipofoffijhlnkif"
+    ],
+    "ExtensionInstallBlocklist": ["*"],
     "HttpsOnlyMode": "force_enabled",
     "HttpsUpgradesEnabled": true,
     "MediaRecommendationsEnabled": false,
