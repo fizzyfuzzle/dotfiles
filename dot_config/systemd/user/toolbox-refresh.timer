@@ -1,0 +1,10 @@
+[Unit]
+Description=Toolbox container refresh timer
+
+[Timer]
+OnCalendar=weekly
+Persistent=true
+RandomizedDelaySec=1h
+
+[Install]
+WantedBy=timers.target
