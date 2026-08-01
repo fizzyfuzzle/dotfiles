@@ -3,10 +3,11 @@
 # vim: filetype=sh
 set -euo pipefail
 
-container="fedora-toolbox-$(rpm -E %fedora)"
-podman container exists "$container" || toolbox create --assumeyes
-
-toolbox run sudo dnf install --setopt install_weak_deps=false --refresh --assumeyes \
-    ansible offlineimap opentofu pcsc-lite-libs python3-dateutil python3-requests qrencode steghide zsh \
-    || echo "warning: toolbox package install failed, continuing" >&2
+# toolbox-refresh.sh hash: {{ include "dot_local/bin/executable_toolbox-refresh.sh" | sha256sum }}
+# toolbox-refresh.service hash: {{ include "dot_config/systemd/user/toolbox-refresh.service" | sha256sum }}
+# toolbox-refresh.timer hash: {{ include "dot_config/systemd/user/toolbox-refresh.timer" | sha256sum }}
+systemctl --user daemon-reload
+systemctl --user enable --now toolbox-refresh.timer
+systemctl --user start toolbox-refresh.service \
+    || echo "warning: toolbox refresh failed, continuing" >&2
 {{- end -}}
