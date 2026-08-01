@@ -47,6 +47,10 @@ sudo systemctl mask \
     upower.service \
     wpa_supplicant.service
 
+# Add User to dialout group
+grep -q '^dialout:' /etc/group || getent group dialout | sudo tee -a /etc/group
+sudo usermod -aG dialout "$(whoami)"
+
 # Podman network-online fix
 # https://github.com/containers/podman/issues/24796
 sudo ln -sf /usr/lib/systemd/system/network-online.target \
@@ -107,9 +111,6 @@ command -v zsh &>/dev/null || { systemctl reboot; exit 0; }
 # Change Shell to ZSH
 [ "$SHELL" != "$(command -v zsh)" ] && chsh --shell "$(command -v zsh)"
 
-# Enable Kanshi
-systemctl --user enable kanshi.service
-
 # Cleanup
 rm -rf .bash_profile .bashrc .bash_logout .bash_history \
     Desktop Music Pictures Public Templates Videos
@@ -132,7 +133,3 @@ if [ ! -d "$HOME/.local/share/chezmoi" ]; then
     tar -xzf "$tmpdir/chezmoi.tar.gz" -C ~/.local/bin chezmoi
     chezmoi init --apply "$CHEZMOI_USER"
 fi
-
-# Add User to dialout group
-grep -q '^dialout:' /etc/group || getent group dialout | sudo tee -a /etc/group
-sudo usermod -aG dialout "$(whoami)"
