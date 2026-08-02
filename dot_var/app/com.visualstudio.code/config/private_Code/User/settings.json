@@ -50,5 +50,6 @@
     "workbench.colorTheme": "Dark Modern",
     "dev.containers.dockerPath": "podman-remote",
     "editor.formatOnSave": true,
-    "editor.defaultFormatter": "charliermarsh.ruff"
+    "editor.defaultFormatter": "charliermarsh.ruff",
+    "python.useEnvironmentsExtension": true
 }
