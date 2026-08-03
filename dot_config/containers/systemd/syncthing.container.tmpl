@@ -7,7 +7,7 @@ After=network-online.target
 ExecStartPre=mkdir -p %h/.config/syncthing
 
 [Container]
-Image=docker.io/syncthing/syncthing:2.1.2
+Image={{ .containers.syncthing.image }}:{{ .containers.syncthing.tag }}
 UserNS=keep-id
 Environment=STGUIADDRESS=0.0.0.0:8384
 PublishPort=127.0.0.1:8384:8384/tcp
