@@ -1,3 +1,9 @@
+" XDG Base Directory support for runtimepath/packpath
+" (native on vim 9.2+; explicit here so it also works on older vim)
+set runtimepath^=$XDG_CONFIG_HOME/vim
+set runtimepath+=$XDG_CONFIG_HOME/vim/after
+let &packpath = &runtimepath
+
 " Not compatible with the old-fashion vi mode
 set nocompatible
 " Encoding utf-8
