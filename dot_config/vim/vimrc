@@ -11,11 +11,11 @@ set encoding=utf-8
 " Info file
 set viminfofile=$XDG_CONFIG_HOME/vim/viminfo
 " Colors
-set background=dark
-set guicursor=
 if has('termguicolors')
   set termguicolors
 endif
+set background=dark
+"set guicursor=
 " No backup or swap, autoread file when external edited
 set nobackup nowritebackup noswapfile autoread
 " Search
@@ -68,9 +68,10 @@ noremap <C-w>- :split<CR>
 noremap <C-w>\ :vsplit<CR>
 
 " Theme
+let g:gruvbox_material_foreground = 'material'
 let g:gruvbox_material_background = 'hard'
 let g:gruvbox_material_colors_override = {'bg0': ['#000000', '0']}
-packadd! gruvbox-material
+let g:gruvbox_material_better_performance = 1
 silent! colorscheme gruvbox-material
 
 " Lightline
