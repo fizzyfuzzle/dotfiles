@@ -1,0 +1,42 @@
+externals:
+  zshPlugins:
+    zshAutosuggestions:
+      repo: zsh-users/zsh-autosuggestions
+      revision: 85919cd1ffa7d2d5412f6d3fe437ebdbeeec4fc5
+    zshHistorySubstringSearch:
+      repo: zsh-users/zsh-history-substring-search
+      revision: 14c8d2e0ffaee98f2df9850b19944f32546fdea5
+    zshSyntaxHighlighting:
+      repo: zsh-users/zsh-syntax-highlighting
+      revision: 1d85c692615a25fe2293bdd44b34c217d5d2bf04
+  vimPlugins:
+    gruvboxMaterial:
+      repo: sainnhe/gruvbox-material
+      revision: 11d779b26a9ab2b3db8c22c6ac9fb6e8ed4fea79
+    ctrlp:
+      repo: ctrlpvim/ctrlp.vim
+      revision: 0065942ef13ce28293e2b26cb622d035da050b44
+    lightline:
+      repo: itchyny/lightline.vim
+      revision: d042c506cb2e7a59112a72447e0b5fe8739d9d1d
+    vimFugitive:
+      repo: tpope/vim-fugitive
+      revision: 3b753cf8c6a4dcde6edee8827d464ba9b8c4a6f0
+    vimGitgutter:
+      repo: airblade/vim-gitgutter
+      revision: 90b75207bd9b55d8ac4af15f72b4e935462014d0
+  age:
+    repo: FiloSottile/age
+    version: v1.3.1
+    checksum: bdc69c09cbdd6cf8b1f333d372a1f58247b3a33146406333e30c0f26e8f51377
+  agePluginYubikey:
+    repo: str4d/age-plugin-yubikey
+    version: v0.5.0
+    checksum: 019b35a13fc81be56d73d0723db0a2082fbd04c936c2c6836381111f7f51b2c3
+containers:
+  syncthing:
+    image: docker.io/syncthing/syncthing
+    tag: "2.1.2"
+  wineNovnc:
+    image: ghcr.io/fizzyfuzzle/wine-novnc
+    tag: "2"
