@@ -62,8 +62,6 @@ alias ls='ls --color=auto'
 alias scu="systemctl --user"
 (( $+commands[toolbox] )) && alias tbe="toolbox enter"
 (( $+commands[toolbox] )) && alias tbr="toolbox run"
-(( $+commands[rpm-ostree] )) && alias upgrade="rpm-ostree upgrade && flatpak upgrade --user --assumeyes"
-(( $+commands[dnf] )) && alias upgrade="sudo dnf upgrade --refresh --assumeyes"
 
 # ZSH-syntax-highlighting
 if [[ -e ~/.submodules/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh ]]; then
