@@ -15,7 +15,6 @@ if has('termguicolors')
   set termguicolors
 endif
 set background=dark
-"set guicursor=
 " No backup or swap, autoread file when external edited
 set nobackup nowritebackup noswapfile autoread
 " Search
