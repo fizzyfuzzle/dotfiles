@@ -37,7 +37,6 @@
     untracked = red bold
 [core]
     whitespace = fix,-indent-with-non-tab,trailing-space,cr-at-eol
-    excludesfile = ~/.gitignore
     autocrlf = input
 [diff]
     tool = meld
