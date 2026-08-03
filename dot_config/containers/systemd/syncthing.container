@@ -1,0 +1,18 @@
+[Unit]
+Description=Syncthing
+Wants=network-online.target
+After=network-online.target
+
+[Service]
+ExecStartPre=mkdir -p %h/.config/syncthing
+
+[Container]
+Image=docker.io/syncthing/syncthing:2.1.2
+UserNS=keep-id
+Environment=STGUIADDRESS=0.0.0.0:8384
+PublishPort=127.0.0.1:8384:8384/tcp
+PublishPort=22000:22000/tcp
+PublishPort=22000:22000/udp
+Volume=%h/.config/syncthing:/var/syncthing/config:Z
+Volume=%h/Documents/DCIM:/var/syncthing/DCIM:Z
+Volume=%h/Documents/Mobile:/var/syncthing/Backup:Z
