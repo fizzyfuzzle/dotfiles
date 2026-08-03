@@ -13,6 +13,9 @@ set viminfofile=$XDG_CONFIG_HOME/vim/viminfo
 " Colors
 set background=dark
 set guicursor=
+if has('termguicolors')
+  set termguicolors
+endif
 " No backup or swap, autoread file when external edited
 set nobackup nowritebackup noswapfile autoread
 " Search
@@ -65,15 +68,14 @@ noremap <C-w>- :split<CR>
 noremap <C-w>\ :vsplit<CR>
 
 " Theme
-let g:jellybeans_use_term_italics = 1
-let g:jellybeans_overrides = {
-    \ 'background': { 'guibg': '#000000' }
-\ }
-silent! colorscheme jellybeans
+let g:gruvbox_material_background = 'hard'
+let g:gruvbox_material_colors_override = {'bg0': ['#000000', '0']}
+packadd! gruvbox-material
+silent! colorscheme gruvbox-material
 
 " Lightline
 let g:lightline = {
-    \ 'colorscheme': '16color',
+    \ 'colorscheme': 'gruvbox_material',
     \ 'active': {
     \   'left': [ [ 'mode', 'paste' ],
     \             [ 'gitbranch', 'readonly', 'filename', 'modified' ] ]
