@@ -83,15 +83,6 @@ let g:lightline = {
     \ },
 \ }
 
-" ALE
-let g:ale_virtualtext_cursor = 'disabled'
-let g:ale_linters_explicit = 1
-let g:ale_linters = {
-    \ 'puppet': ['puppetlint'],
-    \ 'python': ['flake8'],
-    \ 'yaml': ['yamllint'],
-\ }
-
 " CtrlP
 let g:ctrlp_cmd = 'CtrlPMixed'
 let g:ctrlp_show_hidden = 1
@@ -101,4 +92,5 @@ let g:ctrlp_custom_ignore = {
     \ 'dir':  '\v[\/]\.(git|hg|svn)$',
     \ 'file': '\v\.(pyc|swp|vim)$',
 \ }
+let g:ctrlp_user_command = ['.git', 'cd %s && git ls-files -co --exclude-standard']
 
