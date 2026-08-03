@@ -64,28 +64,26 @@ alias scu="systemctl --user"
 (( $+commands[toolbox] )) && alias tbr="toolbox run"
 
 # ZSH-syntax-highlighting
-if [[ -e ~/.submodules/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh ]]; then
-    source ~/.submodules/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
-    ZSH_HIGHLIGHT_HIGHLIGHTERS=(main brackets cursor)
-    ZSH_HIGHLIGHT_MAXLENGTH=250
-    typeset -A ZSH_HIGHLIGHT_STYLES
-    ZSH_HIGHLIGHT_STYLES[alias]='fg=magenta,bold'
-    ZSH_HIGHLIGHT_STYLES[path]='fg=cyan'
-    ZSH_HIGHLIGHT_STYLES[globbing]='none'
-fi
+ZSH_HIGHLIGHT_HIGHLIGHTERS=(main brackets cursor)
+ZSH_HIGHLIGHT_MAXLENGTH=250
+typeset -A ZSH_HIGHLIGHT_STYLES
+ZSH_HIGHLIGHT_STYLES[alias]='fg=magenta,bold'
+ZSH_HIGHLIGHT_STYLES[path]='fg=cyan'
+ZSH_HIGHLIGHT_STYLES[globbing]='none'
 
 # ZSH-autosuggestions
-if [[ -e ~/.submodules/zsh-autosuggestions/zsh-autosuggestions.zsh ]]; then
-    source ~/.submodules/zsh-autosuggestions/zsh-autosuggestions.zsh
-    ZSH_AUTOSUGGEST_BUFFER_MAX_SIZE=20
-fi
+ZSH_AUTOSUGGEST_BUFFER_MAX_SIZE=20
 
 # ZSH-history-substring-search
-if [[ -e ~/.submodules/zsh-history-substring-search/zsh-history-substring-search.zsh ]]; then
-    source ~/.submodules/zsh-history-substring-search/zsh-history-substring-search.zsh
-    bindkey '^[[1;5A' history-substring-search-up
-    bindkey '^[[1;5B' history-substring-search-down
-fi
+bindkey '^[[1;5A' history-substring-search-up
+bindkey '^[[1;5B' history-substring-search-down
+
+# Plugin loader
+for plugin_dir in "${XDG_DATA_HOME}/zsh/plugins"/*/; do
+    plugin_name="${plugin_dir:t}"
+    plugin_file="${plugin_dir}${plugin_name}.zsh"
+    [[ -e "${plugin_file}" ]] && source "${plugin_file}"
+done
 
 # Prompt Builder
 function prompt_builder() {
