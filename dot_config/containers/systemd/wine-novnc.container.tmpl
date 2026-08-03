@@ -7,7 +7,7 @@ After=network-online.target
 ExecStartPre=mkdir -p %h/wine
 
 [Container]
-Image=ghcr.io/fizzyfuzzle/wine-novnc:2
+Image={{ .containers.wineNovnc.image }}:{{ .containers.wineNovnc.tag }}
 UserNS=keep-id
 Environment=RESOLUTION=1920x1200x24
 PublishPort=8090:8080
