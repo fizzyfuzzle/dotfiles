@@ -1,0 +1,15 @@
+[Unit]
+Description=Wine NoVNC
+Wants=network-online.target
+After=network-online.target
+
+[Service]
+ExecStartPre=mkdir -p %h/wine
+
+[Container]
+Image=ghcr.io/fizzyfuzzle/wine-novnc:2
+UserNS=keep-id
+Environment=RESOLUTION=1920x1200x24
+PublishPort=8090:8080
+PublishPort=22346:22346
+Volume=%h/wine:/home/wine:Z
