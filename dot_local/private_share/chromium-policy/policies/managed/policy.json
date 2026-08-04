@@ -10,7 +10,9 @@
     "BuiltInDnsClientEnabled": false,
     "CookiesAllowedForUrls": [
         "https://[*.]claude.ai:443",
-        "https://[*.]github.com:443"
+        "https://[*.]github.com:443",
+        "https://[*.]todoist.com:443",
+        "https://[*.]tradingview.com:443"
     ],
     "DefaultBrowserSettingEnabled": false,
     "DefaultClipboardSetting": 2,
