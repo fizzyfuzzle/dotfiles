@@ -1,3 +1,4 @@
+AGENTS.md
 README.md
 install
 {{- if .server }}
