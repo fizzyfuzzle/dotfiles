@@ -4,3 +4,11 @@ configuration {
 }
 
 @theme "gruvbox-dark-hard"
+
+* {
+    background: #000000;
+}
+
+window {
+    border:  1px;
+}
