@@ -30,7 +30,7 @@
         "**/.venv": true
     },
     "files.watcherExclude": {
-        "**/.git/**": true,
+        "**/.git/objects/**": true,
         "**/__pycache__/**": true,
         "**/*.pyc": true,
         "**/.mypy_cache/**": true,
