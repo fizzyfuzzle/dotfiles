@@ -20,9 +20,6 @@
     },
     "window.menuBarVisibility": "toggle",
     "editor.renderWhitespace": "trailing",
-    "chat.agent.enabled": false,
-    "chat.commandCenter.enabled": false,
-    "chat.notifyWindowOnConfirmation": "off",
     "ansible.lightspeed.enabled": false,
     "files.exclude": {
         "**/__pycache__": true,
@@ -60,7 +57,6 @@
     "terminal.integrated.defaultProfile.linux": "bash",
     "editor.mouseWheelZoom": true,
     "git.confirmSync": false,
-    "dev.containers.dockerPath": "podman-remote",
     "editor.formatOnSave": true,
     "editor.defaultFormatter": "charliermarsh.ruff",
     "python.useEnvironmentsExtension": true,
