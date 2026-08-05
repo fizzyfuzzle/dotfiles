@@ -10,7 +10,6 @@
         "editorBracketMatch.border": "#ff0000",
         "editorWhitespace.foreground": "#ff0000"
     },
-    "editor.semanticHighlighting.enabled": false,
     "extensions.ignoreRecommendations": true,
     "python.languageServer": "Pylance",
     "python.analysis.typeCheckingMode": "standard",
