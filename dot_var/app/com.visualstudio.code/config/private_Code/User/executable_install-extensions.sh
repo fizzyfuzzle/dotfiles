@@ -1,8 +1,6 @@
 #!/bin/bash
 #
 EXTENSIONS=(
-  ms-vscode-remote.remote-ssh \
-  ms-vscode-remote.remote-containers \
   ms-python.python \
   charliermarsh.ruff \
   opentofu.vscode-opentofu \
