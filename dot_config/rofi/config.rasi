@@ -3,4 +3,4 @@ configuration {
   combi-modes: [ window, drun, run ];
 }
 
-@theme "glue_pro_blue"
+@theme "gruvbox-dark-hard"
