@@ -60,5 +60,7 @@
     "editor.formatOnSave": true,
     "editor.defaultFormatter": "charliermarsh.ruff",
     "python.useEnvironmentsExtension": true,
-    "workbench.colorTheme": "Dark Modern"
+    "workbench.colorTheme": "Dark Modern",
+    "telemetry.feedback.enabled": false,
+    "redhat.telemetry.enabled": false
 }
