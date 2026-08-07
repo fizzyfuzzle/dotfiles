@@ -11,7 +11,7 @@
         "editorWhitespace.foreground": "#ff0000"
     },
     "extensions.ignoreRecommendations": true,
-    "python.languageServer": "Pylance",
+    "python.languageServer": "None",
     "python.analysis.typeCheckingMode": "standard",
     "editor.codeActionsOnSave": {
        "source.organizeImports": "explicit",
