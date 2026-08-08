@@ -77,6 +77,20 @@ wifi.backend=iwd
 EOF
 fi
 
+# DNS over TLS (Quad9 primary, Cloudflare fallback)
+file="/etc/systemd/resolved.conf.d/dot.conf"
+if ! sudo test -f "$file"; then
+    sudo mkdir -pZ "$(dirname "$file")"
+    sudo tee "$file" > /dev/null <<'EOF'
+[Resolve]
+DNS=9.9.9.9#dns.quad9.net 149.112.112.112#dns.quad9.net
+FallbackDNS=1.1.1.1#cloudflare-dns.com 1.0.0.1#cloudflare-dns.com
+DNSOverTLS=yes
+DNSSEC=yes
+EOF
+    sudo systemctl restart systemd-resolved
+fi
+
 # Add run0 Polkit rule
 file="/etc/polkit-1/rules.d/90-run0-wheel.rules"
 if ! sudo test -f "$file"; then
