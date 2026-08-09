@@ -52,6 +52,7 @@ alias jc='journalctl -aq --no-hostname'
 alias jcu='jc --user-unit'
 alias jcuf='jc --no-pager -n 25 -f --user-unit'
 alias ls='ls --color=auto'
+openhtml() { xdg-open "$(realpath "$1")"; }
 (( $+commands[pass] )) && alias p='pass show'
 (( $+commands[zbarimg] )) && alias qrdec='zbarimg -q --raw'
 (( $+commands[qrencode] )) && alias qrenc='qrencode -t ansiutf8'
