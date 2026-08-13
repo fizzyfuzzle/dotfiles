@@ -39,4 +39,4 @@ containers:
     tag: "2.1.2"
   wineNovnc:
     image: ghcr.io/fizzyfuzzle/wine-novnc
-    tag: "1.0.0"
+    tag: "1.0.3"
