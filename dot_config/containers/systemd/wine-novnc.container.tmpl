@@ -1,15 +1,21 @@
 [Unit]
-Description=Wine NoVNC
+Description=Wine noVNC
 Wants=network-online.target
 After=network-online.target
+StartLimitIntervalSec=300
+StartLimitBurst=5
 
 [Service]
-ExecStartPre=mkdir -p %h/wine
+ExecStartPre=mkdir -p %h/.wine
+Restart=on-failure
+RestartSec=10
+TimeoutStartSec=120
 
 [Container]
 Image={{ .containers.wineNovnc.image }}:{{ .containers.wineNovnc.tag }}
 UserNS=keep-id
-Environment=RESOLUTION=1920x1200x24
-PublishPort=8090:8080
-PublishPort=22346:22346
-Volume=%h/wine:/home/wine:Z
+Environment=RESOLUTION=1920x1200
+HealthOnFailure=kill
+PublishPort=127.0.0.1:8090:8080
+PublishPort=127.0.0.1:7777:7777
+Volume=%h/.wine:/home/wine/.wine:Z
