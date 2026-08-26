@@ -48,9 +48,6 @@ export VISUAL="${EDITOR}"
 # Aliases
 alias e="${EDITOR}"
 (( $+commands[git] )) && alias g='git'
-alias jc='journalctl -aq --no-hostname'
-alias jcu='jc --user-unit'
-alias jcuf='jc --no-pager -n 25 -f --user-unit'
 alias ls='ls --color=auto'
 openhtml() { xdg-open "$(realpath "$1")"; }
 (( $+commands[pass] )) && alias p='pass show'
@@ -58,11 +55,18 @@ openhtml() { xdg-open "$(realpath "$1")"; }
 (( $+commands[qrencode] )) && alias qrenc='qrencode -t ansiutf8'
 (( $+commands[curl] )) && alias rip='curl -s ip.me'
 (( $+commands[rpm-ostree] )) && alias ros='rpm-ostree status'
-(( $+commands[rsync] )) && alias rs='rsync --archive --delete --progress --exclude={".git",".gitignore"} --filter=":- .gitignore"'
 (( $+commands[shred] )) && alias sd='shred -u'
-alias scu="systemctl --user"
-(( $+commands[toolbox] )) && alias tbe="toolbox enter"
-(( $+commands[toolbox] )) && alias tbr="toolbox run"
+(( $+commands[toolbox] )) && alias tbe="toolbox enter" && alias tbr="toolbox run"
+
+# Manage service accounts
+svc() {
+  local account="svc-$1"; shift
+  ( cd / && sudo -u "$account" XDG_RUNTIME_DIR="/run/user/$(id -u "$account")" "$@" )
+}
+svc-shell() {
+  local account="svc-$1"
+  ( cd / && sudo -u "$account" /bin/bash -c 'cd && exec bash' )
+}
 
 # ZSH-syntax-highlighting
 ZSH_HIGHLIGHT_HIGHLIGHTERS=(main brackets cursor)
