@@ -1,51 +1,51 @@
 # ZSH Plugins
 [".local/share/zsh/plugins/zsh-autosuggestions"]
     type = "git-repo"
-    url = "https://github.com/{{ .externals.zshPlugins.zshAutosuggestions.repo }}.git"
-    revision = {{ .externals.zshPlugins.zshAutosuggestions.revision | quote }}
+    url = "https://github.com/zsh-users/zsh-autosuggestions.git"
+    revision = "85919cd1ffa7d2d5412f6d3fe437ebdbeeec4fc5"
 [".local/share/zsh/plugins/zsh-history-substring-search"]
     type = "git-repo"
-    url = "https://github.com/{{ .externals.zshPlugins.zshHistorySubstringSearch.repo }}.git"
-    revision = {{ .externals.zshPlugins.zshHistorySubstringSearch.revision | quote }}
+    url = "https://github.com/zsh-users/zsh-history-substring-search.git"
+    revision = "14c8d2e0ffaee98f2df9850b19944f32546fdea5"
 [".local/share/zsh/plugins/zsh-syntax-highlighting"]
     type = "git-repo"
-    url = "https://github.com/{{ .externals.zshPlugins.zshSyntaxHighlighting.repo }}.git"
-    revision = {{ .externals.zshPlugins.zshSyntaxHighlighting.revision | quote }}
+    url = "https://github.com/zsh-users/zsh-syntax-highlighting.git"
+    revision = "1d85c692615a25fe2293bdd44b34c217d5d2bf04"
 
 # VIM Plugins
 [".config/vim/pack/vendor/start/gruvbox-material"]
     type = "git-repo"
-    url = "https://github.com/{{ .externals.vimPlugins.gruvboxMaterial.repo }}.git"
-    revision = {{ .externals.vimPlugins.gruvboxMaterial.revision | quote }}
+    url = "https://github.com/sainnhe/gruvbox-material.git"
+    revision = "11d779b26a9ab2b3db8c22c6ac9fb6e8ed4fea79"
 [".config/vim/pack/vendor/start/ctrlp.vim"]
     type = "git-repo"
-    url = "https://github.com/{{ .externals.vimPlugins.ctrlp.repo }}.git"
-    revision = {{ .externals.vimPlugins.ctrlp.revision | quote }}
+    url = "https://github.com/ctrlpvim/ctrlp.vim.git"
+    revision = "0065942ef13ce28293e2b26cb622d035da050b44"
 [".config/vim/pack/vendor/start/lightline.vim"]
     type = "git-repo"
-    url = "https://github.com/{{ .externals.vimPlugins.lightline.repo }}.git"
-    revision = {{ .externals.vimPlugins.lightline.revision | quote }}
+    url = "https://github.com/itchyny/lightline.vim.git"
+    revision = "d042c506cb2e7a59112a72447e0b5fe8739d9d1d"
 [".config/vim/pack/vendor/start/vim-fugitive"]
     type = "git-repo"
-    url = "https://github.com/{{ .externals.vimPlugins.vimFugitive.repo }}.git"
-    revision = {{ .externals.vimPlugins.vimFugitive.revision | quote }}
+    url = "https://github.com/tpope/vim-fugitive.git"
+    revision = "3b753cf8c6a4dcde6edee8827d464ba9b8c4a6f0"
 [".config/vim/pack/vendor/start/vim-gitgutter"]
     type = "git-repo"
-    url = "https://github.com/{{ .externals.vimPlugins.vimGitgutter.repo }}.git"
-    revision = {{ .externals.vimPlugins.vimGitgutter.revision | quote }}
+    url = "https://github.com/airblade/vim-gitgutter.git"
+    revision = "90b75207bd9b55d8ac4af15f72b4e935462014d0"
 
 # Workstation Tools
 {{- if .workstation }}
 [".local/share/age"]
     type = "archive"
-    url = {{ gitHubReleaseAssetURL .externals.age.repo .externals.age.version "age-*-linux-amd64.tar.gz" | quote }}
+    url = {{ gitHubReleaseAssetURL "FiloSottile/age" "v1.3.1" "age-*-linux-amd64.tar.gz" | quote }}
     exact = true
     stripComponents = 1
-    checksum.sha256 = {{ .externals.age.checksum | quote }}
+    checksum.sha256 = "bdc69c09cbdd6cf8b1f333d372a1f58247b3a33146406333e30c0f26e8f51377"
 [".local/share/age-plugin-yubikey"]
     type = "archive"
-    url = {{ gitHubReleaseAssetURL .externals.agePluginYubikey.repo .externals.agePluginYubikey.version "age-plugin-yubikey-*-x86_64-linux.tar.gz" | quote }}
+    url = {{ gitHubReleaseAssetURL "str4d/age-plugin-yubikey" "v0.5.0" "age-plugin-yubikey-*-x86_64-linux.tar.gz" | quote }}
     exact = true
     stripComponents = 1
-    checksum.sha256 = {{ .externals.agePluginYubikey.checksum | quote }}
+    checksum.sha256 = "019b35a13fc81be56d73d0723db0a2082fbd04c936c2c6836381111f7f51b2c3"
 {{- end }}

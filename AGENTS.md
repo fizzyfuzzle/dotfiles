@@ -19,7 +19,6 @@ restricted perms, `*.tmpl` → templated at apply time. See
 - `dot_var/` — → `~/.var/` (e.g. Flatpak VS Code settings)
 - `install/` — bootstrap/install scripts
 - `.chezmoi.toml.tmpl` — chezmoi config template (source of machine-specific vars)
-- `.chezmoidata.yaml` — static template data
 - `.chezmoiexternal.toml.tmpl` — externally-fetched files (not vendored in repo)
 - `.chezmoiignore` — paths excluded from apply
 - `dot_zshrc` — → `~/.zshrc`
@@ -36,6 +35,6 @@ restricted perms, `*.tmpl` → templated at apply time. See
 
 - `.chezmoiexternal.toml.tmpl` entries are fetched, not stored here — don't
   try to "find" that content in the repo.
-- Templated files (`.tmpl`) render using `.chezmoidata.yaml` and
-  `.chezmoi.toml.tmpl` vars — check both before assuming a value is hardcoded.
+- Templated files (`.tmpl`) render using `.chezmoi.toml.tmpl` vars — check
+  before assuming a value is hardcoded.
 - Idempotency: scripts under `.chezmoiscripts/` should be safe to re-run.
