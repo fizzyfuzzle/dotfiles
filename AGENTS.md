@@ -22,6 +22,8 @@ restricted perms, `*.tmpl` → templated at apply time. See
 - `.chezmoiexternal.toml.tmpl` — externally-fetched files (not vendored in repo)
 - `.chezmoiignore` — paths excluded from apply
 - `dot_zshrc` — → `~/.zshrc`
+- `.github/renovate.json5` — Renovate config; bumps pinned versions/checksums
+  in `.chezmoiexternal.toml.tmpl` and the container unit files
 
 ## Workflow
 
