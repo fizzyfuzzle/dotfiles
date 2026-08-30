@@ -122,6 +122,8 @@ sudo firewall-cmd --permanent --zone=public \
     --remove-service=mdns \
     --remove-service=ssh
 sudo firewall-cmd --permanent --zone=public --remove-forward
+# Fix wireguard IPv6
+sudo sed -i 's/^IPv6_rpfilter=.*/IPv6_rpfilter=loose/' /etc/firewalld/firewalld.conf
 sudo firewall-cmd --reload
 
 # Update GRUB timeout
