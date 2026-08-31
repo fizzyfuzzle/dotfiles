@@ -12,7 +12,7 @@ RestartSec=10
 TimeoutStartSec=120
 
 [Container]
-Image=ghcr.io/fizzyfuzzle/wine-novnc:1.0.3
+Image=ghcr.io/fizzyfuzzle/wine-novnc:1.0.4
 UserNS=keep-id
 Environment=RESOLUTION=1920x1200
 HealthOnFailure=kill
