@@ -38,10 +38,10 @@
 {{- if .workstation }}
 [".local/share/age"]
     type = "archive"
-    url = {{ gitHubReleaseAssetURL "FiloSottile/age" "v1.3.1" "age-*-linux-amd64.tar.gz" | quote }}
+    url = {{ gitHubReleaseAssetURL "FiloSottile/age" "v1.3.2" "age-*-linux-amd64.tar.gz" | quote }}
     exact = true
     stripComponents = 1
-    checksum.sha256 = "bdc69c09cbdd6cf8b1f333d372a1f58247b3a33146406333e30c0f26e8f51377"
+    checksum.sha256 = "cbe24006683f8eb669266162894b9a522a1af52f2665fbc63a4bb032ed26ac10"
 [".local/share/age-plugin-yubikey"]
     type = "archive"
     url = {{ gitHubReleaseAssetURL "str4d/age-plugin-yubikey" "v0.5.0" "age-plugin-yubikey-*-x86_64-linux.tar.gz" | quote }}
