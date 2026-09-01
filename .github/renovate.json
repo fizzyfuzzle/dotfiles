@@ -8,7 +8,9 @@
     {
       "customType": "regex",
       "description": "chezmoi git-repo externals (zsh/vim plugins) pinned by commit SHA, default branch read from a `# renovate: branch=...` comment next to each pin",
-      "fileMatch": ["^\\.chezmoiexternal\\.toml\\.tmpl$"],
+      "managerFilePatterns": [
+        "/^\\.chezmoiexternal\\.toml\\.tmpl$/"
+      ],
       "matchStrings": [
         "url = \"https://github\\.com/(?<depName>[^\"]+)\\.git\"\\n\\s*revision = \"(?<currentDigest>[0-9a-f]{40})\" # renovate: branch=(?<currentValue>\\S+)"
       ],
@@ -18,7 +20,9 @@
     {
       "customType": "regex",
       "description": "chezmoi archive externals (age, age-plugin-yubikey) pinned by tag + sha256 checksum of the release asset",
-      "fileMatch": ["^\\.chezmoiexternal\\.toml\\.tmpl$"],
+      "managerFilePatterns": [
+        "/^\\.chezmoiexternal\\.toml\\.tmpl$/"
+      ],
       "matchStrings": [
         "gitHubReleaseAssetURL \"(?<depName>[^\"]+)\" \"(?<currentValue>[^\"]+)\" \"[^\"]+\"[\\s\\S]*?checksum\\.sha256 = \"(?<currentDigest>[0-9a-f]{64})\""
       ],
@@ -27,7 +31,9 @@
     {
       "customType": "regex",
       "description": "Podman Quadlet container image tags",
-      "fileMatch": ["^dot_config/containers/systemd/.*\\.container$"],
+      "managerFilePatterns": [
+        "/^dot_config/containers/systemd/.*\\.container$/"
+      ],
       "matchStrings": ["Image=(?<depName>[^:\\s]+):(?<currentValue>[\\w.-]+)"],
       "datasourceTemplate": "docker"
     }
