@@ -17,7 +17,7 @@
     st = status
     r = reflog
     rc = reset --soft HEAD~1
-    rmr = "!git checkout main && git branch --merged | egrep -v '(master|main)' | xargs git branch -d"
+    rmr = "!git checkout main && git branch --merged main | grep -vE '^\\*?[[:space:]]*(main|master)$' | xargs -r git branch -d"
     rp = remote prune origin
 [color]
     ui = auto
