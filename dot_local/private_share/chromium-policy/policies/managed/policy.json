@@ -8,12 +8,6 @@
     "BookmarkBarEnabled": true,
     "BrowserSignin": 0,
     "BuiltInDnsClientEnabled": false,
-    "CookiesAllowedForUrls": [
-        "https://[*.]claude.ai:443",
-        "https://[*.]github.com:443",
-        "https://[*.]todoist.com:443",
-        "https://[*.]tradingview.com:443"
-    ],
     "DefaultBrowserSettingEnabled": false,
     "DefaultClipboardSetting": 2,
     "DefaultControlledFrameSetting": 2,
@@ -48,13 +42,7 @@
     "SearchSuggestEnabled": false,
     "ServiceWorkerAutoPreloadEnabled": false,
     "ShowHomeButton": true,
-    "SiteSearchSettings": [
-        {
-        "name": "GitHub",
-        "shortcut": "gh",
-        "url": "https://github.com/search?q={searchTerms}"
-        }
-    ],
+    "SiteSearchSettings": [],
     "SpellcheckEnabled": false,
     "SSLErrorOverrideAllowed": false,
     "TranslateEnabled": false,
