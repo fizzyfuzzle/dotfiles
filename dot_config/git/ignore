@@ -1,24 +1,38 @@
-# Python cached file
-**/__pycache__/
-.mypy_cache/
-.venv/
-*.py[cod]
+# Global ignores: personal/OS/editor noise and safety nets only.
+# Project artifacts belong in each repo's own .gitignore.
+# Never ignore lockfiles here (uv.lock, package-lock.json, Cargo.lock, ...): they must be committed.
 
-# Compiled source
-*.com
+# Secrets (safety net)
+.env
+.env.*
+!.env.example
+!.env.sample
+
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+.mypy_cache/
+.pytest_cache/
+.ruff_cache/
+
+# Node
+node_modules/
+
+# Compiled artifacts
 *.class
 *.dll
 *.exe
 *.o
 *.so
-*.iml
 
-# Temp files
+# Editors
 *.swp
 *.swo
 *~
+*.iml
 
-# Packages
+# Archives (repos that commit fixtures or gradle-wrapper.jar: use a repo-level !negation)
 *.7z
 *.dmg
 *.iso
@@ -27,14 +41,14 @@
 *.tar
 *.zip
 
-# Logs and db
+# Logs and local databases
 *.log
 *.sqlite
 
 # OS generated files
 .DS_Store*
-ehthumbs.db
-Icon?
+.directory
+.nfs*
+.Trash-*
 Thumbs.db
-*.lock
-package-lock.json
+ehthumbs.db
