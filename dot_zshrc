@@ -46,10 +46,11 @@ setopt hist_ignore_space
 export VISUAL="${EDITOR}"
 
 # Aliases
+(( $+commands[agent-sandbox] )) && alias claude='agent-sandbox claude'
+(( $+commands[agent-sandbox] )) && alias opencode='agent-sandbox opencode'
 alias e="${EDITOR}"
 (( $+commands[git] )) && alias g='git'
 alias ls='ls --color=auto'
-openhtml() { xdg-open "$(realpath "$1")"; }
 (( $+commands[pass] )) && alias p='pass show'
 (( $+commands[zbarimg] )) && alias qrdec='zbarimg -q --raw'
 (( $+commands[qrencode] )) && alias qrenc='qrencode -t ansiutf8'
