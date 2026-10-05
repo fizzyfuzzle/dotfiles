@@ -48,4 +48,15 @@
     exact = true
     stripComponents = 1
     checksum.sha256 = "019b35a13fc81be56d73d0723db0a2082fbd04c936c2c6836381111f7f51b2c3"
+[".local/share/uv"]
+    type = "archive"
+    url = {{ gitHubReleaseAssetURL "astral-sh/uv" "0.12.23" "uv-x86_64-unknown-linux-gnu.tar.gz" | quote }}
+    exact = true
+    stripComponents = 1
+    checksum.sha256 = "9167d72b3319674b6303c4cbe071854bba13ebdf3d76b1a7cbdc175471fb66d6"
+[".local/share/opentofu"]
+    type = "archive"
+    url = {{ gitHubReleaseAssetURL "opentofu/opentofu" "v1.13.1" "tofu_*_linux_amd64.tar.gz" | quote }}
+    exact = true
+    checksum.sha256 = "378ada19d4bc70c43732004e8159be771b23b9a5afdf059e5f8a2b3fa2c70a69"
 {{- end }}
