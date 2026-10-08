@@ -115,7 +115,6 @@ sudo firewall-cmd --permanent --zone=home --add-source=192.168.88.0/24
 sudo firewall-cmd --permanent --zone=home \
     --remove-service=mdns \
     --remove-service=samba-client
-sudo firewall-cmd --permanent --zone=home --add-service=syncthing
 sudo firewall-cmd --permanent --zone=home --remove-forward
 #
 sudo firewall-cmd --permanent --zone=public \
