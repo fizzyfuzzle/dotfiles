@@ -57,6 +57,7 @@ alias ls='ls --color=auto'
 (( $+commands[curl] )) && alias rip='curl -s ip.me'
 (( $+commands[rpm-ostree] )) && alias ros='rpm-ostree status'
 (( $+commands[shred] )) && alias sd='shred -u'
+(( $+commands[tmux] )) && alias t='tmux new-session -A -s "${HOST%%.*}"'
 (( $+commands[toolbox] )) && alias tbe="toolbox enter" && alias tbr="toolbox run"
 
 # Manage service accounts
