@@ -19,9 +19,7 @@ sudo systemctl enable --now rpm-ostreed-automatic.timer
 
 # Overlay Additional Packages
 rpm-ostree install --idempotent --assumeyes \
-    iwd \
-    vim-enhanced \
-    zsh
+    iwd tmux vim-enhanced zsh
 
 # Overlay Remove Firefox
 command -v firefox &>/dev/null && \
