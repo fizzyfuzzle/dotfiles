@@ -11,10 +11,7 @@ set encoding=utf-8
 " Info file
 set viminfofile=$XDG_CONFIG_HOME/vim/viminfo
 " Colors
-if has('termguicolors')
-  set termguicolors
-endif
-set background=dark
+set notermguicolors
 " No backup or swap, autoread file when external edited
 set nobackup nowritebackup noswapfile autoread
 " Search
@@ -66,16 +63,40 @@ inoremap <script> <silent> <buffer> date<Tab> <C-R>=strftime("%Y-%m-%d")<CR>
 noremap <C-w>- :split<CR>
 noremap <C-w>\ :vsplit<CR>
 
-" Theme
-let g:gruvbox_material_foreground = 'material'
-let g:gruvbox_material_background = 'hard'
-let g:gruvbox_material_colors_override = {'bg0': ['#000000', '0']}
-let g:gruvbox_material_better_performance = 1
-silent! colorscheme gruvbox-material
+" Use Vim's built-in defaults and the terminal's ANSI palette.
+colorscheme default
+set background=dark
+
+" Keep foot's default foreground and use its black background.
+highlight Normal       cterm=NONE      ctermfg=NONE ctermbg=0
+highlight Comment      cterm=italic    ctermfg=8    ctermbg=NONE gui=italic
+
+" Syntax colours use only the terminal's 16 configurable colours.
+highlight Constant     cterm=NONE      ctermfg=13   ctermbg=NONE
+highlight String       cterm=NONE      ctermfg=2    ctermbg=NONE
+highlight Identifier   cterm=NONE      ctermfg=6    ctermbg=NONE
+highlight Statement    cterm=NONE      ctermfg=11   ctermbg=NONE
+highlight PreProc      cterm=NONE      ctermfg=12   ctermbg=NONE
+highlight Type         cterm=NONE      ctermfg=10   ctermbg=NONE
+highlight Special      cterm=NONE      ctermfg=14   ctermbg=NONE
+
+" Keep whitespace markers and line numbers unobtrusive.
+highlight NonText      cterm=NONE      ctermfg=8    ctermbg=0
+highlight SpecialKey   cterm=NONE      ctermfg=8    ctermbg=0
+highlight LineNr       cterm=NONE      ctermfg=8    ctermbg=0
+highlight CursorLineNr cterm=bold      ctermfg=11   ctermbg=0
+highlight VertSplit    cterm=NONE      ctermfg=8    ctermbg=0
+
+" Clear selection, search and completion highlighting.
+highlight Visual       cterm=reverse   ctermfg=NONE ctermbg=NONE
+highlight Search       cterm=NONE      ctermfg=0    ctermbg=11
+highlight IncSearch    cterm=reverse   ctermfg=NONE ctermbg=NONE
+highlight Pmenu        cterm=NONE      ctermfg=7    ctermbg=0
+highlight PmenuSel     cterm=NONE      ctermfg=0    ctermbg=6
 
 " Lightline
 let g:lightline = {
-    \ 'colorscheme': 'gruvbox_material',
+    \ 'colorscheme': '16color',
     \ 'active': {
     \   'left': [ [ 'mode', 'paste' ],
     \             [ 'gitbranch', 'readonly', 'filename', 'modified' ] ]
