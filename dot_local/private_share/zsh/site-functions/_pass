@@ -1,67 +1,143 @@
 #compdef pass
 # vim: filetype=zsh
 
-(( $+functions[_pass_files] )) ||
-_pass_files() {
-  local prefix="${PASSAGE_DIR:-$HOME/.passage/store}"
-  _path_files -W $prefix -g "**/*.age(:r)"
+# Completion reads filenames only. It never invokes pass or decrypts entries.
+
+_pass_store_entries() {
+  local store="${PASSAGE_DIR:-$HOME/.passage/store}"
+  local file
+  local -a entries
+  local -a expl
+
+  [[ -d "$store" ]] || return 1
+  store="${store%/}"
+
+  # Expand once, preserving each filename as a separate array element.
+  # Strip the store prefix literally and remove only the final .age.
+  for file in "$store"/**/*.age(N); do
+    [[ -f "$file" ]] || continue
+    entries+=( "${${file#"$store"/}%.age}" )
+  done
+
+  (( $#entries )) || return 1
+  _wanted password-entries expl 'password entry' \
+    compadd "$@" -a entries
 }
 
-local curcontext="$curcontext" state line ret=1
+_pass_store_directories() {
+  local store="${PASSAGE_DIR:-$HOME/.passage/store}"
+  local directory
+  local -a directories
+  local -a expl
 
-_arguments -C \
-  '1: :->cmds' \
-  '*: :->args' && ret=0
+  [[ -d "$store" ]] || return 1
+  store="${store%/}"
 
-case "$state" in
-  (cmds)
-    local -a cmds=(
-      'add:Add new password'
-      'edit:Edit password'
-      'generate:Generate new password'
-      'git:Call git on the password store'
-      'mv:Move password'
-      'reencrypt:Reencrypt password(s)'
-      'rm:Remove password'
-      'show:Show password'
+  for directory in "$store"/**/*(/N); do
+    directories+=( "${directory#"$store"/}" )
+  done
+
+  (( $#directories )) || return 1
+  _wanted store-directories expl 'store directory' \
+    compadd -S / "$@" -a directories
+}
+
+_pass_store_paths() {
+  local ret=1
+
+  _pass_store_entries "$@" && ret=0
+  _pass_store_directories "$@" && ret=0
+
+  return ret
+}
+
+local curcontext="$curcontext"
+local command=show
+local ret=1
+local -a commands
+
+commands=(
+  'show:Show an entry or list a directory'
+  'add:Add a password'
+  'edit:Edit or create a password'
+  'generate:Generate a password'
+  'reencrypt:Reencrypt a directory'
+  'mv:Move an entry or directory'
+  'rm:Remove a password'
+  'git:Run Git in the password store'
+)
+
+# At the first argument, offer commands alongside implicit-show completion.
+if (( CURRENT == 2 )) && [[ "$PREFIX" != -* ]]; then
+  _describe -t commands 'pass command' commands && ret=0
+fi
+
+# Remove an explicit subcommand from the completion's argument view.
+# Otherwise, retain the arguments and complete the implicit show command.
+if (( CURRENT > 2 )); then
+  case "${words[2]}" in
+    show|add|edit|generate|reencrypt|mv|rm|git)
+      command="${words[2]}"
+      words=( "${words[1]}" "${(@)words[3,-1]}" )
+      (( CURRENT-- ))
+      ;;
+  esac
+fi
+
+case "$command" in
+  show)
+    _arguments \
+      '-c-[copy a line to the clipboard; default 1]::line number:' \
+      '-q-[display a line as a QR code; default 1]::line number:' \
+      '1:entry or directory:_pass_store_paths' && ret=0
+    ;;
+
+  add)
+    _arguments \
+      '-f[overwrite without prompting]' \
+      '-m[read multiline input]' \
+      '1:new or existing entry:_pass_store_paths' && ret=0
+    ;;
+
+  edit)
+    _arguments \
+      '1:new or existing entry:_pass_store_paths' && ret=0
+    ;;
+
+  generate)
+    _arguments \
+      '-f[overwrite without prompting]' \
+      '-i[replace the first line of an existing entry]' \
+      '1:new or existing entry:_pass_store_paths' && ret=0
+    ;;
+
+  reencrypt)
+    _arguments \
+      '1:directory:_pass_store_directories' && ret=0
+    ;;
+
+  mv)
+    _arguments \
+      '1:source entry or directory:_pass_store_paths' \
+      '2:destination entry or directory:_pass_store_paths' && ret=0
+    ;;
+
+  rm)
+    _arguments \
+      '1:entry:_pass_store_entries' && ret=0
+    ;;
+
+  git)
+    # Give Git's own completion the store as its working directory.
+    words=(
+      git
+      -C
+      "${PASSAGE_DIR:-$HOME/.passage/store}"
+      "${(@)words[2,-1]}"
     )
-    _describe -t cmds 'pass cmds' cmds && ret=0
-  ;;
-  (args)
-    case "$line[1]" in
-      show)
-        _arguments '1::' \
-          '-c[clipboard \[line\]]' \
-          '-q[qrcode \[line\]]' \
-          '*:file:_pass_files' && ret=0
-        ;;
-      add)
-        _arguments '1::' \
-          '-f[force overwrite]' \
-          '-m[multiline]' \
-          '*:file:_pass_files' && ret=0
-        ;;
-      generate)
-        _arguments '1::' \
-          '-f[force overwrite]' \
-          '-i[replace first line]' \
-          '*:file:_pass_files' && ret=0
-        ;;
-      edit|mv|rm|reencrypt)
-        _arguments '1::' \
-          '*:file:_pass_files' && ret=0
-        ;;
-      git)
-        local -a cmds=(
-          'init:Initialize git repository'
-          'log:Show git log'
-          'pull:Pull from remote repository'
-          'push:Push to remote repository'
-        )
-        _describe -t cmds 'pass git cmds' cmds && ret=0
-        ;;
-    esac
-  ;;
+    (( CURRENT += 2 ))
+    _git && ret=0
+    ;;
 esac
 
 return ret
