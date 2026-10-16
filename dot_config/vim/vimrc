@@ -67,32 +67,35 @@ noremap <C-w>\ :vsplit<CR>
 colorscheme default
 set background=dark
 
-" Keep foot's default foreground and use its black background.
-highlight Normal       cterm=NONE      ctermfg=NONE ctermbg=0
-highlight Comment      cterm=italic    ctermfg=8    ctermbg=NONE gui=italic
+" Keep foot's default foreground.
+highlight Normal       cterm=NONE   ctermfg=NONE ctermbg=0
+highlight Comment      cterm=italic ctermfg=245  ctermbg=NONE gui=italic
 
-" Syntax colours use only the terminal's 16 configurable colours.
-highlight Constant     cterm=NONE      ctermfg=13   ctermbg=NONE
-highlight String       cterm=NONE      ctermfg=2    ctermbg=NONE
-highlight Identifier   cterm=NONE      ctermfg=6    ctermbg=NONE
-highlight Statement    cterm=NONE      ctermfg=11   ctermbg=NONE
-highlight PreProc      cterm=NONE      ctermfg=12   ctermbg=NONE
-highlight Type         cterm=NONE      ctermfg=10   ctermbg=NONE
-highlight Special      cterm=NONE      ctermfg=14   ctermbg=NONE
+" Muted syntax accents from the extended terminal palette.
+highlight Constant     cterm=NONE   ctermfg=176  ctermbg=NONE
+highlight String       cterm=NONE   ctermfg=108  ctermbg=NONE
+highlight Identifier   cterm=NONE   ctermfg=109  ctermbg=NONE
+highlight Statement    cterm=NONE   ctermfg=180  ctermbg=NONE
+highlight PreProc      cterm=NONE   ctermfg=110  ctermbg=NONE
+highlight Type         cterm=NONE   ctermfg=151  ctermbg=NONE
+highlight Special      cterm=NONE   ctermfg=139  ctermbg=NONE
 
-" Keep whitespace markers and line numbers unobtrusive.
-highlight NonText      cterm=NONE      ctermfg=8    ctermbg=0
-highlight SpecialKey   cterm=NONE      ctermfg=8    ctermbg=0
-highlight LineNr       cterm=NONE      ctermfg=8    ctermbg=0
-highlight CursorLineNr cterm=bold      ctermfg=11   ctermbg=0
-highlight VertSplit    cterm=NONE      ctermfg=8    ctermbg=0
+" Unobtrusive whitespace markers, line numbers and separators.
+highlight NonText      cterm=NONE   ctermfg=239  ctermbg=0
+highlight SpecialKey   cterm=NONE   ctermfg=239  ctermbg=0
+highlight LineNr       cterm=NONE   ctermfg=242  ctermbg=0
+highlight CursorLineNr cterm=bold   ctermfg=180  ctermbg=0
+highlight VertSplit    cterm=NONE   ctermfg=238  ctermbg=0
+highlight SignColumn   cterm=NONE   ctermfg=245  ctermbg=0
 
-" Clear selection, search and completion highlighting.
-highlight Visual       cterm=reverse   ctermfg=NONE ctermbg=NONE
-highlight Search       cterm=NONE      ctermfg=0    ctermbg=11
-highlight IncSearch    cterm=reverse   ctermfg=NONE ctermbg=NONE
-highlight Pmenu        cterm=NONE      ctermfg=7    ctermbg=0
-highlight PmenuSel     cterm=NONE      ctermfg=0    ctermbg=6
+" Distinct selection, search and completion highlighting.
+highlight Visual       cterm=NONE   ctermfg=NONE ctermbg=237
+highlight Search       cterm=NONE   ctermfg=0    ctermbg=180
+highlight IncSearch    cterm=NONE   ctermfg=0    ctermbg=173
+highlight Pmenu        cterm=NONE   ctermfg=252  ctermbg=235
+highlight PmenuSel     cterm=NONE   ctermfg=0    ctermbg=109
+highlight PmenuSbar    cterm=NONE   ctermfg=NONE ctermbg=237
+highlight PmenuThumb   cterm=NONE   ctermfg=NONE ctermbg=245
 
 " Lightline
 let g:lightline = {
