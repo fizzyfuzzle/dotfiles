@@ -14,11 +14,14 @@ set viminfofile=$XDG_CONFIG_HOME/vim/viminfo
 set notermguicolors
 " No backup or swap, autoread file when external edited
 set nobackup nowritebackup noswapfile autoread
-" Re-check files on disk after a git change
-augroup reload_on_focus
-    autocmd!
-    autocmd FocusGained,BufEnter * silent! checktime
-augroup END
+" Vim does not detect focus event support for TERM=tmux-256color: enable it
+" explicitly so FocusGained fires (needs tmux focus-events on)
+if &term =~# '^tmux'
+    let &t_fe = "\<Esc>[?1004h"
+    let &t_fd = "\<Esc>[?1004l"
+    execute "set <FocusGained>=\<Esc>[I"
+    execute "set <FocusLost>=\<Esc>[O"
+endif
 " Search
 set hlsearch incsearch ignorecase smartcase
 " Show cursor position in status bar
