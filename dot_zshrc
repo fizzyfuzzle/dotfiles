@@ -57,24 +57,8 @@ alias ls='ls --color=auto'
 (( $+commands[curl] )) && alias rip='curl -s ip.me'
 (( $+commands[rpm-ostree] )) && alias ros='rpm-ostree status'
 (( $+commands[shred] )) && alias sd='shred -u'
+(( $+commands[tmux] )) && alias t='tmux attach \; choose-tree -sZ'
 (( $+commands[toolbox] )) && alias tbe="toolbox enter" && alias tbr="toolbox run"
-
-# Manage tmux sessions
-tma() {
-  command -v tmux >/dev/null 2>&1 || { print -u2 "tma: tmux not found"; return 127; }
-
-  # Already inside tmux: switch sessions instead of nesting
-  if [[ -n $TMUX ]]; then
-    tmux choose-tree -s
-    return
-  fi
-
-  if tmux has-session 2>/dev/null; then
-    tmux attach-session \; choose-tree -s
-  else
-    tmux new-session
-  fi
-}
 
 # Manage service accounts
 svc() {
