@@ -1,14 +1,39 @@
 configuration {
-  modes: [ combi ];
-  combi-modes: [ window, drun, run ];
+    modes: [ combi ];
+    combi-modes: [ window, drun, run ];
 }
 
-@theme "gruvbox-dark-hard"
+@theme "default"
 
 * {
-    background: #000000;
+    background:     #000000;
+    foreground:     #abb2bf;
+    lightbg:        #000000;
+    lightfg:        #87afaf;
+    blue:           #87af87;
+    red:            #cc0403;
+    border-color:   #767676;
+    separatorcolor: #767676;
 }
 
 window {
-    border:  1px;
+    border: 1px;
+}
+
+listview, message, sidebar {
+    border: 1px solid 0px 0px;
+}
+
+scrollbar {
+    handle-color: #767676;
+}
+
+element-text {
+    highlight: bold #d7af87;
+}
+
+element-text selected.normal,
+element-text selected.active,
+element-text selected.urgent {
+    highlight: bold;
 }
