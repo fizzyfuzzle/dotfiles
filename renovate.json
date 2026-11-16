@@ -2,8 +2,16 @@
   "$schema": "https://docs.renovatebot.com/renovate-schema.json",
   "extends": ["config:best-practices"],
   "platformCommit": "enabled",
-  "schedule": ["before 6am on monday"],
   "enabledManagers": ["custom.regex", "github-actions"],
+  "packageRules": [
+    {
+      "description": "Group non-major updates for manual review; keep major upgrades separate.",
+      "matchPackageNames": ["*"],
+      "matchUpdateTypes": ["minor", "patch", "digest", "pin", "pinDigest"],
+      "groupName": "all non-major dependencies",
+      "groupSlug": "all-non-major"
+    }
+  ],
   "customManagers": [
     {
       "customType": "regex",
