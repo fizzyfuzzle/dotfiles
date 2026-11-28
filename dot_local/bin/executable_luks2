@@ -1,0 +1,251 @@
+#!/usr/bin/env zsh
+#
+# LUKS2 containers and removable media unlocked by age-encrypted key files,
+# after tomb. Open and close go through udisks, so they need no sudo for
+# container files and removable devices; formatting and header backups use sudo.
+#
+emulate -R zsh
+setopt pipe_fail
+umask 077
+
+STEGHIDE=(toolbox run steghide)
+
+MAPPER= SECRET= PASS= CLEANUP=0 CLEANUP_BLOCK= CLEANUP_LOOP=
+
+_info()    { print -r -- $'\e[0;32m'"$1"$'\e[0m' }
+_warning() { print -ru2 -- $'\e[0;33m'"$1"$'\e[0m' }
+_die()     { print -ru2 -- $'\e[0;31m'"$1"$'\e[0m'; exit 1 }
+
+# Undoes a lock or open that failed halfway, so nothing is left unlocked.
+# Traps live at top level: in zsh an EXIT trap set inside a function fires when
+# that function returns, and INT/TERM/HUP must exit or zsh resumes the script.
+_cleanup() {
+    (( CLEANUP )) || return 0
+    [[ -n $MAPPER && -e /dev/mapper/$MAPPER ]] && sudo cryptsetup luksClose $MAPPER
+    [[ -n $CLEANUP_BLOCK && -n $(_cleartext $CLEANUP_BLOCK) ]] && udisksctl lock -b $CLEANUP_BLOCK >/dev/null
+    [[ -n $CLEANUP_LOOP ]] && udisksctl loop-delete -b $CLEANUP_LOOP >/dev/null
+    return 0
+}
+trap _cleanup EXIT
+trap 'exit 129' HUP
+trap 'exit 130' INT
+trap 'exit 143' TERM
+
+_need() { [[ -n $2 ]] || _die "NO $1 SPECIFIED" }
+
+# Sets MAPPER from the container's resolved path, for lock's temporary mapping.
+_mapper() {
+    [[ -e $1 ]] || _die "'$1' NOT FOUND"
+    MAPPER=luks.${"$(realpath -- $1 | sha256sum)"%% *}
+}
+
+# Sets SECRET. Command substitution drops trailing newlines from the binary key;
+# existing containers were formatted with the key stripped that way, so every
+# command must be fed SECRET, never the raw output of age.
+_secret() {
+    [[ -r $1 ]] || _die "KEY FILE NOT FOUND"
+    SECRET=$(age -d -- $1) && [[ -n $SECRET ]] || _die "DECRYPTING KEY FILE FAILED"
+}
+
+_read_pass() {
+    read -rs "REPLY?ENTER PASSPHRASE: " && print || { print; exit 1 }
+    [[ -n $REPLY ]] || _die "EMPTY PASSPHRASE"
+    PASS=$REPLY
+    (( ${1:-0} )) || return 0
+    read -rs "REPLY?RETYPE PASSPHRASE: " && print || { print; exit 1 }
+    [[ $REPLY == "$PASS" ]] || _die "PASSPHRASES DO NOT MATCH"
+}
+
+_is_jpeg() { [[ $(file -b --mime-type -- $1) == image/jpeg ]] }
+
+# The device names are looked up from the kernel (lsblk, losetup)
+# rather than parsed from udisksctl's messages, which may be translated.
+_loop_of()   { losetup -nO NAME -j $1 | head -n 1 }
+_cleartext() { lsblk -nrpo KNAME,TYPE -- $1 | awk '$2 == "crypt" { print $1; exit }' }
+_mounted_at() { lsblk -dno MOUNTPOINT -- $1 }
+
+# Prints the udisks object path of a block device, the first line of
+# `udisksctl info` without its trailing colon.
+_udisks_object() {
+    local line
+    line=$(udisksctl info -b $1 | head -n 1) && [[ $line == /org/freedesktop/UDisks2/* ]] \
+        || _die "NO UDISKS OBJECT FOR $1"
+    print -r -- ${line%:}
+}
+
+# Runs Filesystem.Check (e2fsck -f -n, read-only). Damage is not repaired here:
+# udisks' Repair runs e2fsck -f -y, which answers yes to every fix, so the device
+# is left unlocked and unmounted for a repair by hand.
+_check() {
+    local obj out
+    obj=$(_udisks_object $1) || exit 1
+    out=$(busctl call --system org.freedesktop.UDisks2 $obj org.freedesktop.UDisks2.Filesystem Check 'a{sv}' 0) \
+        || _die "FILESYSTEM CHECK FAILED"
+    [[ $out == "b true" ]] && return 0
+    CLEANUP=0
+    _die "FILESYSTEM ON $1 IS DAMAGED. REPAIR IT WITH: sudo e2fsck -f -p $1"
+}
+
+# DIG TARGET: a file of random data, so used and unused space look the same.
+_dig() {
+    _need TARGET ${1-}
+    local size=${2:-100}
+    [[ ! -e $1 ]] || _die "TARGET ALREADY EXISTS"
+    [[ $size == <1-> ]] || _die "'$size' IS NOT A SIZE IN MiB"
+    head -c ${size}M /dev/urandom > $1 || { rm -f -- $1; _die "DIG TARGET FAILED" }
+}
+
+# FORGE KEY: 512 random bytes, encrypted with an age passphrase.
+_forge() {
+    _need "KEY FILE" ${1-}
+    [[ ! -e $1 ]] || _die "KEY FILE ALREADY EXISTS"
+    head -c 512 /dev/urandom | age -a -p -o $1 || { rm -f -- $1; _die "FORGE KEY FAILED" }
+}
+
+# LOCK TARGET WITH KEY: destroys what is in TARGET, so it refuses LUKS
+# containers and asks before formatting a block device such as a microSD card.
+# The ext4 label names the mountpoint udisks picks, /run/media/$USER/LABEL.
+_lock() {
+    _need TARGET ${1-}
+    _need "KEY FILE" ${2-}
+    local target=${1:A} label=${3:-LUKS}
+    [[ -n $label && $label != *[^A-Za-z0-9._-]* && $#label -le 16 ]] \
+        || _die "'$label' IS NOT A LABEL OF 1 TO 16 CHARACTERS FROM [A-Za-z0-9._-]"
+    [[ -f $target || -b $target ]] || _die "'$1' IS NOT A FILE OR BLOCK DEVICE"
+    sudo cryptsetup isLuks $target 2>/dev/null && _die "'$1' IS ALREADY A LUKS CONTAINER"
+    if [[ -b $target ]]; then
+        lsblk -o NAME,SIZE,MODEL,MOUNTPOINTS -- $target
+        read -qs "?FORMAT $target? ALL DATA ON IT WILL BE LOST. [y/N] " && print || { print; exit 1 }
+    fi
+    _mapper $target
+    [[ ! -e /dev/mapper/$MAPPER ]] || _die "'$1' IS ALREADY OPEN"
+    _secret $2
+
+    print -rn -- $SECRET | sudo cryptsetup --type luks2 --key-file - --batch-mode \
+        --cipher aes-xts-plain64 --key-size 512 --hash sha512 --key-slot 0 \
+        luksFormat $target || _die "LUKS FORMAT FAILED"
+    CLEANUP=1
+    print -rn -- $SECRET | sudo cryptsetup --key-file - luksOpen $target $MAPPER || _die "LUKS OPEN FAILED"
+    sudo mkfs.ext4 -q -L $label -E root_owner=$UID:$GID /dev/mapper/$MAPPER || _die "EXT4 FORMAT FAILED"
+    sync
+    sudo cryptsetup luksClose $MAPPER || _die "LUKS CLOSE FAILED"
+    CLEANUP=0
+}
+
+# OPEN TARGET WITH KEY: a container file is attached as a loop device first.
+# udisks mounts it at /run/media/$USER/<filesystem label>.
+_open() {
+    _need TARGET ${1-}
+    _need "KEY FILE" ${2-}
+    local target=${1:A} block clear mountpoint usage
+    [[ -f $target || -b $target ]] || _die "'$1' IS NOT A FILE OR BLOCK DEVICE"
+    _secret $2
+
+    CLEANUP=1
+    if [[ -f $target ]]; then
+        block=$(_loop_of $target)
+        if [[ -z $block ]]; then
+            udisksctl loop-setup -f $target >/dev/null || _die "LOOP SETUP FAILED"
+            block=$(_loop_of $target)
+            [[ -n $block ]] || _die "LOOP DEVICE NOT FOUND"
+            CLEANUP_LOOP=$block
+        fi
+    else
+        block=$target
+    fi
+    [[ $(lsblk -dno FSTYPE -- $block) == crypto_LUKS ]] || _die "'$1' IS NO VALID LUKS CONTAINER"
+    [[ -z $(_cleartext $block) ]] || _die "'$1' IS ALREADY OPEN"
+
+    print -rn -- $SECRET | udisksctl unlock -b $block --key-file /dev/stdin >/dev/null || _die "UNLOCK FAILED"
+    CLEANUP_BLOCK=$block
+    clear=$(_cleartext $block)
+    [[ -n $clear ]] || _die "UNLOCKED DEVICE NOT FOUND"
+    _check $clear
+    udisksctl mount -b $clear >/dev/null || _die "MOUNT FAILED"
+    CLEANUP=0
+
+    mountpoint=$(_mounted_at $clear)
+    usage=$(df -hP $mountpoint | awk 'NR>1{print "FREE: " $4 " | USAGE: " $5}')
+    _info "[$mountpoint] $usage"
+}
+
+# CLOSE TARGET: unmounts, locks, and detaches the loop device of a container file.
+_close() {
+    _need TARGET ${1-}
+    local target=${1:A} block loop= clear
+    [[ -e $target ]] || _die "'$1' NOT FOUND"
+    if [[ -f $target ]]; then
+        loop=$(_loop_of $target)
+        [[ -n $loop ]] || _die "'$1' IS NOT OPEN"
+        block=$loop
+    else
+        block=$target
+    fi
+    clear=$(_cleartext $block)
+    if [[ -n $clear ]]; then
+        if [[ -n $(_mounted_at $clear) ]]; then
+            udisksctl unmount -b $clear >/dev/null || _die "UMOUNT FAILED"
+        fi
+        udisksctl lock -b $block >/dev/null || _die "LOCK FAILED"
+    fi
+    if [[ -n $loop ]]; then
+        udisksctl loop-delete -b $loop >/dev/null || _die "LOOP DELETE FAILED"
+    fi
+}
+
+# HEADER BACKUP: the backup plus any key valid when it was made decrypts the
+# data, even after the key is changed on TARGET, so keep it as safe as the key.
+_header_backup() {
+    _need TARGET ${1-}
+    _need "BACKUP FILE" ${2-}
+    local target=${1:A}
+    [[ -f $target || -b $target ]] || _die "'$1' IS NOT A FILE OR BLOCK DEVICE"
+    [[ ! -e $2 ]] || _die "BACKUP FILE ALREADY EXISTS"
+    sudo cryptsetup isLuks $target 2>/dev/null || _die "'$1' IS NO VALID LUKS CONTAINER"
+    sudo cryptsetup luksHeaderBackup $target --header-backup-file $2 || _die "HEADER BACKUP FAILED"
+    sudo chown $UID:$GID -- $2 || _die "CHOWN OF BACKUP FILE FAILED"
+    _info "HEADER OF '$1' SAVED TO '$2'"
+}
+
+# EMBED KEY INTO IMAGE: the armor lines are dropped to save space, exhume adds them back.
+_bury() {
+    _need "KEY FILE" ${1-}
+    _need IMAGE ${2-}
+    [[ -r $1 ]] || _die "KEY FILE NOT FOUND"
+    [[ -r $2 ]] || _die "IMAGE FILE NOT FOUND"
+    _is_jpeg $2 || _die "IMAGE FILE NOT JPG"
+    _read_pass 1
+    sed '/^-----/d' -- $1 | $STEGHIDE embed -q -ef - -cf $2 -p $PASS -e serpent cbc -z 9 \
+        || _die "STEGHIDE EMBED FAILED"
+}
+
+# EXTRACT KEY FROM IMAGE
+_exhume() {
+    _need IMAGE ${1-}
+    _need "KEY FILE" ${2-}
+    [[ -r $1 ]] || _die "IMAGE FILE NOT FOUND"
+    _is_jpeg $1 || _die "IMAGE FILE NOT JPG"
+    [[ ! -e $2 ]] || _die "KEY FILE ALREADY EXISTS"
+    _read_pass
+    local body
+    body=$($STEGHIDE extract -q -sf $1 -xf - -p $PASS) || _die "STEGHIDE EXTRACT FAILED"
+    print -rl -- '-----BEGIN AGE ENCRYPTED FILE-----' $body '-----END AGE ENCRYPTED FILE-----' > $2
+}
+
+_usage() {
+    print -r -- 'usage: luks2 dig TARGET [SIZE_MIB]
+       luks2 forge KEY
+       luks2 lock TARGET KEY [LABEL]
+       luks2 open TARGET KEY
+       luks2 close TARGET
+       luks2 header-backup TARGET BACKUP_FILE
+       luks2 bury KEY IMAGE
+       luks2 exhume IMAGE KEY'
+}
+
+case ${1-} in
+    dig|forge|lock|open|close|bury|exhume) cmd=$1; shift; _$cmd "$@" ;;
+    header-backup) shift; _header_backup "$@" ;;
+    ''|help|-h|--help) _usage ;;
+    *) _usage >&2; exit 1 ;;
+esac
