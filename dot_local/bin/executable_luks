@@ -1,221 +1,184 @@
 #!/usr/bin/env zsh
 #
-set -o pipefail
+# File-backed LUKS2 containers unlocked by age-encrypted key files, after tomb.
 #
-TARGETMOUNT="${LUKS_TARGETMOUNT:-$HOME/luks}"
-TBR="toolbox run"
-#
-function _info() {
-    print "\033[0;32m$1\033[0m"
+emulate -R zsh
+setopt pipe_fail
+umask 077
+
+TARGETMOUNT=${LUKS_TARGETMOUNT:-$HOME/luks}
+STEGHIDE=(toolbox run steghide)
+
+MAPPER= SECRET= MADE_DIR= CLEANUP=0
+
+_info()    { print -r -- $'\e[0;32m'"$1"$'\e[0m' }
+_warning() { print -ru2 -- $'\e[0;33m'"$1"$'\e[0m' }
+_die()     { print -ru2 -- $'\e[0;31m'"$1"$'\e[0m'; exit 1 }
+
+# Undoes a lock or open that failed halfway, so the mapper is not left open.
+# Traps live at top level: in zsh an EXIT trap set inside a function fires when
+# that function returns, and INT/TERM/HUP must exit or zsh resumes the script.
+_cleanup() {
+    (( CLEANUP )) || return 0
+    [[ -n $MADE_DIR ]] && rmdir -- $MADE_DIR 2>/dev/null
+    [[ -e /dev/mapper/$MAPPER ]] && sudo cryptsetup luksClose $MAPPER
+    return 0
 }
-function _warning() {
-    print "\033[0;33m$1\033[0m"
+trap _cleanup EXIT
+trap 'exit 129' HUP
+trap 'exit 130' INT
+trap 'exit 143' TERM
+
+_need() { [[ -n $2 ]] || _die "NO $1 SPECIFIED" }
+
+# Sets MAPPER from the container's resolved path, so open and close agree on it.
+_mapper() {
+    [[ -e $1 ]] || _die "'$1' NOT FOUND"
+    MAPPER=luks.${"$(realpath -- $1 | sha256sum)"%% *}
 }
-function _error() {
-    print "\033[0;31m$1\033[0m" >&2
-    exit 1
+
+# Sets SECRET, so lock decrypts the key file only once. Command substitution
+# drops trailing newlines from the binary key; existing containers were
+# formatted with the key stripped that way, so it must stay. Opening one by hand
+# needs the same stripping.
+_secret() {
+    [[ -r $1 ]] || _die "KEY FILE NOT FOUND"
+    SECRET=$(age -d -- $1) && [[ -n $SECRET ]] || _die "DECRYPTING KEY FILE FAILED"
 }
 
-# EMBED KEY INTO IMAGE
-function _bury_key() {
-    local KEYFILE=$1
-    local IMAGE=$2
+_luks_open() {
+    print -rn -- $SECRET | sudo cryptsetup --key-file - luksOpen $1 $MAPPER || _die "LUKS OPEN FAILED"
+}
 
-    [[ ! -z $KEYFILE ]] || _error "NO KEY FILE SPECIFIED"
-    [[ -r $KEYFILE ]] || _error "KEY FILE NOT FOUND"
-    [[ ! -z $IMAGE ]] || _error "NO IMAGE FILE SPECIFIED"
-    [[ -r $IMAGE ]] || _error "IMAGE FILE NOT FOUND"
-    [[ $(file $IMAGE) =~ "JP.G" ]] || _error "IMAGE FILE NOT JPG"
+_read_pass() {
+    read -rs "REPLY?ENTER PASSPHRASE: " && print || { print; exit 1 }
+    [[ -n $REPLY ]] || _die "EMPTY PASSPHRASE"
+    PASS=$REPLY
+    (( ${1:-0} )) || return 0
+    read -rs "REPLY?RETYPE PASSPHRASE: " && print || { print; exit 1 }
+    [[ $REPLY == "$PASS" ]] || _die "PASSPHRASES DO NOT MATCH"
+}
 
-    # GET PASSWORD
-    read -s "PASSWD?ENTER PASSPHRASE: " && print
+_is_jpeg() { [[ $(file -b --mime-type -- $1) == image/jpeg ]] }
 
-    # REMOVE HEADER+FOOTER AND EMBED INTO IMAGE
-    cat "${KEYFILE}" \
-        | sed '/^-----/d' \
-        | eval $TBR steghide embed -q -ef - -cf "${IMAGE}" -p "${PASSWD}" -e serpent cbc -z 9
-    [[ $? == 0 ]] || _error "STEGHIDE EMBED FAILED"
+# DIG TARGET: a file of random data, so used and unused space look the same.
+_dig() {
+    _need TARGET ${1-}
+    local size=${2:-100}
+    [[ ! -e $1 ]] || _die "TARGET ALREADY EXISTS"
+    [[ $size == <1-> ]] || _die "'$size' IS NOT A SIZE IN MiB"
+    head -c ${size}M /dev/urandom > $1 || { rm -f -- $1; _die "DIG TARGET FAILED" }
+}
+
+# FORGE KEY: 512 random bytes, encrypted with an age passphrase.
+_forge() {
+    _need "KEY FILE" ${1-}
+    [[ ! -e $1 ]] || _die "KEY FILE ALREADY EXISTS"
+    head -c 512 /dev/urandom | age -a -p -o $1 || { rm -f -- $1; _die "FORGE KEY FAILED" }
+}
+
+# LOCK TARGET WITH KEY: destroys what is in TARGET, so only plain files that
+# are not LUKS containers yet are accepted.
+_lock() {
+    _need TARGET ${1-}
+    _need "KEY FILE" ${2-}
+    local target=${1:A}
+    [[ -f $target ]] || _die "'$1' IS NOT A REGULAR FILE"
+    sudo cryptsetup isLuks $target 2>/dev/null && _die "'$1' IS ALREADY A LUKS CONTAINER"
+    _mapper $target
+    [[ ! -e /dev/mapper/$MAPPER ]] || _die "'$1' IS ALREADY OPEN"
+    _secret $2
+
+    print -rn -- $SECRET | sudo cryptsetup --type luks2 --key-file - --batch-mode \
+        --cipher aes-xts-plain64 --key-size 512 --hash sha512 --key-slot 0 \
+        luksFormat $target || _die "LUKS FORMAT FAILED"
+    CLEANUP=1
+    _luks_open $target
+    sudo mkfs.ext4 -q -L LUKS -E root_owner=$UID:$GID /dev/mapper/$MAPPER || _die "EXT4 FORMAT FAILED"
+    sync
+    sudo cryptsetup luksClose $MAPPER || _die "LUKS CLOSE FAILED"
+    CLEANUP=0
+}
+
+# OPEN CONTAINER
+_open() {
+    _need TARGET ${1-}
+    _need "KEY FILE" ${2-}
+    local target=${1:A} usage
+    _mapper $target
+    [[ ! -e /dev/mapper/$MAPPER ]] || _die "'$1' IS ALREADY OPEN"
+    [[ ! -e $TARGETMOUNT ]] || _die "MOUNTPOINT ALREADY EXISTS"
+    sudo cryptsetup isLuks $target 2>/dev/null || _die "'$1' IS NO VALID LUKS CONTAINER"
+    _secret $2
+
+    CLEANUP=1
+    _luks_open $target
+    # fsck exit status 1 means that errors were found and corrected.
+    sudo fsck -p -C0 /dev/mapper/$MAPPER > /dev/null
+    (( $? <= 1 )) || _die "FSCK FAILED"
+    mkdir -p -- $TARGETMOUNT && MADE_DIR=$TARGETMOUNT || _die "CREATE MOUNTPOINT FAILED"
+    sudo mount -o rw,noatime,nodev,nosuid /dev/mapper/$MAPPER $TARGETMOUNT || _die "MOUNT FAILED"
+    CLEANUP=0
+
+    usage=$(df -hP $TARGETMOUNT | awk 'NR>1{print "FREE: " $4 " | USAGE: " $5}')
+    _info "[$TARGETMOUNT] $usage"
+}
+
+# CLOSE CONTAINER: unmounts TARGETMOUNT only if this container is mounted there.
+_close() {
+    _need TARGET ${1-}
+    _mapper ${1:A}
+    local source
+    if [[ -d $TARGETMOUNT ]]; then
+        source=$(findmnt -n -o SOURCE --mountpoint $TARGETMOUNT)
+        if [[ -n $source ]]; then
+            [[ ${source:A} == ${${:-/dev/mapper/$MAPPER}:A} ]] || _die "$TARGETMOUNT IS NOT MOUNTED FROM '$1'"
+            sudo umount $TARGETMOUNT || _die "UMOUNT FAILED"
+        fi
+        rmdir -- $TARGETMOUNT || _warning "REMOVE MOUNTPOINT FAILED"
+    fi
+    if [[ -e /dev/mapper/$MAPPER ]]; then
+        sudo cryptsetup luksClose $MAPPER || _die "LUKS CLOSE FAILED"
+    fi
+}
+
+# EMBED KEY INTO IMAGE: the armor lines are dropped to save space, exhume adds them back.
+_bury() {
+    _need "KEY FILE" ${1-}
+    _need IMAGE ${2-}
+    [[ -r $1 ]] || _die "KEY FILE NOT FOUND"
+    [[ -r $2 ]] || _die "IMAGE FILE NOT FOUND"
+    _is_jpeg $2 || _die "IMAGE FILE NOT JPG"
+    _read_pass 1
+    sed '/^-----/d' -- $1 | $STEGHIDE embed -q -ef - -cf $2 -p $PASS -e serpent cbc -z 9 \
+        || _die "STEGHIDE EMBED FAILED"
 }
 
 # EXTRACT KEY FROM IMAGE
-function _exhume_key() {
-    local IMAGE=$1
-    local KEYFILE=$2
-
-    [[ ! -z $IMAGE ]] || _error "NO IMAGE FILE SPECIFIED"
-    [[ -r $IMAGE ]] || _error "IMAGE NOT FOUND"
-    [[ $(file $IMAGE) =~ "JP.G" ]] || _error "IMAGE FILE NOT JPG"
-    [[ ! -z $KEYFILE ]] || _error "NO KEY FILE SPECIFIED"
-    [[ ! -r $KEYFILE ]] || _error "KEY FILE ALREADY EXISTS"
-
-    # GET PASSWORD
-    read -s "PASSWD?ENTER PASSPHRASE: " && print
-
-    # EXTRACT FROM IMAGE AND ADD HEADER+FOOTER
-    EXTRACTED=$(eval $TBR steghide extract -q -sf "${IMAGE}" -xf - -p "${PASSWD}")
-    [[ $? == 0 ]] || _error "STEGHIDE EXTRACT FAILED"
-    KEY="-----BEGIN AGE ENCRYPTED FILE-----\n"
-    KEY+="$EXTRACTED\n"
-    KEY+="-----END AGE ENCRYPTED FILE-----\n"
-
-    # SAVE TO FILE
-    print -n - "${KEY}" > "${KEYFILE}"
+_exhume() {
+    _need IMAGE ${1-}
+    _need "KEY FILE" ${2-}
+    [[ -r $1 ]] || _die "IMAGE FILE NOT FOUND"
+    _is_jpeg $1 || _die "IMAGE FILE NOT JPG"
+    [[ ! -e $2 ]] || _die "KEY FILE ALREADY EXISTS"
+    _read_pass
+    local body
+    body=$($STEGHIDE extract -q -sf $1 -xf - -p $PASS) || _die "STEGHIDE EXTRACT FAILED"
+    print -rl -- '-----BEGIN AGE ENCRYPTED FILE-----' $body '-----END AGE ENCRYPTED FILE-----' > $2
 }
 
-# DIG TARGET
-function _dig() {
-    local TARGET=$1
-    local SIZE=${2:-100}
-
-    [[ ! -r $TARGET ]] || _error "TARGET ALREADY EXISTS"
-
-    # FILL TARGET WITH RANDOM DATA
-    dd if=/dev/urandom bs=1048576 count=$SIZE status=none of=$TARGET
-    [[ $? == 0 ]] || _error "DIG TARGET FAILED"
+_usage() {
+    print -r -- 'usage: luks dig TARGET [SIZE_MIB]
+       luks forge KEY
+       luks lock TARGET KEY
+       luks open TARGET KEY
+       luks close TARGET
+       luks bury KEY IMAGE
+       luks exhume IMAGE KEY'
 }
 
-# FORGE KEY
-function _forge() {
-    local KEYFILE=$1
-
-    [[ ! -r $KEYFILE ]] || _error "KEY FILE ALREADY EXIST"
-
-    # GENERATE RANDOM KEYFILE AND ENCRYPT
-    dd if=/dev/urandom bs=1 count=512 status=none | age -a -p > "${KEYFILE}"
-    [[ $? == 0 ]] || _error "FORGE KEY FAILED"
-    chmod 0600 "${KEYFILE}"
-}
-
-# LOCK TARGET WITH KEY
-function _lock() {
-    local TARGET=$1
-    local KEYFILE=$2
-
-    [[ ! -z $TARGET ]] || _error "NO TARGET SPECIFIED"
-    [[ ! -z $KEYFILE ]] || _error "NO KEY SPECIFIED"
-    [[ -r $KEYFILE ]] || _error "KEYFILE NOT FOUND"
-    local TARGETHASH=$(realpath ${TARGET} | sha256sum | cut -d " " -f1)
-    local TARGETMAPPER="/dev/mapper/luks.${TARGETHASH}"
-    [[ ! -e $TARGETMAPPER ]] || _error "TARGETMAPPER ALREADY EXISTS"
-
-    # DECRYPT KEYFILE
-    local SECRET=$(age -d ${KEYFILE})
-    [[ ! -z $SECRET ]] || _error "DECODING KEYFILE FAILED"
-
-    # LUKS FORMAT
-    print -R -n - "${SECRET}" | sudo cryptsetup --type luks2 --key-file - \
-        --cipher "aes-xts-plain64" --hash sha512 \
-        --batch-mode --key-size 512 --key-slot 0 \
-        luksFormat "${TARGET}"
-    [[ $? == 0 ]] || _error "LUKS FORMAT FAILED"
-
-    # LUKS OPEN
-    print -R -n - "${SECRET}" | sudo cryptsetup --key-file - \
-        luksOpen "${TARGET}" "${TARGETMAPPER##*/}"
-    [[ $? == 0 ]] || _error "LUKS OPEN FAILED"
-
-    # FORMAT EXT4
-    sudo mkfs.ext4 -q -L "LUKS" "${TARGETMAPPER}"
-    [[ $? == 0 ]] || _error "EXT4 FORMAT FAILED"
-
-    # SYNC CACHE TO TARGET
-    sync
-
-    # LUKS CLOSE
-    sudo cryptsetup luksClose "${TARGETMAPPER##*/}"
-    [[ $? == 0 ]] || _error "LUKS CLOSE FAILED"
-}
-
-# MOUNT CONTAINER
-function _mount() {
-    local TARGET=$1
-    local KEYFILE=$2
-
-    [[ ! -z $TARGET ]] || _error "NO TARGET SPECIFIED"
-    [[ ! -z $KEYFILE ]] || _error "NO KEY SPECIFIED"
-    [[ -r $KEYFILE ]] || _error "KEYFILE NOT FOUND"
-    local TARGETHASH=$(realpath ${TARGET} | sha256sum | cut -d " " -f1)
-    local TARGETMAPPER="/dev/mapper/luks.${TARGETHASH}"
-    [[ ! -e $TARGETMAPPER ]] || _error "TARGETMAPPER ALREADY EXISTS"
-    [[ ! -e $TARGETMOUNT ]] || _error "MOUNTPOINT ALREADY EXISTS"
-
-    # CHECK TARGET
-    sudo cryptsetup isLuks ${TARGET} &>/dev/null
-    [[ $? == 0 ]] || _error "${TARGET} IS NO VALID LUKS CONTAINER"
-
-    # DECRYPT KEY FILE
-    local SECRET=$(age -d ${KEYFILE})
-    [[ ! -z $SECRET ]] || _error "DECODING KEYFILE FAILED"
-
-    # LUKS OPEN
-    print -R -n - "${SECRET}" | sudo cryptsetup --key-file - \
-        luksOpen "${TARGET}" "${TARGETMAPPER##*/}"
-    [[ $? == 0 ]] || _error "LUKS OPEN FAILED"
-
-    # CHECK FILESYSTEM
-    sudo fsck -p -C0 "${TARGETMAPPER}" > /dev/null
-    [[ $? == 0 ]] || _error "FSCK FAILED"
-
-    # MOUNT
-    [[ -d "${TARGETMOUNT}" ]] || sudo mkdir -p "${TARGETMOUNT}"
-    sudo mount -o "rw,noatime,nodev" "${TARGETMAPPER}" "${TARGETMOUNT}"
-    [[ $? == 0 ]] || _error "MOUNT FAILED"
-
-    # UPDATE OWNER
-    sudo chown -R "$(id -u):$(id -g)" "${TARGETMOUNT}"
-    [[ $? == 0 ]] || _error "CHOWN FAILED"
-
-    # STATUS
-    STATUS=$(df -hP "${TARGETMOUNT}" | awk 'NR>1{print "FREE: " $4 " | USAGE: " $5}')
-    _info "[${TARGETMOUNT}] ${STATUS}"
-}
-
-# UMOUNT CONTAINER
-function _umount() {
-    local TARGET=$1
-
-    [[ ! -z $TARGET ]] || _error "NO TARGET SPECIFIED"
-    local TARGETHASH=$(realpath ${TARGET} | sha256sum | cut -d " " -f1)
-    local TARGETMAPPER="/dev/mapper/luks.${TARGETHASH}"
-
-    # UMOUNT
-    [[ -e "${TARGETMOUNT}" ]] && {
-        sudo umount "${TARGETMOUNT}"
-        [[ $? == 0 ]] || _warning "UMOUNT FAILED"
-        sudo rmdir "${TARGETMOUNT}"
-        [[ $? == 0 ]] || _warning "REMOVE MOUNTPOINT FAILED"
-    }
-
-    # LUKS CLOSE
-    [[ -e "${TARGETMAPPER}" ]] && {
-        sudo cryptsetup luksClose "${TARGETMAPPER##*/}"
-        [[ $? == 0 ]] || _error "LUKS CLOSE FAILED"
-    }
-}
-
-function main() {
-    case "$1" in
-        dig) shift; _dig "$@" ;;
-        forge) shift; _forge "$@" ;;
-        lock) shift; _lock "$@" ;;
-        open) shift; _mount "$@" ;;
-        close) shift; _umount "$@" ;;
-        bury) shift; _bury_key "$@" ;;
-        exhume) shift; _exhume_key "$@" ;;
-        *)
-            _warning "CMD\t\tARG1\t\tARG2"
-            print - "-----\t\t-----\t\t-----"
-            _info "dig\t\ttarget\t\t[size]"
-            _info "forge\t\tkey\t\t-"
-            _info "lock\t\ttarget\t\tkey"
-            _info "open\t\ttarget\t\tkey"
-            _info "close\t\ttarget\t\t-"
-            _info "bury\t\tkey\t\timage"
-            _info "exhume\t\timage\t\tkey"
-            exit 0
-            ;;
-    esac
-    exit 0
-}
-
-main "$@"
+case ${1-} in
+    dig|forge|lock|open|close|bury|exhume) cmd=$1; shift; _$cmd "$@" ;;
+    ''|help|-h|--help) _usage ;;
+    *) _usage >&2; exit 1 ;;
+esac
