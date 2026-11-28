@@ -14,6 +14,7 @@ set viminfofile=$XDG_CONFIG_HOME/vim/viminfo
 set notermguicolors
 " No backup or swap, autoread file when external edited
 set nobackup nowritebackup noswapfile autoread
+autocmd BufNewFile,BufReadPre /dev/shm/pass.* setlocal noundofile | set viminfo=
 " Vim does not detect focus event support for TERM=tmux-256color: enable it
 " explicitly so FocusGained fires (needs tmux focus-events on)
 if &term =~# '^tmux'
