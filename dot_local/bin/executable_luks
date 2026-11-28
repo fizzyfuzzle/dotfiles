@@ -77,14 +77,18 @@ _forge() {
     head -c 512 /dev/urandom | age -a -p -o $1 || { rm -f -- $1; _die "FORGE KEY FAILED" }
 }
 
-# LOCK TARGET WITH KEY: destroys what is in TARGET, so only plain files that
-# are not LUKS containers yet are accepted.
+# LOCK TARGET WITH KEY: destroys what is in TARGET, so it refuses LUKS
+# containers and asks before formatting a block device such as a microSD card.
 _lock() {
     _need TARGET ${1-}
     _need "KEY FILE" ${2-}
     local target=${1:A}
-    [[ -f $target ]] || _die "'$1' IS NOT A REGULAR FILE"
+    [[ -f $target || -b $target ]] || _die "'$1' IS NOT A FILE OR BLOCK DEVICE"
     sudo cryptsetup isLuks $target 2>/dev/null && _die "'$1' IS ALREADY A LUKS CONTAINER"
+    if [[ -b $target ]]; then
+        lsblk -o NAME,SIZE,MODEL,MOUNTPOINTS -- $target
+        read -qs "?FORMAT $target? ALL DATA ON IT WILL BE LOST. [y/N] " && print || { print; exit 1 }
+    fi
     _mapper $target
     [[ ! -e /dev/mapper/$MAPPER ]] || _die "'$1' IS ALREADY OPEN"
     _secret $2
