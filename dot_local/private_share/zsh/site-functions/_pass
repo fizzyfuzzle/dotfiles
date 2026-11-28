@@ -3,40 +3,22 @@
 
 # Completion reads filenames only. It never invokes pass or decrypts entries.
 
+# Regular files only, like the pass script: it skips symlinks when listing and reencrypting.
 _pass_store_entries() {
-  local store="${PASSAGE_DIR:-$HOME/.passage/store}"
-  local file
-  local -a entries
-  local -a expl
+  local store="${${PASSAGE_DIR:-$HOME/.passage/store}%/}"
+  local -a expl entries=( "$store"/**/*.age(.N) )
 
-  [[ -d "$store" ]] || return 1
-  store="${store%/}"
-
-  # Expand once, preserving each filename as a separate array element.
-  # Strip the store prefix literally and remove only the final .age.
-  for file in "$store"/**/*.age(N); do
-    [[ -f "$file" ]] || continue
-    entries+=( "${${file#"$store"/}%.age}" )
-  done
-
+  entries=( "${(@)${(@)entries#"$store"/}%.age}" )
   (( $#entries )) || return 1
   _wanted password-entries expl 'password entry' \
     compadd "$@" -a entries
 }
 
 _pass_store_directories() {
-  local store="${PASSAGE_DIR:-$HOME/.passage/store}"
-  local directory
-  local -a directories
-  local -a expl
+  local store="${${PASSAGE_DIR:-$HOME/.passage/store}%/}"
+  local -a expl directories=( "$store"/**/*(/N) )
 
-  [[ -d "$store" ]] || return 1
-  store="${store%/}"
-
-  for directory in "$store"/**/*(/N); do
-    directories+=( "${directory#"$store"/}" )
-  done
-
+  directories=( "${(@)directories#"$store"/}" )
   (( $#directories )) || return 1
   _wanted store-directories expl 'store directory' \
     compadd -S / "$@" -a directories
@@ -78,6 +60,7 @@ if (( CURRENT > 2 )); then
   case "${words[2]}" in
     show|add|edit|generate|reencrypt|mv|rm|git)
       command="${words[2]}"
+      curcontext="${curcontext%:*:*}:pass-$command:"
       words=( "${words[1]}" "${(@)words[3,-1]}" )
       (( CURRENT-- ))
       ;;
@@ -128,14 +111,13 @@ case "$command" in
     ;;
 
   git)
-    # Give Git's own completion the store as its working directory.
-    words=(
-      git
-      -C
-      "${PASSAGE_DIR:-$HOME/.passage/store}"
-      "${(@)words[2,-1]}"
-    )
-    (( CURRENT += 2 ))
+    # _git completes Git only when $service is git, otherwise it calls _$service.
+    # It also expects the Git subcommand in words[2], so the store is passed via
+    # the environment rather than as -C, which _git would not apply anyway.
+    local service=git
+    local -x GIT_DIR="${PASSAGE_DIR:-$HOME/.passage/store}/.git"
+    local -x GIT_WORK_TREE="${PASSAGE_DIR:-$HOME/.passage/store}"
+    words[1]=git
     _git && ret=0
     ;;
 esac
