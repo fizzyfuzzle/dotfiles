@@ -1,0 +1,97 @@
+#compdef luks luks2
+# vim: filetype=zsh
+
+# Completion lists files, and block devices from lsblk and losetup. It never
+# runs luks, decrypts a key or needs root. Only removable or hotplugged devices
+# are offered, so the system's own LUKS disks do not show up.
+
+# Unopened LUKS devices on removable media, such as a microSD card.
+# Rows are split one at a time: lsblk leaves an empty FSTYPE out of the line.
+_luks_devices() {
+  local -a devices expl f
+  local row
+  for row in ${(f)"$(_call_program luks-devices lsblk -nrpo PATH,RM,HOTPLUG,FSTYPE 2>/dev/null)"}; do
+    f=( ${=row} )
+    [[ $f[4] == crypto_LUKS && ( $f[2] == 1 || $f[3] == 1 ) ]] || continue
+    [[ -z ${(M)${(f)"$(lsblk -nrpo TYPE -- $f[1] 2>/dev/null)"}:#crypt} ]] && devices+=( $f[1] )
+  done
+  (( $#devices )) || return 1
+  _wanted luks-devices expl 'LUKS device' compadd "$@" -a devices
+}
+
+# What close can close: a container file whose loop device is unlocked, or an
+# unlocked removable device.
+_luks_open_targets() {
+  local -a targets expl f
+  local row file
+  for row in ${(f)"$(_call_program luks-open lsblk -nrpo TYPE,PKNAME 2>/dev/null)"}; do
+    f=( ${=row} )
+    [[ $f[1] == crypt && -n $f[2] ]] || continue
+    if [[ $f[2] == /dev/loop* ]]; then
+      file=$(_call_program luks-loops losetup --list -nO BACK-FILE -- $f[2] 2>/dev/null)
+      [[ -n $file ]] && targets+=( $file )
+    elif [[ $(lsblk -dnro RM,HOTPLUG -- $f[2] 2>/dev/null) == *1* ]]; then
+      targets+=( $f[2] )
+    fi
+  done
+  (( $#targets )) || return 1
+  _wanted luks-open expl 'open container or device' compadd "$@" -a targets
+}
+
+_luks_targets() {
+  _alternative 'files:container file:_files' 'devices:LUKS device:_luks_devices'
+}
+
+_luks_keys() { _files -g '*.(age|key)(-.)' }
+
+_luks_images() { _files -g '*.(#i)(jpg|jpeg)(-.)' }
+
+local curcontext="$curcontext"
+local ret=1
+local -a commands
+
+commands=(
+  'dig:create a container file of random data'
+  'forge:create an age-encrypted key file'
+  'lock:format a container file or device with LUKS2 and ext4'
+  'open:unlock and mount a container file or device'
+  'close:unmount and lock a container file or device'
+  'header-backup:save the LUKS header of a container file or device'
+  'bury:hide a key file in a JPEG image'
+  'exhume:extract a key file from a JPEG image'
+  'help:show usage'
+)
+
+if (( CURRENT == 2 )); then
+  _describe -t commands 'luks command' commands && ret=0
+  return ret
+fi
+
+# Remove the subcommand from the argument view, so positions count from 1.
+local command="${words[2]}"
+curcontext="${curcontext%:*:*}:luks-$command:"
+words=( "${words[1]}" "${(@)words[3,-1]}" )
+(( CURRENT-- ))
+
+case "$command" in
+  dig)
+    _arguments '1:new container file:_files' '2:size in MiB (default 100):' && ret=0 ;;
+  forge)
+    _arguments '1:new key file:_files' && ret=0 ;;
+  lock)
+    # Devices are not offered here: lock destroys what is on the target.
+    _arguments '1:container file or device:_files' '2:key file:_luks_keys' \
+      '3:filesystem label (default LUKS):' && ret=0 ;;
+  open)
+    _arguments '1:container file or device:_luks_targets' '2:key file:_luks_keys' && ret=0 ;;
+  close)
+    _arguments '1:open container or device:_luks_open_targets' && ret=0 ;;
+  header-backup)
+    _arguments '1:container file or device:_luks_targets' '2:new backup file:_files' && ret=0 ;;
+  bury)
+    _arguments '1:key file:_luks_keys' '2:JPEG image:_luks_images' && ret=0 ;;
+  exhume)
+    _arguments '1:JPEG image:_luks_images' '2:new key file:_files' && ret=0 ;;
+esac
+
+return ret
